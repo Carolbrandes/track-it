@@ -1,36 +1,35 @@
-import User from '@/models/User';
+import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 
 export async function POST(req: Request) {
     await dbConnect();
     const { email } = await req.json();
 
-    // Generate a 6-digit verification code
+    // Gerar código de verificação
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     console.log('Generated verification code:', code); // Debugging
 
-    // Check if the user exists, or create a new user
     let user = await User.findOne({ email });
 
     if (!user) {
-        console.log('User does not exist. Creating a new user...'); // Debugging
+        console.log('User does not exist. Creating a new user...');
         user = await User.create({
             email,
-            verificationCode: code, // Save the verification code
-            selectedTheme: 'light', // Default theme
-            currencyId: 'USD', // Default currency
+            verificationCode: code, // Código de verificação
+            selectedTheme: 'light',
+            currencyId: new mongoose.Types.ObjectId('67e12322a2f7b8353bceb3f6'), // Dólar Americano como moeda padrão
         });
     } else {
-        // Update the verification code for existing users
-        user.verificationCode = code;
+        user.verificationCode = code;  // Atualiza o código de verificação
         await user.save();
     }
 
-    console.log('User after update/creation:', user); // Debugging
+    console.log('User after update/creation:', user);
 
-    // Send the code via email
+    // Enviar o código por e-mail
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
