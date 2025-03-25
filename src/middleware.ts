@@ -9,13 +9,11 @@ export function middleware(request: NextRequest) {
 
     // Redirect unauthenticated users to /login
     if (!authToken && protectedRoutes.includes(request.nextUrl.pathname)) {
-        console.log("Redirect unauthenticated users to /login")
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
     // Redirect authenticated users away from /login
     if (authToken && request.nextUrl.pathname === '/login') {
-        console.log("Redirect authenticated users away from /login")
         return NextResponse.redirect(new URL('/', request.url));
     }
 

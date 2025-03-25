@@ -5,19 +5,19 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
-    font-weight: 400; // Default weight
+    font-weight: 400; 
     background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
   }
 
   h1, h2, h3 {
-    font-weight: 700; // Bold for headings
+    font-weight: 700;
   }
 
   a {
     text-decoration: none;
     color: inherit;
-    font-weight: 500; // Medium for links
+    font-weight: 500;
   }
 
   * {

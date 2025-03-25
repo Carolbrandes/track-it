@@ -8,28 +8,27 @@ export async function POST(req: Request) {
     await dbConnect();
     const { email } = await req.json();
 
-    // Gerar código de verificação
+    // generate code verification
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('Generated verification code:', code); // Debugging
+
 
     let user = await User.findOne({ email });
 
     if (!user) {
-        console.log('User does not exist. Creating a new user...');
         user = await User.create({
             email,
-            verificationCode: code, // Código de verificação
+            verificationCode: code,
             selectedTheme: 'light',
-            currencyId: new mongoose.Types.ObjectId('67e12322a2f7b8353bceb3f6'), // Dólar Americano como moeda padrão
+            currencyId: new mongoose.Types.ObjectId('67e12322a2f7b8353bceb3f6'),
         });
     } else {
-        user.verificationCode = code;  // Atualiza o código de verificação
+        user.verificationCode = code;
         await user.save();
     }
 
-    console.log('User after update/creation:', user);
 
-    // Enviar o código por e-mail
+
+
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {

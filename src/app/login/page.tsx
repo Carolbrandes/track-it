@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { TbPigMoney } from "react-icons/tb";
 import { Spinner } from '../components/Spinner';
-import * as S from './styles'; // Importando o arquivo de estilos
+import * as S from './styles';
 
 export default function Login() {
     const [email, setEmail] = useState('');

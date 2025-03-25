@@ -25,15 +25,14 @@ if (!cached) {
 
 async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
-        console.log("🚀 Conexão reutilizada!");
         return cached.conn;
     }
 
-    console.log("🚀 Criando nova conexão...");
-    await mongoose.disconnect(); // Fecha conexões antigas
+
+    await mongoose.disconnect();
 
     cached.conn = await mongoose.connect(MONGODB_URI!, { bufferCommands: false });
-    console.log("🚀 Conectado ao MongoDB!");
+
 
     return cached.conn;
 }

@@ -8,10 +8,9 @@ export async function GET(request: Request) {
 
     // Extract the authToken from cookies
     const authToken = (await cookies()).get('authToken')?.value;
-    console.log("🔹 authToken:", authToken);
+
 
     if (!authToken) {
-        console.log("❌ authToken não encontrado!");
         return NextResponse.json(
             { success: false, message: 'Unauthorized' },
             { status: 401 }
@@ -20,10 +19,9 @@ export async function GET(request: Request) {
 
     // Find the user by their ID (stored in authToken)
     const user = await User.findById(authToken);
-    console.log("🔹 Usuário encontrado:", user);
+
 
     if (!user) {
-        console.log("❌ Usuário não encontrado!");
         return NextResponse.json(
             { success: false, message: 'User not found' },
             { status: 404 }

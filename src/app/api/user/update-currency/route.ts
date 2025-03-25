@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, user });
     } catch (error) {
-        console.log("🚀 ~ POST ~ update currency error:", error)
+        console.error("🚀 ~ POST ~ update currency error:", error)
         return NextResponse.json({ success: false, message: 'Failed to update currency' }, { status: 500 });
     }
 }

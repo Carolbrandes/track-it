@@ -14,8 +14,8 @@ async function fetchUserData() {
 
 export function useUserData() {
     return useQuery({
-        queryKey: ['user'], // Unique key for the query
-        queryFn: fetchUserData, // Function to fetch data
+        queryKey: ['user'],
+        queryFn: fetchUserData,
         staleTime: 1000 * 60 * 5, // Data is considered fresh for 5 minutes
         retry: 1, // Retry once if the query fails
     });

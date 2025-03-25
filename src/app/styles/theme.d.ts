@@ -1,4 +1,3 @@
-// src/styles/theme.d.ts
 import 'styled-components';
 
 declare module 'styled-components' {
@@ -8,7 +7,7 @@ declare module 'styled-components' {
             text: string;
             primary: string;
             hover: string;
-            secondary: string; // Adicionando a variável 'secondary' aqui
+            secondary: string;
         };
     }
 }

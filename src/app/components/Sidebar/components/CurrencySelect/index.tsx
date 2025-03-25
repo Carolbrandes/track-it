@@ -14,7 +14,7 @@ export const CurrencySelect = () => {
     const [currencies, setCurrencies] = useState<CurrencyProps[]>([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
 
-    // Fetch currencies from the API
+
     useEffect(() => {
         const fetchCurrencies = async () => {
             try {
@@ -23,7 +23,7 @@ export const CurrencySelect = () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log("🚀 ~ fetchCurrencies ~ data:", data); // Log the API response
+
                 if (data.success) {
                     setCurrencies(data.currencies);
                     const defaultCurrency = data.currencies.find((currency: any) => currency.code === 'USO');
@@ -39,19 +39,18 @@ export const CurrencySelect = () => {
         fetchCurrencies();
     }, []);
 
-    // Handle currency selection change
     const handleCurrencyChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newCurrencyId = event.target.value;
         setSelectedCurrency(newCurrencyId);
 
-        // Save the selected currency to the user's profile
+
         try {
             const response = await fetch('/api/user/update-currency', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email: 'user@example.com', currencyId: newCurrencyId }), // Replace with the actual user email
+                body: JSON.stringify({ email: 'user@example.com', currencyId: newCurrencyId }),
             });
             const data = await response.json();
             if (!data.success) {

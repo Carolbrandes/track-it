@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
         const data = await res.json();
-        console.log("🚀 ~ checkAuth ~ data:", data)
+
         setIsLoggedIn(data.isLoggedIn);
       } catch (error) {
         console.error('Erro ao verificar login:', error);
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     checkAuth();
   }, []);
 
-  // Toggle theme
+
   const toggleTheme = () => {
     const newTheme = theme === lightTheme ? darkTheme : lightTheme;
     setTheme(newTheme);
@@ -48,7 +48,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GlobalStyle />
           <QueryClientProvider client={queryClient}>
             <div style={{ display: 'flex' }}>
-              {/* Renderizar a Sidebar apenas se o usuário estiver logado */}
               {isLoggedIn && <Sidebar toggleTheme={toggleTheme} />}
               <div style={{ flex: 1 }}>{children}</div>
             </div>

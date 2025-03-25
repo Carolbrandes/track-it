@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-// Container principal da página (centrando todo o conteúdo)
+
 export const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@ export const LoginHeader = styled.header`
    }
 `
 
-// Caixa de login (onde fica o título e os campos)
+
 export const LoginBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -33,14 +33,13 @@ export const LoginBox = styled.div`
   max-width: 400px;
 `;
 
-// Estilo do título de login
 export const Title = styled.h1`
   font-size: 24px;
   color: ${(props) => props.theme.colors.background};
   margin-bottom: 20px;
 `;
 
-// Estilo do input
+
 export const Input = styled.input`
   width: 100%;
   padding: 10px;
@@ -56,7 +55,6 @@ export const Input = styled.input`
   }
 `;
 
-// Estilo do botão
 export const Button = styled.button`
   width: 100%;
   padding: 10px;
