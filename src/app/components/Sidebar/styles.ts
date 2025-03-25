@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const SidebarContainer = styled.div`
   width: 250px;
-  height: 100vh;
+  min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
   padding: 20px;
