@@ -1,12 +1,12 @@
 import styled from "styled-components";
 
 export const CurrencySelect = styled.div`
-    display: 'flex';
+    display: flex;
     align-items: center;
 
     select{
         max-width: 11rem;
-        margin-left: 1rem; 
+        margin-left: 0.5rem; 
         padding: 0.5rem; 
         border-radius: 5px; 
         border: 1px solid #ccc;
