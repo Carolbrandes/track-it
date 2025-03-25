@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
     const authToken = request.cookies.get('authToken');
 
     // Define routes that require authentication
-    const protectedRoutes = ['/', '/transactions', '/categories', '/graphics'];
+    const protectedRoutes = ['/', '/transactions', '/add-transaction', '/categories', 'add-category', '/graphics'];
 
     // Redirect unauthenticated users to /login
     if (!authToken && protectedRoutes.includes(request.nextUrl.pathname)) {

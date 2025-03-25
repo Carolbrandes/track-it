@@ -2,12 +2,12 @@
 
 // import * as S from './style';
 
-const Transactions = () => {
+const AddTransaction = () => {
     return (
         <div>
-            transactions
+            add transaction
         </div>
     );
 };
 
-export default Transactions
+export default AddTransaction
