@@ -1,40 +1,53 @@
-import User from '@/models/User';
-import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose'; // Usando jose (Edge-compatible)
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import User from '../../../models/User';
 import dbConnect from '../../lib/db';
 
-export async function GET(request: Request) {
-    await dbConnect();
+export async function GET() {
+    try {
+        await dbConnect();
 
-    // Extract the authToken from cookies
-    const authToken = (await cookies()).get('authToken')?.value;
+        // Método mais robusto para obter cookies
+
+        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0]
 
 
-    if (!authToken) {
+        if (!authToken) {
+            return NextResponse.json(
+                { success: false, message: 'Token não encontrado' },
+                { status: 401 }
+            );
+        }
+
+        const { payload } = await jwtVerify(
+            authToken,
+            new TextEncoder().encode(process.env.JWT_SECRET!)
+        );
+
+        const user = await User.findById(payload.userId);
+
+        if (!user) {
+            return NextResponse.json(
+                { success: false, message: 'Usuário não encontrado' },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json({
+            success: true,
+            user: {
+                email: user.email,
+                selectedTheme: user.selectedTheme,
+                currencyId: user.currencyId
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro na rota /api/user:', error);
         return NextResponse.json(
-            { success: false, message: 'Unauthorized' },
-            { status: 401 }
+            { success: false, message: 'Erro interno do servidor' },
+            { status: 500 }
         );
     }
-
-    // Find the user by their ID (stored in authToken)
-    const user = await User.findById(authToken);
-
-
-    if (!user) {
-        return NextResponse.json(
-            { success: false, message: 'User not found' },
-            { status: 404 }
-        );
-    }
-
-    // Return the user data (excluding sensitive fields like verificationCode)
-    return NextResponse.json({
-        success: true,
-        user: {
-            email: user.email,
-            selectedTheme: user.selectedTheme,
-            currencyId: user.currencyId,
-        },
-    });
 }
