@@ -1,16 +1,17 @@
+// src > app > api > auth > send-code
+
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 
-export async function POST(req: Request) {
+export async function POST(req) {
     await dbConnect();
     const { email } = await req.json();
 
-    // generate code verification
+    // Gerar código de verificação
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-
 
     let user = await User.findOne({ email });
 
@@ -26,9 +27,6 @@ export async function POST(req: Request) {
         await user.save();
     }
 
-
-
-
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -40,8 +38,8 @@ export async function POST(req: Request) {
     await transporter.sendMail({
         from: `"Track It" <${process.env.EMAIL_USER}>`,
         to: email,
-        subject: 'Your Verification Code',
-        text: `Your verification code is ${code}.`,
+        subject: 'Seu Código de Verificação',
+        text: `Seu código de verificação é ${code}.`,
     });
 
     return NextResponse.json({ success: true });

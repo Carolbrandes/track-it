@@ -57,6 +57,7 @@ export const Input = styled.input`
 
 export const Button = styled.button`
   width: 100%;
+  height: 2.5rem;
   padding: 10px;
   border-radius: 8px;
   background-color:  ${(props) => props.theme.colors.secondary};

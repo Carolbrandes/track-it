@@ -1,23 +1,38 @@
+import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 
-export async function GET(req: Request) {
+export async function GET(req) {
     await dbConnect();
 
-    // 🔥 get token o request
-    const authToken = req.headers.get('cookie')?.split('; ').find(c => c.startsWith('authToken='))?.split('=')[1];
+    // Pegar o token do cookie
+    const token = req.cookies.get('authToken');
+    console.log("🚀 ~ GET ~ token:", token)
 
-    if (!authToken) {
+    if (!token) {
         return NextResponse.json({ isLoggedIn: false }, { status: 401 });
     }
 
-    // 🔎 search for user in db
-    const user = await User.findById(authToken);
+    try {
+        // Verificar o token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as jwt.JwtPayload; // Assegura que decoded é um JwtPayload
+        console.log("🚀 ~ GET ~ decoded:", decoded)
 
-    if (!user) {
-        return NextResponse.json({ isLoggedIn: false }, { status: 401 });
+        // Verificar se a propriedade userId existe
+        if (!decoded.userId) {
+            return NextResponse.json({ isLoggedIn: false }, { status: 401 });
+        }
+
+        const user = await User.findById(decoded.userId).select('-verificationCode');
+        console.log("🚀 ~ GET ~ user:", user)
+
+        if (!user) {
+            return NextResponse.json({ isLoggedIn: false }, { status: 401 });
+        }
+
+        return NextResponse.json({ isLoggedIn: true, user });
+    } catch (error) {
+        return NextResponse.json({ isLoggedIn: false, message: 'Token inválido' }, { status: 401 });
     }
-
-    return NextResponse.json({ isLoggedIn: true, user });
 }

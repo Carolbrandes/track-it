@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { TbPigMoney } from "react-icons/tb";
 import { Spinner } from '../components/Spinner';
@@ -11,7 +10,7 @@ export default function Login() {
     const [code, setCode] = useState('');
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter();
+
 
     const handleSendCode = async () => {
         try {
@@ -34,14 +33,29 @@ export default function Login() {
         }
     };
 
+
     const handleVerifyCode = async () => {
-        const res = await fetch('/api/auth/verify-code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code }),
-        });
-        if (res.ok) {
-            router.push('/');
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/auth/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code }),
+                credentials: 'include' // Importante para cookies
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Forçar recarregamento completo para garantir que o middleware processe o cookie
+                window.location.href = '/';
+            } else {
+                alert(data.message || 'Erro ao verificar código.');
+            }
+        } catch (error) {
+            console.error('Erro ao verificar código:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 

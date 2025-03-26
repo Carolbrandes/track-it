@@ -2,7 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { Sidebar } from './components/Sidebar';
 import { GlobalStyle } from './styles/global';
@@ -12,24 +13,9 @@ const queryClient = new QueryClient();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState(lightTheme);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/me', { credentials: 'include' });
-        const data = await res.json();
-
-        setIsLoggedIn(data.isLoggedIn);
-      } catch (error) {
-        console.error('Erro ao verificar login:', error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
+  const isLoginPage = pathname.includes("login")
 
   const toggleTheme = () => {
     const newTheme = theme === lightTheme ? darkTheme : lightTheme;
@@ -48,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GlobalStyle />
           <QueryClientProvider client={queryClient}>
             <div style={{ display: 'flex' }}>
-              {isLoggedIn && <Sidebar toggleTheme={toggleTheme} />}
+              {!isLoginPage && <Sidebar toggleTheme={toggleTheme} />}
               <div style={{ flex: 1 }}>{children}</div>
             </div>
           </QueryClientProvider>

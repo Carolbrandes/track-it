@@ -1,35 +1,57 @@
-import User from '@/models/User';
+import { SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
+import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
-
 
 export async function POST(req: Request) {
     await dbConnect();
-
     const { email, code } = await req.json();
 
     if (!email || !code) {
-        return NextResponse.json({ success: false, message: 'Email e código são obrigatórios' }, { status: 400 });
+        return NextResponse.json(
+            { success: false, message: 'Email e código são obrigatórios' },
+            { status: 400 }
+        );
     }
 
     const user = await User.findOne({ email });
-
-    if (!user || user.verificationCode !== code) {
-        return NextResponse.json({ success: false, message: 'Código inválido' }, { status: 400 });
+    if (!user) {
+        return NextResponse.json(
+            { success: false, message: 'Usuário não encontrado' },
+            { status: 400 }
+        );
     }
 
+    if (String(user.verificationCode) !== String(code)) {
+        return NextResponse.json(
+            { success: false, message: 'Código inválido' },
+            { status: 400 }
+        );
+    }
 
-    user.verificationCode = undefined;
-    await user.save();
+    // Remover código de verificação
+    await User.findByIdAndUpdate(user._id, { $unset: { verificationCode: 1 } });
 
-    const response = NextResponse.json({ success: true });
+    // Gerar JWT
+    const token = await new SignJWT({ userId: user._id.toString() })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setExpirationTime('7d')
+        .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
 
+    // Configurar resposta
+    const response = NextResponse.json(
+        { success: true },
+        { status: 200 }
+    );
 
-    response.cookies.set('authToken', user._id.toString(), {
+    // Configurar cookie
+    response.cookies.set({
+        name: 'authToken',
+        value: token,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 24 * 7, // 1 week
+        sameSite: 'lax', // Mais compatível que 'strict'
+        maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
 
