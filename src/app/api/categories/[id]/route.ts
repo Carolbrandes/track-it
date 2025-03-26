@@ -9,9 +9,9 @@ export async function PUT(
     try {
         await dbConnect();
         const { name } = await request.json();
-        const { id } = params;
+        const { id } = await params; // Adicionado await aqui
 
-        // Check if new name already exists
+        // Verifica se o nome já existe
         const existingCategory = await Category.findOne({ name, _id: { $ne: id } });
         if (existingCategory) {
             return NextResponse.json(
@@ -39,15 +39,13 @@ export async function PUT(
     }
 }
 
-
-
 export async function DELETE(
     request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
         await dbConnect();
-        const { id } = params;
+        const { id } = await params; // Adicionado await aqui
 
         const deletedCategory = await Category.findByIdAndDelete(id);
 
