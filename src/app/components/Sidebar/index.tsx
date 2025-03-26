@@ -23,7 +23,6 @@ export const Sidebar = ({ toggleTheme }: SidebarProps) => {
             <S.NavLink href="/transactions">Transactions</S.NavLink>
             <S.NavLink href="/add-transaction">Add Transaction</S.NavLink>
             <S.NavLink href="/categories">Categories</S.NavLink>
-            <S.NavLink href="/add-category">Add Category</S.NavLink>
             <S.NavLink href="/graphics">Graphics</S.NavLink>
 
             <S.UserSection>
