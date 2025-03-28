@@ -9,8 +9,10 @@ declare module 'styled-components' {
             hover: string;
             secondary: string;
             secondaryDark: string;
+            secondary2: string
             danger: string;
             dangerDark: string;
+            border: string
         };
     }
 }
