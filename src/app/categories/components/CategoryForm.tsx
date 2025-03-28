@@ -1,10 +1,9 @@
-// components/CategoryForm.tsx
 'use client';
 
 import { useState } from 'react';
 import * as S from '../styles';
 
-export default function CategoryForm({ onAdd }: { onAdd: (category: any) => void }) {
+export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void }) {
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,21 +14,7 @@ export default function CategoryForm({ onAdd }: { onAdd: (category: any) => void
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('/api/categories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to add category');
-            }
-
-            const newCategory = await response.json();
-            onAdd(newCategory);
+            onAdd(name); // Just pass the name to the parent component
             setName('');
         } catch (err: any) {
             setError(err.message);

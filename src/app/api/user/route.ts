@@ -1,4 +1,4 @@
-import { jwtVerify } from 'jose'; // Usando jose (Edge-compatible)
+import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import User from '../../../models/User';
@@ -8,10 +8,8 @@ export async function GET() {
     try {
         await dbConnect();
 
-        // Método mais robusto para obter cookies
 
-        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0]
-
+        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
         if (!authToken) {
             return NextResponse.json(
@@ -37,6 +35,7 @@ export async function GET() {
         return NextResponse.json({
             success: true,
             user: {
+                id: user._id.toString(),
                 email: user.email,
                 selectedTheme: user.selectedTheme,
                 currencyId: user.currencyId

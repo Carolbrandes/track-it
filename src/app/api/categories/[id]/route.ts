@@ -1,3 +1,5 @@
+import { jwtVerify } from 'jose';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Category from '../../../../models/Category';
 import dbConnect from '../../../lib/db';
@@ -8,55 +10,74 @@ export async function PUT(
 ) {
     try {
         await dbConnect();
+
+        const id = params.id;
+
+        if (!id) {
+            return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
+        }
+
         const { name } = await request.json();
-        const { id } = await params; // Adicionado await aqui
 
-        // Verifica se o nome já existe
-        const existingCategory = await Category.findOne({ name, _id: { $ne: id } });
+        if (!name) {
+            return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
+        }
+
+        const authToken = headers().get('cookie')?.split('authToken=')[1]?.split(';')[0];
+
+        if (!authToken) {
+            return NextResponse.json({ error: 'Token not found' }, { status: 401 });
+        }
+
+        const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
+        const userId = payload.userId;
+
+        const category = await Category.findOne({ _id: id, userId });
+        if (!category) {
+            return NextResponse.json({ error: 'Category not found or does not belong to user' }, { status: 404 });
+        }
+
+        const existingCategory = await Category.findOne({ name, userId, _id: { $ne: id } });
         if (existingCategory) {
-            return NextResponse.json(
-                { error: 'Category name already exists' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'Category name already exists' }, { status: 400 });
         }
 
-        const updatedCategory = await Category.findByIdAndUpdate(
-            id,
-            { name },
-            { new: true }
-        );
+        category.name = name;
+        await category.save();
 
-        if (!updatedCategory) {
-            return NextResponse.json(
-                { error: 'Category not found' },
-                { status: 404 }
-            );
-        }
-
-        return NextResponse.json(updatedCategory);
+        return NextResponse.json(category);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
         await dbConnect();
-        const { id } = await params; // Adicionado await aqui
+        const { id } = await params;
 
-        const deletedCategory = await Category.findByIdAndDelete(id);
+        // Obtém o token de autenticação do cookie
+        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
-        if (!deletedCategory) {
-            return NextResponse.json(
-                { error: 'Category not found' },
-                { status: 404 }
-            );
+        if (!authToken) {
+            return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
         }
 
-        return NextResponse.json({ message: 'Category deleted successfully' });
+        // Verifica o JWT e obtém o payload
+        const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
+        const userId = payload.userId; // Obtém o userId do payload
+
+        // Verifica se a categoria existe e pertence ao usuário
+        const category = await Category.findOne({ _id: id, userId });
+        if (!category) {
+            return NextResponse.json({ error: 'Categoria não encontrada ou não pertence ao usuário' }, { status: 404 });
+        }
+
+        // Deleta a categoria
+        await Category.findByIdAndDelete(id);
+
+        return NextResponse.json({ message: 'Categoria deletada com sucesso' });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

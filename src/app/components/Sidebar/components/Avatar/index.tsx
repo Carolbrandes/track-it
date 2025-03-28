@@ -4,6 +4,7 @@ import * as S from './styles';
 
 export const Avatar = () => {
     const { data, isLoading, isError } = useUserData();
+    console.log("🚀 ~ Avatar ~ data:", data)
 
     if (isLoading) {
         return <div>Loading...</div>;

@@ -1,20 +1,22 @@
 'use client';
 
+import { useCategories } from '@/app/hooks/useCategories';
+import { useUserData } from '@/app/hooks/useUserData';
 import { useState } from 'react';
 import * as S from '../styles';
 
 export default function CategoryList({
-    categories,
-    onUpdate,
-    onDelete,
+    categories
 }: {
-    categories: any[];
-    onUpdate: (category: any) => void;
-    onDelete: (id: string) => void;
+    categories: any[]
 }) {
+    console.log("🚀 ~ categories:", categories)
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const { data: userData } = useUserData()
+    const { updateCategory,
+        deleteCategory, } = useCategories(userData?.user?.id)
 
     const handleEdit = (category: any) => {
         setEditingId(category._id);
@@ -26,46 +28,27 @@ export default function CategoryList({
         setEditName('');
     };
 
-    const handleUpdate = async (id: string) => {
+    const handleUpdateCategory = async ({ id, name }: { id: string; name: string }) => {
         try {
-            const response = await fetch(`/api/categories/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: editName }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to update category');
-            }
-
-            const updatedCategory = await response.json();
-            onUpdate(updatedCategory);
+            await updateCategory(id, name);
             setEditingId(null);
-        } catch (err: any) {
-            setError(err.message);
+            setEditName('');
+        } catch (error) {
+            console.error("Update error:", error);
+            setError('Error updating category');
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this category?')) return;
-
+    const handleDeleteCategory = (id: string) => {
         try {
-            const response = await fetch(`/api/categories/${id}`, {
-                method: 'DELETE',
-            });
+            deleteCategory(id);
 
-            if (!response.ok) {
-                throw new Error('Failed to delete category');
-            }
-
-            onDelete(id);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (error) {
+            console.error("🚀 ~ handleDeleteCategory ~ error:", error)
+            setError('Ocurred an error on delete category')
         }
     };
+
 
     return (
         <S.ListContainer>
@@ -87,7 +70,10 @@ export default function CategoryList({
                                     <S.ButtonGroup>
                                         <S.Button
                                             $small
-                                            onClick={() => handleUpdate(category._id)}
+                                            onClick={() => handleUpdateCategory({
+                                                id: category._id,
+                                                name: editName,
+                                            })}
                                         >
                                             Save
                                         </S.Button>
@@ -113,7 +99,7 @@ export default function CategoryList({
                                         <S.Button
                                             $small
                                             $danger
-                                            onClick={() => handleDelete(category._id)}
+                                            onClick={() => handleDeleteCategory(category._id)}
                                         >
                                             Delete
                                         </S.Button>
