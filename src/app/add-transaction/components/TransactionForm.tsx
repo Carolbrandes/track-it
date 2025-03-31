@@ -1,10 +1,10 @@
-// app/transactions/components/TransactionForm.tsx
 'use client';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Form, { FormField } from '../../components/Form';
 import { useCategories } from '../../hooks/useCategories';
 import { useUserData } from '../../hooks/useUserData';
+import * as S from '../styles';
 
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) => void }) {
     const { data: userData } = useUserData();
@@ -18,17 +18,29 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
     const [categoryId, setCategoryId] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+    // Set default category when categories load
+    useEffect(() => {
+        if (categories.length > 0 && !categoryId) {
+            setCategoryId(categories[0]._id); // Set first category as default
+        }
+    }, [categories]);
 
     const handleAmountChange = (value: string) => {
-        const numericValue = value.replace(/\D/g, '');
-        setAmount(numericValue ? (Number(numericValue) / 100).toFixed(2) : '');
+        const numericValue = value.replace(/[^0-9.]/g, '');
+        if (/^\d*\.?\d{0,2}$/.test(numericValue)) {
+            setAmount(numericValue);
+        }
     };
 
     const handleSubmit = async () => {
         setError(null);
         setIsSubmitting(true);
+        setSuccessMsg(null);
 
         try {
+            // Validate all fields including category
             if (!description || !amount || !date || !categoryId) {
                 throw new Error('All fields are required');
             }
@@ -42,10 +54,14 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
                 category: categoryId
             });
 
-            // Reset form
+            setSuccessMsg('Transaction successfully registered!');
+
+            // Reset form but keep the last category selected
             setDescription('');
             setAmount('');
-            setCategoryId('');
+            setType('expense');
+
+            setTimeout(() => setSuccessMsg(null), 3000);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -56,23 +72,25 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
     const fields: FormField[] = [
         {
             label: 'Description',
-            type: 'text' as const,
+            type: 'text',
             name: 'description',
             value: description,
             onChange: setDescription,
-            required: true
+            required: true,
+            placeholder: 'e.g. Salary, Groceries'
         },
         {
             label: 'Amount',
-            type: 'text' as const, // Or 'number' if you prefer
+            type: 'text',
             name: 'amount',
-            value: amount ? `$${amount}` : '',
+            value: amount,
             onChange: handleAmountChange,
-            required: true
+            required: true,
+            placeholder: '0.00'
         },
         {
             label: 'Currency',
-            type: 'select' as const,
+            type: 'select',
             name: 'currency',
             value: currency,
             onChange: setCurrency,
@@ -85,7 +103,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
         },
         {
             label: 'Date',
-            type: 'date' as const,
+            type: 'date',
             name: 'date',
             value: date,
             onChange: setDate,
@@ -93,7 +111,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
         },
         {
             label: 'Type',
-            type: 'radio-group' as const,
+            type: 'radio-group',
             name: 'type',
             value: type,
             onChange: setType,
@@ -105,7 +123,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
         },
         {
             label: 'Category',
-            type: 'select' as const,
+            type: 'select',
             name: 'category',
             value: categoryId,
             onChange: setCategoryId,
@@ -117,14 +135,20 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
         }
     ];
 
-
     return (
-        <Form
-            fields={fields}
-            onSubmit={handleSubmit}
-            submitText={isSubmitting ? 'Adding...' : 'Add Transaction'}
-            isSubmitting={isSubmitting}
-            error={error}
-        />
+        <>
+            <Form
+                fields={fields}
+                onSubmit={handleSubmit}
+                submitText={isSubmitting ? 'Adding...' : 'Add Transaction'}
+                isSubmitting={isSubmitting}
+                error={error}
+            />
+
+            {successMsg && <S.SuccessMessage>
+                {successMsg}
+            </S.SuccessMessage>}
+        </>
+
     );
 }

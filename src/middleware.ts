@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
     console.log(`🚀 ~ middleware ~ Rota: ${pathname}, Token: ${token ? 'presente' : 'ausente'}`);
 
-    const protectedRoutes = ['/', '/transactions', '/add-transaction', '/categories', '/graphics'];
+    const protectedRoutes = ['/', '/add-transaction', '/categories', '/graphics'];
 
     if (protectedRoutes.includes(pathname)) {
         if (!token) {
@@ -53,7 +53,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/',
-        '/transactions',
         '/categories',
         '/graphics',
     ],

@@ -1,6 +1,6 @@
 // components/Form.tsx
 'use client';
-import * as S from './styles';
+import * as S from '../../styles/shared';
 
 export type FieldType = 'text' | 'number' | 'date' | 'select' | 'radio-group';
 

@@ -22,7 +22,6 @@ export default function AddTransaction() {
 
     return (
         <S.PageContainer>
-            <S.Title>Manage Transactions</S.Title>
 
             {isError && <S.ErrorMessage>{error?.message}</S.ErrorMessage>}
 

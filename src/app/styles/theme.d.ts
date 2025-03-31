@@ -13,6 +13,7 @@ declare module 'styled-components' {
             danger: string;
             dangerDark: string;
             border: string
+            successLight: string
         };
     }
 }

@@ -1,5 +1,74 @@
-// components/styles.ts
+// styles/shared.ts
 import styled from 'styled-components';
+
+export const PageContainer = styled.div`
+  max-width: 1200px;
+  padding: 2rem;
+  
+`;
+
+export const Title = styled.h1`
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+export const Section = styled.section`
+  margin-bottom: 3rem;
+  
+`;
+
+export const SectionTitle = styled.h2`
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+export const LoadingIndicator = styled.div`
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const ErrorMessage = styled.div`
+  color: ${({ theme }) => theme.colors.danger};
+  background-color: ${({ theme }) => theme.colors.dangerLight};
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.danger};
+`;
+
+// Add any other common styled components you use across multiple pages
+export const Button = styled.button<{
+  $primary?: boolean;
+  $danger?: boolean;
+  $disabled?: boolean;
+}>`
+  padding: 0.75rem 1.5rem;
+  background-color: ${({ $primary, $danger, theme }) =>
+    $danger ? theme.colors.danger :
+      $primary ? theme.colors.primary :
+        theme.colors.secondary};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${({ $disabled }) => ($disabled ? 0.7 : 1)};
+  transition: all 0.2s ease;
+  width: fit-content;
+  max-width: 10rem;
+
+  &:hover {
+    background-color: ${({ $primary, $danger, $disabled, theme }) =>
+    $disabled ?
+      ($danger ? theme.colors.danger : $primary ? theme.colors.primary : theme.colors.secondary) :
+      ($danger ? theme.colors.dangerDark :
+        $primary ? theme.colors.primaryDark :
+          theme.colors.secondaryDark)};
+  }
+`;
 
 export const Form = styled.form`
   display: flex;
@@ -23,35 +92,6 @@ export const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
-`;
-
-export const Button = styled.button<{
-  $primary?: boolean;
-  $small?: boolean;
-  $danger?: boolean;
-  $disabled?: boolean;
-}>`
-  padding: ${({ $small }) => ($small ? '0.5rem 1rem' : '0.75rem 1.5rem')};
-  background-color: ${({ $primary, $danger, theme }) =>
-    $danger ? theme.colors.danger :
-      $primary ? theme.colors.primary :
-        theme.colors.secondary};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
-  font-size: ${({ $small }) => ($small ? '0.875rem' : '1rem')};
-  transition: background-color 0.2s;
-  opacity: ${({ $disabled }) => ($disabled ? 0.7 : 1)};
-
-  &:hover {
-    background-color: ${({ $primary, $danger, $disabled, theme }) =>
-    $disabled ?
-      ($danger ? theme.colors.danger : $primary ? theme.colors.primary : theme.colors.secondary) :
-      ($danger ? theme.colors.dangerDark :
-        $primary ? theme.colors.primaryDark :
-          theme.colors.secondaryDark)};
-  }
 `;
 
 export const RadioGroup = styled.div`
@@ -81,11 +121,4 @@ export const RadioButton = styled.button<{ $active: boolean }>`
   &:active {
     transform: translateY(0);
   }
-`;
-export const ErrorMessage = styled.div`
-  color: ${({ theme }) => theme.colors.danger};
-  background-color: #ffebee;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
 `;

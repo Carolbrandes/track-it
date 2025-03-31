@@ -41,7 +41,7 @@ export const TransactionMeta = styled.div`
 export const TransactionAmount = styled.span<{ $type: 'income' | 'expense' }>`
   font-weight: bold;
   color: ${({ theme, $type }) =>
-        $type === 'income' ? theme.colors.success : theme.colors.danger};
+    $type === 'income' ? theme.colors.success : theme.colors.danger};
 `;
 
 export const RadioGroup = styled.div`
@@ -53,7 +53,7 @@ export const RadioGroup = styled.div`
 export const RadioButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-        $active ? theme.colors.primary : theme.colors.secondary};
+    $active ? theme.colors.primary : theme.colors.secondary};
   color: white;
   border: none;
   border-radius: 4px;
@@ -62,7 +62,7 @@ export const RadioButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-        $active ? theme.colors.primaryDark : theme.colors.secondaryDark};
+    $active ? theme.colors.primaryDark : theme.colors.secondaryDark};
   }
 `;
 
@@ -100,21 +100,34 @@ export const CategorySelect = styled.select`
 
 // Add to your theme if needed (in your global styles)
 declare module 'styled-components' {
-    export interface DefaultTheme {
-        colors: {
-            primary: string;
-            primaryDark: string;
-            secondary: string;
-            secondaryDark: string;
-            danger: string;
-            dangerDark: string;
-            success: string;
-            successDark: string;
-            text: string;
-            textSecondary: string;
-            background: string;
-            hover: string;
-            border: string;
-        };
-    }
+  export interface DefaultTheme {
+    colors: {
+      primary: string;
+      primaryDark: string;
+      secondary: string;
+      secondaryDark: string;
+      danger: string;
+      dangerDark: string;
+      success: string;
+      successDark: string;
+      text: string;
+      textSecondary: string;
+      background: string;
+      hover: string;
+      border: string;
+    };
+  }
 }
+
+export const SuccessMessage = styled.div`
+    color: ${({ theme }) => theme.colors.background};
+    background-color: ${({ theme }) => theme.colors.successLight};
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid ${({ theme }) => theme.colors.success};
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    width: fit-content;
+`;

@@ -4,7 +4,7 @@ async function fetchUserData() {
     const response = await fetch('/api/user', {
         credentials: 'include', // Include cookies in the request
     });
-    console.log("🚀 ~ fetchUserData ~ response:", response)
+
 
     if (!response.ok) {
         throw new Error('Failed to fetch user data');

@@ -9,7 +9,8 @@ export const lightTheme = {
         danger: '#e53935',
         dangerDark: '#c62828',
         hover: '#f0f0f0',
-        border: '#bdbdbd'
+        border: '#bdbdbd',
+        successLight: "green"
     },
 };
 
@@ -24,6 +25,7 @@ export const darkTheme = {
         hover: '#1e1e1e',
         danger: '#e53935',
         dangerDark: '#c62828',
-        border: '#bdbdbd'
+        border: '#bdbdbd',
+        successLight: "green"
     },
 };
