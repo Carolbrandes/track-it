@@ -58,11 +58,9 @@ export async function GET(request: Request) {
                 $lte: endUTC      // Less than or equal to end of the day
             };
 
-            console.log("🚀 ~ GET ~ filterQuery:", filterQuery)
+
         }
 
-
-        console.log("🚀 ~ GET ~ filterQuery:", filterQuery)
         const totalCount = await Transaction.countDocuments(filterQuery);
         const totalPages = Math.ceil(totalCount / limit);
 
@@ -72,7 +70,7 @@ export async function GET(request: Request) {
             .skip((page - 1) * limit)
             .limit(limit);
 
-        console.log("🚀 ~ GET ~ transactions:", transactions)
+
 
         return NextResponse.json({
             data: transactions,

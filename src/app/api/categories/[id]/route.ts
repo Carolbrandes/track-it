@@ -23,7 +23,7 @@ export async function PUT(
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
         }
 
-        const authToken = headers().get('cookie')?.split('authToken=')[1]?.split(';')[0];
+        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
         if (!authToken) {
             return NextResponse.json({ error: 'Token not found' }, { status: 401 });

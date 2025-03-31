@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Modal from './components/Modal';
 import { useCategories } from './hooks/useCategories';
 import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
@@ -18,6 +19,9 @@ export default function Home() {
     startDate: '',
     endDate: ''
   });
+  const [transactionToEdit, setTransactionToEdit] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const {
     transactions,
@@ -27,7 +31,9 @@ export default function Home() {
     isError,
     error,
     isDeleting,
-    isUpdating
+    isUpdating,
+    updateTransaction,
+    deleteTransaction
   } = useTransactions(
     userData?.user?.id,
     currentPage,
@@ -35,7 +41,7 @@ export default function Home() {
     filters
   );
 
-  console.log("🚀 ~ Home ~ transactions:", transactions);
+
   const { categories } = useCategories(userData?.user?.id);
 
   // Calculate totals
@@ -71,14 +77,33 @@ export default function Home() {
     setCurrentPage(page);
   };
 
-  const handleEdit = (id: string) => {
-    // Implement edit functionality
-    console.log('Edit transaction:', id);
+  const handleEdit = (transaction: any) => {
+    setTransactionToEdit(transaction);
+    setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    // Implement delete functionality
-    console.log('Delete transaction:', id);
+  const handleDelete = async (id: string) => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm('Are you sure you want to delete this transaction?');
+
+    if (isConfirmed) {
+      try {
+        await deleteTransaction(id); // Call the delete function from the hook
+        setIsModalOpen(false); // Close modal after successful deletion
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+      }
+    }
+  };
+
+
+  const handleSave = async (updatedTransaction: any) => {
+    try {
+      await updateTransaction(updatedTransaction._id, updatedTransaction);
+      setIsModalOpen(false); // Close the modal after successful save
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+    }
   };
 
   const resetFilters = () => {
@@ -241,7 +266,7 @@ export default function Home() {
                 <td>
                   <S.ActionButtons>
                     <S.EditButton
-                      onClick={() => handleEdit(transaction._id)}
+                      onClick={() => handleEdit(transaction)}
                       disabled={isUpdating}
                     >
                       Edit
@@ -288,6 +313,18 @@ export default function Home() {
           </S.Pagination>
         )}
       </S.Section>
+
+      {transactionToEdit && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+          transaction={transactionToEdit}
+          categories={categories} // Pass your categories here
+        />
+      )}
     </S.PageContainer>
+
+
   );
 }

@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('authToken')?.value;
     const { pathname } = request.nextUrl;
 
-    console.log(`🚀 ~ middleware ~ Rota: ${pathname}, Token: ${token ? 'presente' : 'ausente'}`);
+
 
     const protectedRoutes = ['/', '/add-transaction', '/categories', '/graphics'];
 
@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
                 new TextEncoder().encode(process.env.JWT_SECRET!) // Chave deve ser um Uint8Array
             ) as { payload: JwtPayload };
 
-            console.log('🚀 ~ Token válido para usuário:', payload.userId);
+
 
             // Clone da requisição e adição de headers
             const requestHeaders = new Headers(request.headers);
