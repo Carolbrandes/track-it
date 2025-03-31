@@ -1,4 +1,3 @@
-// app/categories/components/CategoryForm.tsx
 'use client';
 import { useState } from 'react';
 import Form, { FormField } from '../../components/Form';

@@ -1,11 +1,11 @@
-// app/api/transactions/route.ts
+
 import Transaction from '@/models/Transaction';
 import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '../../lib/db';
 
-// app/api/transactions/route.ts
+
 export async function GET(request: Request) {
     try {
         await db();
@@ -18,10 +18,10 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
-        // Build filter query
+
         const filterQuery: any = { userId };
 
-        // Add filters if they exist
+
         if (url.searchParams.get('description')) {
             filterQuery.description = { $regex: url.searchParams.get('description'), $options: 'i' };
         }
@@ -41,21 +41,13 @@ export async function GET(request: Request) {
             const startDate = new Date(url.searchParams.get('startDate')!);
             const endDate = new Date(url.searchParams.get('endDate')!);
 
-            console.log("🚀 ~ GET ~ startDate:", startDate)
-            console.log("🚀 ~ GET ~ endDate:", endDate)
-
-            // Set start time to 00:00:00.000 (midnight) for the start of the day
             const startUTC = new Date(startDate.setHours(0, 0, 0, 0));
-
-            // Set end time to 23:59:59.999 (end of the day)
             const endUTC = new Date(endDate.setHours(23, 59, 59, 999));
 
-            console.log("🚀 ~ GET ~ startUTC:", startUTC)
-            console.log("🚀 ~ GET ~ endUTC:", endUTC)
 
             filterQuery.date = {
-                $gte: startUTC,   // Greater than or equal to start of the day
-                $lte: endUTC      // Less than or equal to end of the day
+                $gte: startUTC,
+                $lte: endUTC
             };
 
 
@@ -93,7 +85,7 @@ export async function POST(request: Request) {
 
         const { description, amount, currency, date, type, category } = await request.json();
 
-        // Validate required fields
+
         if (!description || !amount || !currency || !date || !type || !category) {
             return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
         }

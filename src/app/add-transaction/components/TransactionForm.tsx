@@ -20,10 +20,10 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-    // Set default category when categories load
+
     useEffect(() => {
         if (categories.length > 0 && !categoryId) {
-            setCategoryId(categories[0]._id); // Set first category as default
+            setCategoryId(categories[0]._id);
         }
     }, [categories]);
 
@@ -40,7 +40,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
         setSuccessMsg(null);
 
         try {
-            // Validate all fields including category
+
             if (!description || !amount || !date || !categoryId) {
                 throw new Error('All fields are required');
             }
@@ -56,7 +56,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
 
             setSuccessMsg('Transaction successfully registered!');
 
-            // Reset form but keep the last category selected
+
             setDescription('');
             setAmount('');
             setType('expense');

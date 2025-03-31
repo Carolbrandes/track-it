@@ -44,7 +44,7 @@ export default function Home() {
 
   const { categories } = useCategories(userData?.user?.id);
 
-  // Calculate totals
+
   const totals = transactions.reduce((acc, transaction) => {
     if (transaction.type === 'income') {
       acc.income += transaction.amount;
@@ -57,7 +57,7 @@ export default function Home() {
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    console.log("🚀 ~ handleFilterChange ~ name:", name, value);
+
 
     setFilters(prev => {
       const updatedFilters = { ...prev, [name]: value };
@@ -83,13 +83,13 @@ export default function Home() {
   };
 
   const handleDelete = async (id: string) => {
-    // Show confirmation dialog
+
     const isConfirmed = window.confirm('Are you sure you want to delete this transaction?');
 
     if (isConfirmed) {
       try {
-        await deleteTransaction(id); // Call the delete function from the hook
-        setIsModalOpen(false); // Close modal after successful deletion
+        await deleteTransaction(id);
+        setIsModalOpen(false);
       } catch (error) {
         console.error('Error deleting transaction:', error);
       }
@@ -100,7 +100,7 @@ export default function Home() {
   const handleSave = async (updatedTransaction: any) => {
     try {
       await updateTransaction(updatedTransaction._id, updatedTransaction);
-      setIsModalOpen(false); // Close the modal after successful save
+      setIsModalOpen(false);
     } catch (error) {
       console.error('Error updating transaction:', error);
     }
@@ -320,7 +320,7 @@ export default function Home() {
           onClose={() => setIsModalOpen(false)}
           onSave={handleSave}
           transaction={transactionToEdit}
-          categories={categories} // Pass your categories here
+          categories={categories}
         />
       )}
     </S.PageContainer>

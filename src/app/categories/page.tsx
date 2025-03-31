@@ -1,6 +1,6 @@
 'use client';
 
-import { useCategories } from '../hooks/useCategories'; // Certifique-se de importar corretamente
+import { useCategories } from '../hooks/useCategories';
 import { useUserData } from '../hooks/useUserData';
 import CategoryForm from './components/CategoryForm';
 import CategoryList from './components/CategoryList';

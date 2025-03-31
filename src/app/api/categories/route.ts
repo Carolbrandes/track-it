@@ -1,4 +1,3 @@
-// app/api/categories/route.ts
 import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -9,18 +8,16 @@ export async function GET() {
     try {
         await dbConnect();
 
-        // Obtém o token de autenticação do cookie
         const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
         if (!authToken) {
             return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
         }
 
-        // Verifica o JWT e obtém o payload
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
-        const userId = payload.userId; // Obtém o userId do payload
+        const userId = payload.userId;
 
-        // Busca as categorias do usuário específico
+
         const categories = await Category.find({ userId }).sort({ createdAt: -1 });
 
         return NextResponse.json(categories);
@@ -36,24 +33,22 @@ export async function POST(request: Request) {
 
         const { name } = await request.json();
 
-        // Obtém o token de autenticação do cookie
         const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
         if (!authToken) {
             return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
         }
 
-        // Verifica o JWT e obtém o payload
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
-        const userId = payload.userId; // Obtém o userId do payload
+        const userId = payload.userId;
 
-        // Verifica se a categoria já existe para esse usuário
+
         const existingCategory = await Category.findOne({ name, userId });
         if (existingCategory) {
             return NextResponse.json({ error: 'Categoria já existe para este usuário' }, { status: 400 });
         }
 
-        // Cria a nova categoria associada ao usuário
+
         const newCategory = new Category({ name, userId });
         await newCategory.save();
 

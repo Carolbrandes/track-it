@@ -5,14 +5,14 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (updatedTransaction: any) => void;
-    transaction: any; // Define this type based on your data structure
-    categories: any[]; // Categories list
+    transaction: any;
+    categories: any[];
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, categories }) => {
     const [updatedTransaction, setUpdatedTransaction] = useState(transaction);
 
-    // Update the state whenever the modal is opened (i.e., transaction changes)
+
     useEffect(() => {
         setUpdatedTransaction(transaction);
     }, [transaction]);
@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
         onSave(updatedTransaction);
     };
 
-    if (!isOpen) return null; // If modal is not open, return nothing
+    if (!isOpen) return null;
 
     return (
         <S.ModalOverlay>
@@ -48,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                     />
                     <S.Select
                         name="category"
-                        value={updatedTransaction.category._id || ''} // Set initial value based on category ID
+                        value={updatedTransaction.category._id || ''}
                         onChange={handleInputChange}
                     >
                         <option value="">Select Category</option>

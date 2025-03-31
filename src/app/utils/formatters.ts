@@ -1,5 +1,3 @@
-// utils/formatters.ts
-
 /**
  * Formats a date string or Date object into a localized date string
  * @param date - Date string or Date object
@@ -13,7 +11,7 @@ export const formatDate = (isoDate: string) => {
         month: 'short',
         day: '2-digit',
         year: 'numeric',
-        timeZone: 'UTC' // Forces UTC formatting
+        timeZone: 'UTC'
     });
 
 

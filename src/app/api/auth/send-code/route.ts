@@ -1,5 +1,3 @@
-// src > app > api > auth > send-code
-
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
@@ -10,7 +8,7 @@ export async function POST(req) {
     await dbConnect();
     const { email } = await req.json();
 
-    // Gerar código de verificação
+
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     let user = await User.findOne({ email });

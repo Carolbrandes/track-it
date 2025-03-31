@@ -41,13 +41,12 @@ export default function Login() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, code }),
-                credentials: 'include' // Importante para cookies
+                credentials: 'include'
             });
 
             const data = await res.json();
 
             if (data.success) {
-                // Forçar recarregamento completo para garantir que o middleware processe o cookie
                 window.location.href = '/';
             } else {
                 alert(data.message || 'Erro ao verificar código.');

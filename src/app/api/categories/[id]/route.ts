@@ -57,24 +57,24 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         await dbConnect();
         const { id } = await params;
 
-        // Obtém o token de autenticação do cookie
+
         const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
         if (!authToken) {
             return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
         }
 
-        // Verifica o JWT e obtém o payload
-        const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
-        const userId = payload.userId; // Obtém o userId do payload
 
-        // Verifica se a categoria existe e pertence ao usuário
+        const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
+        const userId = payload.userId;
+
+
         const category = await Category.findOne({ _id: id, userId });
         if (!category) {
             return NextResponse.json({ error: 'Categoria não encontrada ou não pertence ao usuário' }, { status: 404 });
         }
 
-        // Deleta a categoria
+
         await Category.findByIdAndDelete(id);
 
         return NextResponse.json({ message: 'Categoria deletada com sucesso' });

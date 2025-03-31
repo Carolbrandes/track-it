@@ -1,10 +1,7 @@
-// app/transactions/styles.ts
 import styled from 'styled-components';
-
-// Re-export all existing styles from your categories page
 export * from '../categories/styles';
 
-// Add new transaction-specific styles
+
 export const TransactionItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -98,7 +95,7 @@ export const CategorySelect = styled.select`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-// Add to your theme if needed (in your global styles)
+
 declare module 'styled-components' {
   export interface DefaultTheme {
     colors: {

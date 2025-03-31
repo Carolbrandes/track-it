@@ -7,7 +7,7 @@ interface Category {
 
 const fetchCategories = async (): Promise<Category[]> => {
     const response = await fetch('/api/categories', {
-        credentials: 'include' // Isso garante que os cookies sejam enviados
+        credentials: 'include'
     });
 
     if (!response.ok) {

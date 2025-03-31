@@ -5,12 +5,12 @@ import dbConnect from '../../lib/db';
 
 export async function GET() {
     try {
-        // Verificação profunda da conexão
+
         await dbConnect();
 
-        // Verifica se a conexão está realmente ativa
+
         if (mongoose.connection.readyState !== 1) {
-            throw new Error('Conexão não estabelecida');
+            throw new Error('Conecction is not established');
         }
 
         const currencies = await Currency.find({}, { _id: 1, name: 1, code: 1 }).lean();
@@ -25,7 +25,7 @@ export async function GET() {
             }
         );
     } catch (error: any) {
-        console.error("Erro detalhado:", {
+        console.error("Detailed error:", {
             error: error.message,
             connectionState: mongoose.connection.readyState,
             connectionInfo: mongoose.connection

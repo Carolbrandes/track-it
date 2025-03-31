@@ -14,5 +14,5 @@ const transactionSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, required: true },
 }, { timestamps: true });
 
-// ✅ Fix: Use `models.Transaction` if it exists to prevent overwriting
+
 export default models.Transaction || model('Transaction', transactionSchema);

@@ -1,4 +1,3 @@
-// styles/shared.ts
 import styled from 'styled-components';
 
 export const PageContainer = styled.div`
@@ -40,7 +39,7 @@ export const ErrorMessage = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.danger};
 `;
 
-// Add any other common styled components you use across multiple pages
+
 export const Button = styled.button<{
   $primary?: boolean;
   $danger?: boolean;

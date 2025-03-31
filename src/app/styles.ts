@@ -1,4 +1,3 @@
-// app/transactions/styles.ts
 import styled from 'styled-components';
 import * as CommonStyles from './styles/shared';
 
@@ -174,23 +173,23 @@ export const PaginationButton = styled.button<{ $active?: boolean }>`
   }
 `;
 export const ResetButton = styled.button`
-  background-color: #f0f0f0; /* Light grey background */
-  color: #007bff; /* Blue text color */
-  border: 1px solid #007bff; /* Blue border */
+  background-color: #f0f0f0; 
+  color: #007bff; 
+  border: 1px solid #007bff;
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 
-  /* Hover state */
+ 
   &:hover {
-    background-color: #007bff; /* Darker blue background on hover */
-    color: #fff; /* White text on hover */
-    border-color: #0056b3; /* Darker blue border on hover */
+    background-color: #007bff; 
+    color: #fff;
+    border-color: #0056b3; 
   }
 
-  /* Disabled state */
+ 
   &:disabled {
     background-color: #e0e0e0;
     color: #b0b0b0;

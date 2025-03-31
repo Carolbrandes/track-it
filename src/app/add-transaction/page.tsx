@@ -1,4 +1,3 @@
-// app/transactions/page.tsx
 'use client';
 import { useTransactions } from '../hooks/useTransactions';
 import { useUserData } from '../hooks/useUserData';

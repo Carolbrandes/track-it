@@ -1,4 +1,3 @@
-// components/Form.tsx
 'use client';
 import * as S from '../../styles/shared';
 
@@ -6,7 +5,7 @@ export type FieldType = 'text' | 'number' | 'date' | 'select' | 'radio-group';
 
 export interface FormField {
   label: string;
-  type: FieldType; // Use the specific type here
+  type: FieldType;
   name: string;
   value: any;
   onChange: (value: any) => void;

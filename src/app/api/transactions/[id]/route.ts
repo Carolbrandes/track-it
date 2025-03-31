@@ -19,7 +19,7 @@ export async function PUT(
 
         const { description, amount, currency, type, category } = await request.json();
 
-        // Validation for required fields
+
         if (!description || !amount || !currency || !type || !category) {
             return NextResponse.json({ error: 'All fields (description, amount, currency, type, category) are required' }, { status: 400 });
         }
@@ -33,13 +33,13 @@ export async function PUT(
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        // Check if the transaction exists and belongs to the user
+
         const transaction = await Transaction.findOne({ _id: id, userId });
         if (!transaction) {
             return NextResponse.json({ error: 'Transaction not found or does not belong to user' }, { status: 404 });
         }
 
-        // Update the transaction
+
         transaction.description = description;
         transaction.amount = amount;
         transaction.currency = currency;
@@ -72,13 +72,13 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        // Check if the transaction exists and belongs to the user
+
         const transaction = await Transaction.findOne({ _id: id, userId });
         if (!transaction) {
             return NextResponse.json({ error: 'Transaction not found or does not belong to user' }, { status: 404 });
         }
 
-        // Delete the transaction
+
         await Transaction.findByIdAndDelete(id);
 
         return NextResponse.json({ message: 'Transaction deleted successfully' });
