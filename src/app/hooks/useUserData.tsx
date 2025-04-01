@@ -1,3 +1,5 @@
+'use-cliente'
+
 import { useQuery } from '@tanstack/react-query';
 
 async function fetchUserData() {

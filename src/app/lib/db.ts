@@ -28,10 +28,8 @@ async function dbConnect(): Promise<typeof mongoose> {
         return cached.conn;
     }
 
-
-    await mongoose.disconnect();
-
-    cached.conn = await mongoose.connect(MONGODB_URI!, { bufferCommands: false });
+    cached.promise = cached.promise || mongoose.connect(MONGODB_URI!, { bufferCommands: false });
+    cached.conn = await mongoose.connect(MONGODB_URI!, { bufferCommands: true });
 
 
     return cached.conn;

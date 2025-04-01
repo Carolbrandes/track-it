@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
 
 
-    const protectedRoutes = ['/', '/add-transaction', '/categories', '/graphics'];
+    const protectedRoutes = ['/', '/add-transaction', '/categories', '/financial-analytics'];
 
     if (protectedRoutes.includes(pathname)) {
         if (!token) {
@@ -49,6 +49,6 @@ export const config = {
     matcher: [
         '/',
         '/categories',
-        '/graphics',
+        '/financial-analytics',
     ],
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { FaPiggyBank } from 'react-icons/fa';
 import { Avatar } from "./components/Avatar";
 import { CurrencySelect } from "./components/CurrencySelect";
@@ -22,7 +24,7 @@ export const Sidebar = ({ toggleTheme }: SidebarProps) => {
             <S.NavLink href="/">Transactions</S.NavLink>
             <S.NavLink href="/add-transaction">Add Transaction</S.NavLink>
             <S.NavLink href="/categories">Categories</S.NavLink>
-            <S.NavLink href="/graphics">Graphics</S.NavLink>
+            <S.NavLink href="/financial-analytics">Financial Analytics</S.NavLink>
 
             <S.UserSection>
                 <h4>User Settings</h4>
