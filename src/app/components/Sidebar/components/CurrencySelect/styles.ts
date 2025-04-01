@@ -6,9 +6,9 @@ export const CurrencySelect = styled.div`
 
     select{
         max-width: 11rem;
-        margin-left: 0.5rem; 
         padding: 0.5rem; 
-        border-radius: 5px; 
-        border: 1px solid #ccc;
+        border:none;
+        color: ${({ theme }) => theme.colors.text};
+        font-size: 1rem;
     }
 `

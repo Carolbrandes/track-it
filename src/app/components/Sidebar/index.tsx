@@ -7,11 +7,9 @@ import { Logout } from "./components/Logout";
 import { ThemeButton } from "./components/ThemeButton";
 import * as S from './styles';
 
-interface SidebarProps {
-    toggleTheme: () => void;
-}
 
-export const Sidebar = ({ toggleTheme }: SidebarProps) => {
+
+export const Sidebar = () => {
 
 
     return (
@@ -29,7 +27,7 @@ export const Sidebar = ({ toggleTheme }: SidebarProps) => {
             <S.UserSection>
                 <h4>User Settings</h4>
 
-                <S.SettingsOption onClick={toggleTheme}>
+                <S.SettingsOption>
                     <ThemeButton />
                 </S.SettingsOption>
 

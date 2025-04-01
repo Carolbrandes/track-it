@@ -64,7 +64,7 @@ export const useCategories = (userId: string) => {
     const { data: categories, isLoading, isError, error } = useQuery<Category[]>({
         queryKey: ['categories', userId],
         queryFn: () => fetchCategories(),
-        enabled: !!userId, // Só executa a query se userId existir
+        enabled: !!userId,
     });
 
     const addMutation = useMutation<Category, Error, { name: string; userId: string }>({

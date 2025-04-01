@@ -1,19 +1,29 @@
-'use client'
+// components/ThemeButton.tsx
+'use client';
 
-import { FaMoon, FaSun } from 'react-icons/fa';
-import { useTheme } from 'styled-components';
-import { lightTheme } from '../../../../styles/theme';
-
+import { useTheme } from '../../../../hooks/useTheme';
+import * as S from './styles';
 
 export const ThemeButton = () => {
-    const theme = useTheme()
+    const { toggleTheme, isLightTheme } = useTheme();
 
     return (
-        <>
-            {theme === lightTheme ? <FaMoon size={20} /> : <FaSun size={20} />}
-            <span style={{ marginLeft: '10px' }}>
-                {theme === lightTheme ? 'Dark Theme' : 'Light Theme'}
-            </span>
-        </>
+        <S.SwitchContainer onClick={toggleTheme}>
+            <S.SwitchWrapper>
+                <S.SwitchInput
+                    type="checkbox"
+                    checked={!isLightTheme}
+                    onChange={toggleTheme}
+                    aria-label="Toggle theme"
+                />
+                <S.Slider $isLightTheme={isLightTheme}>
+                    {isLightTheme ? (
+                        <S.MoonIcon size={14} />
+                    ) : (
+                        <S.SunIcon size={14} />
+                    )}
+                </S.Slider>
+            </S.SwitchWrapper>
+        </S.SwitchContainer>
     );
 };
