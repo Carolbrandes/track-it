@@ -9,7 +9,7 @@ export const PageContainer = styled.div`
 export const Title = styled.h1`
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const Section = styled.section`
@@ -19,7 +19,7 @@ export const Section = styled.section`
 export const SectionTitle = styled.h2`
   font-size: 1.25rem;
   margin-bottom: 3rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
   text-decoration: underline;
 `;
 
@@ -50,9 +50,9 @@ export const Input = styled.input`
 export const Button = styled.button<{ $small?: boolean; $secondary?: boolean; $danger?: boolean }>`
   padding: ${({ $small }) => ($small ? '0.5rem 1rem' : '0.75rem 1.5rem')};
   background-color: ${({ $secondary, $danger, theme }) =>
-        $danger ? theme.colors.danger :
-            $secondary ? theme.colors.secondary :
-                theme.colors.primary};
+    $danger ? theme.colors.danger :
+      $secondary ? theme.colors.secondary :
+        theme.colors.primary};
   color: white;
   border: none;
   border-radius: 4px;
@@ -62,9 +62,9 @@ export const Button = styled.button<{ $small?: boolean; $secondary?: boolean; $d
 
   &:hover {
     background-color: ${({ $secondary, $danger, theme }) =>
-        $danger ? theme.colors.dangerDark :
-            $secondary ? theme.colors.secondaryDark :
-                theme.colors.primaryDark};
+    $danger ? theme.colors.danger :
+      $secondary ? theme.colors.gray700 :
+        theme.colors.primaryDark};
   }
 
   &:disabled {

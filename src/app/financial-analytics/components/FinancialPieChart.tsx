@@ -10,20 +10,27 @@ import * as S from '../styles';
 // Register necessary components from Chart.js
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-const FinancialPieChart = () => {
+const FinancialPieChart = ({ month, year }) => {
     const { data: userData } = useUserData();
     const userId = userData?.user?.id;
-    const { transactions } = useTransactions(userId, 1, 100);
+    const { transactions, refetch: refetchTransactions } = useTransactions(userId, 1, 100);
     const { categories } = useCategories(userId);
 
-    console.log('Transactions:', transactions);
-    console.log('Categories:', categories);
+    // Filter transactions by selected month and year
+    const filteredTransactions = transactions?.filter(txn => {
+        if (!txn.date) return false;
+        const txnDate = new Date(txn.date);
+        return (
+            txnDate.getMonth() + 1 === month &&
+            txnDate.getFullYear() === year
+        );
+    }) || [];
 
     // Get categories actually used in transactions, grouped by type
     const getCategoriesByType = (type) => {
         // Get unique category IDs from transactions of this type
         const categoryIds = [...new Set(
-            transactions
+            filteredTransactions
                 .filter(txn => txn.type === type && txn.category?._id)
                 .map(txn => txn.category._id)
         )];
@@ -37,12 +44,9 @@ const FinancialPieChart = () => {
     const expenseCategories = getCategoriesByType('expense');
     const incomeCategories = getCategoriesByType('income');
 
-    console.log('Expense Categories:', expenseCategories);
-    console.log('Income Categories:', incomeCategories);
-
     // Prepare data - group transactions by category for each type
     const expenseData = expenseCategories.map(category =>
-        transactions
+        filteredTransactions
             .filter(txn =>
                 txn.type === 'expense' &&
                 txn.category?._id === category._id
@@ -51,16 +55,13 @@ const FinancialPieChart = () => {
     );
 
     const incomeData = incomeCategories.map(category =>
-        transactions
+        filteredTransactions
             .filter(txn =>
                 txn.type === 'income' &&
                 txn.category?._id === category._id
             )
             .reduce((acc, txn) => acc + txn.amount, 0)
     );
-
-    console.log('Expense Data:', expenseData);
-    console.log('Income Data:', incomeData);
 
     // Calculate totals
     const expenseTotal = expenseData.reduce((acc, val) => acc + val, 0);
@@ -117,8 +118,7 @@ const FinancialPieChart = () => {
     };
 
     return (
-        <S.Container>
-
+        <S.ChartWrapperContainer>
             <S.ChartWrapper>
                 <S.ChartTitle>Expenses by Category</S.ChartTitle>
                 {expenseTotal > 0 ? (
@@ -142,7 +142,7 @@ const FinancialPieChart = () => {
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>No expense data available</div>
+                    <div>No expense data available for {new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
                 )}
             </S.ChartWrapper>
 
@@ -169,10 +169,10 @@ const FinancialPieChart = () => {
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>No income data available</div>
+                    <div>No income data available for {new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
                 )}
             </S.ChartWrapper>
-        </S.Container>
+        </S.ChartWrapperContainer>
     );
 };
 

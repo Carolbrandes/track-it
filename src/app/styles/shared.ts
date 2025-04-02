@@ -9,7 +9,7 @@ export const PageContainer = styled.div`
 export const Title = styled.h1`
   font-size: 2rem;
   margin-bottom: 4rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const Section = styled.section`
@@ -20,14 +20,14 @@ export const Section = styled.section`
 export const SectionTitle = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const LoadingIndicator = styled.div`
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.colors.textPrimarySecondary};
 `;
 
 export const ErrorMessage = styled.div`
@@ -63,9 +63,9 @@ export const Button = styled.button<{
     background-color: ${({ $primary, $danger, $disabled, theme }) =>
     $disabled ?
       ($danger ? theme.colors.danger : $primary ? theme.colors.primary : theme.colors.secondary) :
-      ($danger ? theme.colors.dangerDark :
+      ($danger ? theme.colors.danger :
         $primary ? theme.colors.primaryDark :
-          theme.colors.secondaryDark)};
+          theme.colors.gray700)};
   }
 `;
 
@@ -102,9 +102,9 @@ export const RadioGroup = styled.div`
 export const RadioButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.border};
+    $active ? theme.colors.primary : theme.colors.gray300};
   color: ${({ $active }) => ($active ? 'white' : 'inherit')};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;

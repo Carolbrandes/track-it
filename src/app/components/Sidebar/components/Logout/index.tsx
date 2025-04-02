@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { CiLogout } from "react-icons/ci";
+
 import * as S from '../../styles';
 
 export const Logout = () => {
@@ -20,7 +21,7 @@ export const Logout = () => {
 
     return (
         <S.SettingsOption onClick={handleLogout}>
-            <FaSignOutAlt size={20} />
+            <CiLogout />
             <span style={{ marginLeft: '10px' }}>Logout</span>
         </S.SettingsOption>
     );

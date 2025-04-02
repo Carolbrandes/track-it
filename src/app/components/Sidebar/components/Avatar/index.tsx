@@ -15,8 +15,10 @@ export const Avatar = () => {
 
     return (
         <S.UserInfo>
-            <S.UserAvatar>{data.user.email.charAt(0).toUpperCase()}</S.UserAvatar>
-            <S.UserEmail>{data.user?.email?.match(/^([^@]{1,14})[^@]*@/)?.[1]}</S.UserEmail>
+            <S.User>
+                <S.UserAvatar>{data.user.email.charAt(0).toUpperCase()}</S.UserAvatar>
+                <S.UserEmail>{data.user?.email?.match(/^([^@]{1,14})[^@]*@/)?.[1]}</S.UserEmail>
+            </S.User>
         </S.UserInfo>
     );
 };

@@ -7,12 +7,12 @@ export const TransactionItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
   background-color: ${({ theme }) => theme.colors.background};
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.hover};
+    background-color: ${({ theme }) => theme.colors.gray300};
   }
 `;
 
@@ -25,14 +25,14 @@ export const TransactionDetails = styled.div`
 
 export const TransactionDescription = styled.span`
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const TransactionMeta = styled.div`
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.colors.textPrimarySecondary};
 `;
 
 export const TransactionAmount = styled.span<{ $type: 'income' | 'expense' }>`
@@ -59,7 +59,7 @@ export const RadioButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primaryDark : theme.colors.secondaryDark};
+    $active ? theme.colors.primaryDark : theme.colors.gray700};
   }
 `;
 
@@ -72,7 +72,7 @@ export const CurrencyInputContainer = styled.div`
     left: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: ${({ theme }) => theme.colors.textSecondary};
+    color: ${({ theme }) => theme.colors.textPrimarySecondary};
   }
 
   input {
@@ -88,11 +88,11 @@ export const DatePickerWrapper = styled.div`
 
 export const CategorySelect = styled.select`
   padding: 0.5rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 4px;
   font-size: 1rem;
   background-color: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 
@@ -118,7 +118,7 @@ declare module 'styled-components' {
 
 export const SuccessMessage = styled.div`
     color: ${({ theme }) => theme.colors.background};
-    background-color: ${({ theme }) => theme.colors.successLight};
+    background-color: ${({ theme }) => theme.colors.success};
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1rem;

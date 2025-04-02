@@ -47,7 +47,7 @@ export const Input = styled.input`
   border-radius: 8px;
   border: 1px solid ${(props) => props.theme.colors.primary};
   background-color: ${(props) => props.theme.colors.background};
-  color: ${(props) => props.theme.colors.text};
+  color: ${(props) => props.theme.colors.textPrimary};
   
   &:focus {
     outline: none;
@@ -62,7 +62,7 @@ export const Button = styled.button`
   border-radius: 8px;
   background-color:  ${(props) => props.theme.colors.secondary};
   border: none;
-  color: ${(props) => props.theme.colors.text};
+  color: ${(props) => props.theme.colors.textPrimary};
   cursor: pointer;
   transition: background-color 0.3s ease;
 

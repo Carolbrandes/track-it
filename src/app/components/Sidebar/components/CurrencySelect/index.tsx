@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FaDollarSign } from 'react-icons/fa';
+import { TfiMoney } from "react-icons/tfi";
 import * as S from './styles';
 
 interface CurrencyProps {
@@ -63,7 +63,7 @@ export const CurrencySelect = () => {
 
     return (
         <S.CurrencySelect>
-            <FaDollarSign size={20} />
+            <TfiMoney />
             <select
                 value={selectedCurrency}
                 onChange={handleCurrencyChange}

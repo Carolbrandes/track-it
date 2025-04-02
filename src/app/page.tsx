@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
+import { Filter } from './components/Filter';
 import Modal from './components/Modal';
+import { Pagination } from './components/Pagination';
+import { Summary } from './components/Summary';
+import { TransactionList } from './components/TransactionList';
 import { useCategories } from './hooks/useCategories';
 import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
 import * as S from './styles';
-import { formatCurrency, formatDate } from './utils/formatters';
 
 export default function Home() {
   const { data: userData } = useUserData();
@@ -44,16 +47,6 @@ export default function Home() {
 
   const { categories } = useCategories(userData?.user?.id);
 
-
-  const totals = transactions.reduce((acc, transaction) => {
-    if (transaction.type === 'income') {
-      acc.income += transaction.amount;
-    } else {
-      acc.expense += transaction.amount;
-    }
-    acc.balance = acc.income - acc.expense;
-    return acc;
-  }, { income: 0, expense: 0, balance: 0 });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -119,6 +112,8 @@ export default function Home() {
     setCurrentPage(1); // Reset to first page when filters are reset
   };
 
+
+
   if (isLoading) return <S.LoadingIndicator>Loading...</S.LoadingIndicator>;
   if (isError) return <S.ErrorMessage>{error?.message}</S.ErrorMessage>;
 
@@ -128,189 +123,32 @@ export default function Home() {
 
       {/* Summary Section */}
       <S.Section>
-        <S.SummaryCard>
-          <S.SummaryItem>
-            <span>Income:</span>
-            <S.AmountPositive>{formatCurrency(totals.income)}</S.AmountPositive>
-          </S.SummaryItem>
-          <S.SummaryItem>
-            <span>Expense:</span>
-            <S.AmountNegative>{formatCurrency(totals.expense)}</S.AmountNegative>
-          </S.SummaryItem>
-          <S.SummaryItem>
-            <span>Balance:</span>
-            <S.AmountBalance $positive={totals.balance >= 0}>
-              {formatCurrency(totals.balance)}
-            </S.AmountBalance>
-          </S.SummaryItem>
-          <S.SummaryItem>
-            <span>Number of Transactions:</span>
-            <span>{totalCount}</span>
-          </S.SummaryItem>
-        </S.SummaryCard>
+        <Summary transactions={transactions} totalCount={totalCount} />
       </S.Section>
 
       {/* Filters Section */}
       <S.Section>
-        <S.FilterForm>
-          <S.FilterGroup>
-            <S.FilterInput
-              type="text"
-              name="description"
-              placeholder="Description"
-              value={filters.description}
-              onChange={handleFilterChange}
-            />
-          </S.FilterGroup>
-
-          <S.FilterGroup>
-            <S.FilterSelect
-              name="category"
-              value={filters.category}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Categories</option>
-              {categories.map(category => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </S.FilterSelect>
-          </S.FilterGroup>
-
-          <S.FilterGroup>
-            <S.FilterSelect
-              name="type"
-              value={filters.type}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Types</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </S.FilterSelect>
-          </S.FilterGroup>
-
-          <S.FilterGroup>
-            <S.FilterInput
-              type="number"
-              name="minAmount"
-              placeholder="Min Amount"
-              value={filters.minAmount}
-              onChange={handleFilterChange}
-            />
-            <S.FilterInput
-              type="number"
-              name="maxAmount"
-              placeholder="Max Amount"
-              value={filters.maxAmount}
-              onChange={handleFilterChange}
-            />
-          </S.FilterGroup>
-
-          <S.FilterGroup>
-            <S.FilterInput
-              type="date"
-              name="startDate"
-              placeholder="Start Date"
-              value={filters.startDate}
-              onChange={handleFilterChange}
-            />
-            <S.FilterInput
-              type="date"
-              name="endDate"
-              placeholder="End Date"
-              value={filters.endDate}
-              onChange={handleFilterChange}
-            />
-            {/* Reset Filters Button */}
-            <S.ResetButton onClick={resetFilters}>Reset Filters</S.ResetButton>
-          </S.FilterGroup>
-
-
-        </S.FilterForm>
+        <Filter
+          filters={filters}
+          categories={categories}
+          handleFilterChange={(e) => handleFilterChange(e)}
+          resetFilters={resetFilters}
+        />
       </S.Section>
-
       {/* Transactions Table */}
+      <TransactionList
+        transactions={transactions}
+        isDeleting={isDeleting}
+        isUpdating={isUpdating}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+      />
       <S.Section>
-        <S.ResponsiveTable>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(transaction => (
-              <tr key={transaction._id}>
-                <td>{formatDate(`${transaction.date}`)}</td>
-                <td>{transaction.description}</td>
-                <td>
-                  {typeof transaction.category === 'object'
-                    ? transaction.category.name
-                    : 'Uncategorized'}
-                </td>
-                <td>
-                  <S.TypeBadge $type={transaction.type}>
-                    {transaction.type}
-                  </S.TypeBadge>
-                </td>
-                <td>
-                  <S.Amount $type={transaction.type}>
-                    {formatCurrency(transaction.amount, transaction.currency)}
-                  </S.Amount>
-                </td>
-                <td>
-                  <S.ActionButtons>
-                    <S.EditButton
-                      onClick={() => handleEdit(transaction)}
-                      disabled={isUpdating}
-                    >
-                      Edit
-                    </S.EditButton>
-                    <S.DeleteButton
-                      onClick={() => handleDelete(transaction._id)}
-                      disabled={isDeleting}
-                    >
-                      Delete
-                    </S.DeleteButton>
-                  </S.ActionButtons>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </S.ResponsiveTable>
+
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <S.Pagination>
-            <S.PaginationButton
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous
-            </S.PaginationButton>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <S.PaginationButton
-                key={page}
-                $active={page === currentPage}
-                onClick={() => handlePageChange(page)}
-              >
-                {page}
-              </S.PaginationButton>
-            ))}
-
-            <S.PaginationButton
-              disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next
-            </S.PaginationButton>
-          </S.Pagination>
+          <Pagination currentPage={currentPage} totalPages={totalPages} handlePageChange={handlePageChange} />
         )}
       </S.Section>
 

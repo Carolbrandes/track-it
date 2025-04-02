@@ -1,4 +1,4 @@
-'use-client'
+'use-client';
 
 import styled from 'styled-components';
 
@@ -9,11 +9,21 @@ export const Container = styled.div`
   align-items: center;
   gap: 3rem;
   padding: 2rem;
-  background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
 `;
+
+export const ChartWrapperContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding: 2rem;
+
+  @media (min-width: 1200px){
+    flex-direction: row;
+  }
+`
 
 // Title for the chart section
 export const Title = styled.h1`
@@ -21,6 +31,46 @@ export const Title = styled.h1`
   font-weight: bold;
   color: #333;
   margin-bottom: 1rem;
+`;
+
+// Filter controls container
+export const FilterContainer = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+`;
+
+// Filter group (label + select)
+export const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+`;
+
+// Filter label
+export const FilterLabel = styled.label`
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+`;
+
+// Filter select dropdown
+export const FilterSelect = styled.select`
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+  
+  &:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
 `;
 
 // Wrapper for each individual chart

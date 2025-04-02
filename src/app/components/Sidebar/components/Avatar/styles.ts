@@ -2,10 +2,15 @@ import { styled } from "styled-components";
 
 export const UserInfo = styled.div`
   display: flex;
-  align-items: center;
-  margin-top: 4rem;
+  align-items: end;
   margin-bottom: 2rem;
+  height: 13rem;
 `;
+
+export const User = styled.div`
+  display: flex;
+  align-items: center;
+`
 
 export const UserAvatar = styled.div`
   width: 40px;
@@ -22,3 +27,4 @@ export const UserAvatar = styled.div`
 export const UserEmail = styled.div`
   margin-left: 10px;
 `;
+

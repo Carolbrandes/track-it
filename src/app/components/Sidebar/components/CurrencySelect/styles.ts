@@ -8,7 +8,8 @@ export const CurrencySelect = styled.div`
         max-width: 11rem;
         padding: 0.5rem; 
         border:none;
-        color: ${({ theme }) => theme.colors.text};
+        color: ${({ theme }) => theme.colors.textPrimary};
         font-size: 1rem;
+        background: none;
     }
 `

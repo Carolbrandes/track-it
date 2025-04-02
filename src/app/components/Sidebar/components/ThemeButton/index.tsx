@@ -18,9 +18,9 @@ export const ThemeButton = () => {
                 />
                 <S.Slider $isLightTheme={isLightTheme}>
                     {isLightTheme ? (
-                        <S.MoonIcon size={14} />
+                        <S.MoonIcon $isLightTheme={isLightTheme} size={14} />
                     ) : (
-                        <S.SunIcon size={14} />
+                        <S.SunIcon $isLightTheme={isLightTheme} size={14} />
                     )}
                 </S.Slider>
             </S.SwitchWrapper>

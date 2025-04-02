@@ -1,4 +1,8 @@
-import { FaMoon, FaSun } from 'react-icons/fa';
+// styles.ts
+import { FaMoon } from "react-icons/fa6";
+import { MdWbSunny } from "react-icons/md";
+
+
 import styled from 'styled-components';
 
 export const SwitchContainer = styled.div`
@@ -17,19 +21,19 @@ export const SwitchInput = styled.input`
   width: 0;
   height: 0;
 
-  &:checked + span {
-    background-color: ${({ theme }) => theme.colors.primary};
-  }
+  
 `;
 
 export const Slider = styled.span<{ $isLightTheme: boolean }>`
   position: absolute;
+  width: 4rem;
   cursor: pointer;
   top: 0;
   left: 0;
-  right: 0;
+  right: 1rem;
   bottom: 0;
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background: transparent !important;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
   transition: .4s;
   border-radius: 34px;
   display: flex;
@@ -40,25 +44,34 @@ export const Slider = styled.span<{ $isLightTheme: boolean }>`
   &:before {
     position: absolute;
     content: "";
-    height: 24px;
-    width: 24px;
-    left: 3px;
+    height: 1.5rem;
+    width: 1.5rem;
+    left: ${({ $isLightTheme }) => $isLightTheme ? '2.2rem' : '0.2rem'};
     bottom: 3px;
-    background-color: white;
+    background-color: ${({ theme }) => theme.colors.primary};
     transition: .4s;
     border-radius: 50%;
-    transform: ${({ $isLightTheme }) => $isLightTheme ? 'translateX(0)' : 'translateX(30px)'};
   }
 `;
 
-export const SunIcon = styled(FaSun)`
-  color: ${({ theme }) => theme.colors.text};
+export const SunIcon = styled(MdWbSunny) <{ $isLightTheme: boolean }>`
+  color: ${({ theme }) => theme.colors.primary};
   z-index: 1;
-  margin-right: 4px;
+  position: absolute;
+  left: 2.4rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: ${({ $isLightTheme }) => $isLightTheme ? 0 : 1};
+  transition: opacity 0.3s ease;
 `;
 
-export const MoonIcon = styled(FaMoon)`
-  color: ${({ theme }) => theme.colors.text};
+export const MoonIcon = styled(FaMoon) <{ $isLightTheme: boolean }>`
+  color: ${({ theme }) => theme.colors.primary};
   z-index: 1;
-  margin-left: 4px;
+  position: absolute;
+  right: 2.2rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: ${({ $isLightTheme }) => $isLightTheme ? 1 : 0};
+  transition: opacity 0.3s ease;
 `;
