@@ -13,7 +13,7 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement);
 const FinancialPieChart = ({ month, year }) => {
     const { data: userData } = useUserData();
     const userId = userData?.user?.id;
-    const { transactions, refetch: refetchTransactions } = useTransactions(userId, 1, 100);
+    const { transactions } = useTransactions(userId, 1, 100);
     const { categories } = useCategories(userId);
 
     // Filter transactions by selected month and year

@@ -31,6 +31,7 @@ export async function GET(req) {
 
         return NextResponse.json({ isLoggedIn: true, user });
     } catch (error) {
+        console.error("🚀 ~ GET ~ error:", error)
         return NextResponse.json({ isLoggedIn: false, message: 'Token inválido' }, { status: 401 });
     }
 }
