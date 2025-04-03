@@ -24,21 +24,32 @@ export async function GET() {
                 }
             }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
+
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+
         console.error("Detailed error:", {
-            error: error.message,
+            error: errorMessage,
             connectionState: mongoose.connection.readyState,
             connectionInfo: mongoose.connection
         });
+
 
         return NextResponse.json(
             {
                 success: false,
                 message: 'Database connection failed',
-                error: error.message,
+                error: errorMessage,
                 connectionState: mongoose.connection.readyState
             },
             { status: 500 }
         );
     }
 }
+

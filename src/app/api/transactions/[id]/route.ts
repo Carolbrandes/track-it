@@ -49,8 +49,15 @@ export async function PUT(
         await transaction.save();
 
         return NextResponse.json(transaction);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
@@ -82,7 +89,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         await Transaction.findByIdAndDelete(id);
 
         return NextResponse.json({ message: 'Transaction deleted successfully' });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

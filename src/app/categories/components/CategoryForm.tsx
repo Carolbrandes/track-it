@@ -20,12 +20,20 @@ export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void 
             setSuccessMsg('Category successfully registered!');
 
             setTimeout(() => setSuccessMsg(null), 3000);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (error: unknown) {
+            let errorMessage = 'Failed on operation';
+
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            setError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     const fields: FormField[] = [
         {

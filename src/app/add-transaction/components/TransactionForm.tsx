@@ -63,8 +63,9 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             setType('expense');
 
             setTimeout(() => setSuccessMsg(null), 3000);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            console.error("🚀 ~ handleSubmit ~ err:", err)
+            setError("Error on save new transaction");
         } finally {
             setIsSubmitting(false);
         }

@@ -21,8 +21,15 @@ export async function GET() {
         const categories = await Category.find({ userId }).sort({ createdAt: -1 });
 
         return NextResponse.json(categories);
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
@@ -53,8 +60,15 @@ export async function POST(request: Request) {
         await newCategory.save();
 
         return NextResponse.json(newCategory, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 

@@ -102,8 +102,15 @@ export async function GET(request: Request) {
             totalCount,
             totalPages
         });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
@@ -135,7 +142,14 @@ export async function POST(request: Request) {
 
         await newTransaction.save();
         return NextResponse.json(newTransaction, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
