@@ -1,10 +1,33 @@
 import styled from "styled-components";
 
+export const FilterContainer = styled.div`
+  .filterButtonContainer {
+    display: flex;
+    justify-content: end;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    button {
+      background: transparent;
+      border: 1px solid ${({ theme }) => theme.colors.primary};
+      height: 2rem;
+      width: 2rem;
+      border-radius: 8px;
+    }
+  }
+`
+
 export const FilterForm = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  
+  @media (min-width: 1200px){
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+
+  }
 `;
 
 export const FilterGroup = styled.div`

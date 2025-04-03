@@ -1,10 +1,11 @@
 'use client'
 
+import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency } from '../../utils/formatters';
 import * as S from './styles';
 
 interface SummaryProps {
-    transactions: any
+    transactions: Transaction[]
     totalCount: number
 }
 

@@ -1,17 +1,34 @@
 'use client'
 
+import React, { useState } from 'react';
+import { RiChatDeleteLine } from "react-icons/ri";
+import { TfiFilter } from "react-icons/tfi";
+import { useDeviceDetect } from '../../hooks/useDeviceDetect';
+
+import { Category } from '../../hooks/useCategories';
 import * as S from './styles';
 
+interface IFilter {
+    description?: { $regex: string; $options: string } | string;
+    category?: string | null;
+    type?: string | null;
+    amount?: { $gte?: number; $lte?: number } | string | null;
+    date?: { $gte?: Date; $lte?: Date } | Date;
+    userId?: string | null;
+}
 
 interface FilterProps {
-    filters: any
-    categories: any
-    handleFilterChange: (e: any) => void
+    filters: IFilter
+    categories: Category
+    handleFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
     resetFilters: () => void
 }
 
 export const Filter = ({ filters, categories, handleFilterChange, resetFilters }: FilterProps) => {
-    return (
+    const { isMobile } = useDeviceDetect();
+    const [showFilters, setShowFilters] = useState(false)
+
+    const filterContent = () => (
         <S.FilterForm>
             <S.FilterGroup>
                 <S.FilterInput
@@ -88,5 +105,22 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
 
 
         </S.FilterForm>
-    );
+    )
+
+    return isMobile ? (<S.FilterContainer>
+        <div className="filterButtonContainer">
+            <button onClick={() => setShowFilters(true)}>
+                <TfiFilter />
+            </button>
+
+            {showFilters && <button onClick={() => setShowFilters(false)}><RiChatDeleteLine />
+            </button>}
+        </div>
+
+        {
+            showFilters && filterContent()
+        }
+
+    </S.FilterContainer>)
+        : filterContent()
 };

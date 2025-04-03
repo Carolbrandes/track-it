@@ -10,6 +10,11 @@ interface CurrencyProps {
     code: string
 }
 
+interface DataCurrencies {
+    success: boolean
+    currencies: CurrencyProps[]
+}
+
 export const CurrencySelect = () => {
     const [currencies, setCurrencies] = useState<CurrencyProps[]>([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
@@ -22,11 +27,12 @@ export const CurrencySelect = () => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json();
+                const data = await response.json() as DataCurrencies;
+                console.log("🚀 ~ fetchCurrencies ~ data:", data)
 
                 if (data.success) {
                     setCurrencies(data.currencies);
-                    const defaultCurrency = data.currencies.find((currency: any) => currency.code === 'USO');
+                    const defaultCurrency = data.currencies.find((currency) => currency.code === 'USO');
                     if (defaultCurrency) {
                         setSelectedCurrency(defaultCurrency._id);
                     }

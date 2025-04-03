@@ -116,15 +116,3 @@ declare module 'styled-components' {
   }
 }
 
-export const SuccessMessage = styled.div`
-    color: ${({ theme }) => theme.colors.background};
-    background-color: ${({ theme }) => theme.colors.success};
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 1px solid ${({ theme }) => theme.colors.success};
-    position: fixed;
-    right: 2rem;
-    bottom: 2rem;
-    width: fit-content;
-`;

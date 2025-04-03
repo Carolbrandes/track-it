@@ -7,9 +7,9 @@ export interface FormField {
   label: string;
   type: FieldType;
   name: string;
-  value: any;
-  onChange: (value: any) => void;
-  options?: { value: any; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  options?: { value: string; label: string }[];
   required?: boolean;
   placeholder?: string;
 }
@@ -82,7 +82,7 @@ export default function Form({
         </S.FormGroup>
       ))}
 
-      <S.Button type="submit" disabled={isSubmitting}>
+      <S.Button $primary type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Processing...' : submitText}
       </S.Button>
     </S.Form>

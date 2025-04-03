@@ -9,6 +9,16 @@ export const SidebarContainer = styled.div`
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  position: fixed;
+  left: ${({ $isOpen }) => ($isOpen ? '0' : '-250px')};
+  top: 0;
+  z-index: 100;
+  transition: left 0.3s ease;
+
+  @media (min-width: 768px) {
+    position: relative;
+    left: 0;
+  }
 `;
 
 export const LogoContainer = styled.div`
@@ -42,8 +52,6 @@ export const UserSection = styled.div`
   padding-top: 3rem;
 `;
 
-
-
 export const SettingsOption = styled.div`
   display: flex;
   align-items: center;
@@ -52,5 +60,39 @@ export const SettingsOption = styled.div`
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+`;
 
+export const HamburgerButton = styled.button`
+display: flex;
+position: fixed;
+top: 0;
+left: 0;
+z-index: 101;
+background: ${({ theme }) => theme.colors.background};
+border: none;
+color: ${({ theme }) => theme.colors.textPrimary};
+font-size: 24px;
+padding: 1rem;
+width: 100%;
+cursor: pointer;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+@media (min-width: 1200px) {
+    display: none;
+  }
+`;
+
+export const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+
+  @media (min-width: 768px) {
+    display: none;
+  }
 `;

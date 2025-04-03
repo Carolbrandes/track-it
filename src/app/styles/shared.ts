@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 
 export const PageContainer = styled.div`
-  max-width: 1200px;
   padding: 2rem;
-  
+  margin-block: 2rem;
 `;
 
 export const Title = styled.h1`
@@ -102,8 +101,8 @@ export const RadioGroup = styled.div`
 export const RadioButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.gray300};
-  color: ${({ $active }) => ($active ? 'white' : 'inherit')};
+    $active ? theme.colors.terciary : theme.colors.gray300};
+  color: ${({ theme }) => theme.colors.textSecondary};
   border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 4px;
   cursor: pointer;
@@ -121,3 +120,5 @@ export const RadioButton = styled.button<{ $active: boolean }>`
     transform: translateY(0);
   }
 `;
+
+

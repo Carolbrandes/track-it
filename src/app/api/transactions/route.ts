@@ -5,6 +5,15 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '../../lib/db';
 
+interface FilterQuery {
+    description?: { $regex: string; $options: string } | string;
+    category?: string | null;
+    type?: string | null;
+    amount?: { $gte?: number; $lte?: number } | string | null;
+    date?: { $gte?: Date; $lte?: Date } | Date;
+    userId?: string | null;
+}
+
 
 export async function GET(request: Request) {
     try {
@@ -19,38 +28,62 @@ export async function GET(request: Request) {
         }
 
 
-        const filterQuery: any = { userId };
+        const filterQuery: FilterQuery = {
+            userId: userId || null
+        };
 
+        // Handle description filter
+        const descriptionParam = url.searchParams.get('description');
+        if (descriptionParam) {
+            filterQuery.description = {
+                $regex: descriptionParam,
+                $options: 'i'
+            };
+        }
 
-        if (url.searchParams.get('description')) {
-            filterQuery.description = { $regex: url.searchParams.get('description'), $options: 'i' };
+        // Handle category filter
+        const categoryParam = url.searchParams.get('category');
+        if (categoryParam) {
+            filterQuery.category = categoryParam;
         }
-        if (url.searchParams.get('category')) {
-            filterQuery.category = url.searchParams.get('category');
+
+        // Handle type filter
+        const typeParam = url.searchParams.get('type');
+        if (typeParam) {
+            filterQuery.type = typeParam;
         }
-        if (url.searchParams.get('type')) {
-            filterQuery.type = url.searchParams.get('type');
+
+        // Handle amount filters
+        const minAmountParam = url.searchParams.get('minAmount');
+        const maxAmountParam = url.searchParams.get('maxAmount');
+
+        if (minAmountParam || maxAmountParam) {
+            filterQuery.amount = {};
+
+            if (minAmountParam) {
+                (filterQuery.amount as { $gte: number }).$gte = parseFloat(minAmountParam);
+            }
+
+            if (maxAmountParam) {
+                (filterQuery.amount as { $lte: number }).$lte = parseFloat(maxAmountParam);
+            }
         }
-        if (url.searchParams.get('minAmount')) {
-            filterQuery.amount = { ...filterQuery.amount, $gte: parseFloat(url.searchParams.get('minAmount')!) };
-        }
-        if (url.searchParams.get('maxAmount')) {
-            filterQuery.amount = { ...filterQuery.amount, $lte: parseFloat(url.searchParams.get('maxAmount')!) };
-        }
-        if (url.searchParams.get('startDate') && url.searchParams.get('endDate')) {
-            const startDate = new Date(url.searchParams.get('startDate')!);
-            const endDate = new Date(url.searchParams.get('endDate')!);
+
+        // Handle date range filter
+        const startDateParam = url.searchParams.get('startDate');
+        const endDateParam = url.searchParams.get('endDate');
+
+        if (startDateParam && endDateParam) {
+            const startDate = new Date(startDateParam);
+            const endDate = new Date(endDateParam);
 
             const startUTC = new Date(startDate.setHours(0, 0, 0, 0));
             const endUTC = new Date(endDate.setHours(23, 59, 59, 999));
-
 
             filterQuery.date = {
                 $gte: startUTC,
                 $lte: endUTC
             };
-
-
         }
 
         const totalCount = await Transaction.countDocuments(filterQuery);

@@ -2,11 +2,12 @@
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import Form, { FormField } from '../../components/Form';
+import { Toast } from '../../components/Toast';
 import { useCategories } from '../../hooks/useCategories';
 import { useUserData } from '../../hooks/useUserData';
-import * as S from '../styles';
+import { Transaction } from '../page';
 
-export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) => void }) {
+export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transaction) => void }) {
     const { data: userData } = useUserData();
     const { categories } = useCategories(userData?.user?.id);
 
@@ -145,9 +146,8 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: any) =
                 error={error}
             />
 
-            {successMsg && <S.SuccessMessage>
-                {successMsg}
-            </S.SuccessMessage>}
+            {successMsg && <Toast type='success' message={successMsg} />}
+
         </>
 
     );

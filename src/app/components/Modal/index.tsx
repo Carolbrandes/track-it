@@ -1,17 +1,28 @@
+import { Category } from '@/app/hooks/useCategories';
 import React, { useEffect, useState } from 'react';
+import { Transaction } from '../../hooks/useTransactions';
+import { TransactionToEdit } from '../../page';
 import * as S from './styles';
 
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (updatedTransaction: any) => void;
-    transaction: any;
-    categories: any[];
+    onSave: (updatedTransaction: TransactionToEdit) => void;
+    transaction: Transaction;
+    categories: Category[];
 }
+
+interface CategoryObj {
+    _id: string
+    name: string
+    userId: string | Date
+    createdAt: string | Date
+
+}
+
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, categories }) => {
     const [updatedTransaction, setUpdatedTransaction] = useState(transaction);
-
 
     useEffect(() => {
         setUpdatedTransaction(transaction);
@@ -26,10 +37,40 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
     };
 
     const handleSave = () => {
-        onSave(updatedTransaction);
+        // Verifica se category é um objeto ou string
+        let categoryToSave: string | { _id: string; name: string; userId: string; createdAt: string };
+
+        if (typeof updatedTransaction.category === 'string') {
+            // Se for string, mantém como está
+            categoryToSave = updatedTransaction.category;
+        } else {
+            // Se for objeto, cria um novo objeto com todas propriedades necessárias
+            const categoryObj = updatedTransaction.category || {};
+            const selectedCategory = categories.find(cat => cat._id === categoryObj._id);
+            console.log("🚀 ~ handleSave ~ categoryObj:", categoryObj)
+
+            categoryToSave = {
+                _id: categoryObj._id || selectedCategory?._id || '',
+                name: categoryObj.name || selectedCategory?.name || '',
+                userId: updatedTransaction.userId,
+                createdAt: (categoryObj as CategoryObj).createdAt || new Date().toISOString()
+            };
+        }
+
+        const transactionToSave: TransactionToEdit = {
+            ...updatedTransaction,
+            category: categoryToSave
+        };
+
+        onSave(transactionToSave);
     };
 
     if (!isOpen) return null;
+
+    // Obtém o valor do category para o select
+    const categoryValue = typeof updatedTransaction.category === 'object'
+        ? updatedTransaction.category._id
+        : updatedTransaction.category || '';
 
     return (
         <S.ModalOverlay>
@@ -48,7 +89,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                     />
                     <S.Select
                         name="category"
-                        value={updatedTransaction.category._id || ''}
+                        value={categoryValue}
                         onChange={handleInputChange}
                     >
                         <option value="">Select Category</option>

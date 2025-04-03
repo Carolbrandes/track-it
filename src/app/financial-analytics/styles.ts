@@ -1,17 +1,10 @@
-'use-client';
+'use client';
 
 import styled from 'styled-components';
+import * as CommonStyles from '../styles/shared';
 
-// Container for the entire chart section
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3rem;
-  padding: 2rem;
-  border-radius: 10px;
-  width: 100%;
-`;
+export const PageContainer = CommonStyles.PageContainer
+
 
 export const ChartWrapperContainer = styled.div`
   display: flex;

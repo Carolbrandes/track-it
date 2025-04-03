@@ -1,14 +1,19 @@
 import styled from "styled-components";
 
 export const SummaryCard = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   background: ${({ theme }) => theme.colors.secondary};
   color: ${({ theme }) => theme.colors.textPrimary};
   padding: 0.3rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  @media (min-width: 1200px){
+    display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
 
@@ -30,6 +35,6 @@ export const AmountNegative = styled.span`
 
 export const AmountBalance = styled.span<{ $positive: boolean }>`
   color: ${({ theme, $positive }) =>
-        $positive ? theme.colors.success : theme.colors.danger};
+    $positive ? theme.colors.success : theme.colors.danger};
   font-weight: bold;
 `;

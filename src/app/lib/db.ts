@@ -16,7 +16,7 @@ if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Initialize the cached variable with the correct type
+
 let cached: MongooseCache = global.mongoose;
 
 if (!cached) {

@@ -1,7 +1,7 @@
 'use-cliente'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-interface Category {
+export interface Category {
     _id: string;
     name: string;
 }

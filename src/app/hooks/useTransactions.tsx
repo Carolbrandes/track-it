@@ -1,7 +1,7 @@
 'use-cliente'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-interface Transaction {
+export interface Transaction {
     _id: string;
     description: string;
     amount: number;
@@ -96,7 +96,7 @@ export const useTransactions = (
         queryKey: ['transactions', userId, page, limit, filters],
         queryFn: () => fetchTransactions(userId, page, limit, filters),
         enabled: !!userId,
-        placeholderData: (previousData) => previousData, // Alternative to keepPreviousData
+        placeholderData: (previousData) => previousData,
     });
 
     const addMutation = useMutation({

@@ -8,6 +8,7 @@ declare module 'styled-components' {
             textSecondary: string
             primary: string
             secondary: string
+            terciary: string
             gray200: string
             gray300: string
             gray700: string

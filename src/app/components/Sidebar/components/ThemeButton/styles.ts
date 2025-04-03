@@ -1,4 +1,3 @@
-// styles.ts
 import { FaMoon } from "react-icons/fa6";
 import { MdWbSunny } from "react-icons/md";
 

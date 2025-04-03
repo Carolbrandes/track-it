@@ -5,11 +5,20 @@ import { useUserData } from '@/app/hooks/useUserData';
 import { useState } from 'react';
 import * as S from '../styles';
 
+interface Category {
+    _id: string
+    name: string
+    userId: string
+    createdAt: Date | string
+
+}
+
 export default function CategoryList({
     categories
 }: {
-    categories: any[]
+    categories: Category[]
 }) {
+    console.log("🚀 ~ categories:", categories)
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState('');
@@ -18,7 +27,7 @@ export default function CategoryList({
     const { updateCategory,
         deleteCategory, } = useCategories(userData?.user?.id)
 
-    const handleEdit = (category: any) => {
+    const handleEdit = (category: Category) => {
         setEditingId(category._id);
         setEditName(category.name);
     };

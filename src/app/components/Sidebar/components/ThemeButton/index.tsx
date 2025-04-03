@@ -1,4 +1,3 @@
-// components/ThemeButton.tsx
 'use client';
 
 import { useTheme } from '../../../../hooks/useTheme';

@@ -10,6 +10,27 @@ import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
 import * as S from './styles';
 
+export interface TransactionToEdit {
+  _id: string
+  description: string
+  amount: number
+  currency: string
+  date: Date
+  type: 'expense' | 'income'
+  category: {
+    _id: string
+    name: string
+    userId: string
+    createdAt: string
+
+  } | string,
+  userId: string
+  createdAt?: string
+  updatedAt?: string
+
+}
+
+
 export default function Home() {
   const { data: userData } = useUserData();
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,7 +43,8 @@ export default function Home() {
     startDate: '',
     endDate: ''
   });
-  const [transactionToEdit, setTransactionToEdit] = useState<any | null>(null);
+  const [transactionToEdit, setTransactionToEdit] = useState<TransactionToEdit | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
 
@@ -70,7 +92,7 @@ export default function Home() {
     setCurrentPage(page);
   };
 
-  const handleEdit = (transaction: any) => {
+  const handleEdit = (transaction: TransactionToEdit) => {
     setTransactionToEdit(transaction);
     setIsModalOpen(true);
   };
@@ -90,15 +112,21 @@ export default function Home() {
   };
 
 
-  const handleSave = async (updatedTransaction: any) => {
+  const handleSave = async (updatedTransaction: TransactionToEdit) => {
     try {
-      await updateTransaction(updatedTransaction._id, updatedTransaction);
+      const payload = {
+        ...updatedTransaction,
+        date: typeof updatedTransaction.date === 'string'
+          ? new Date(updatedTransaction.date)
+          : updatedTransaction.date
+      };
+
+      await updateTransaction(updatedTransaction._id, payload);
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error updating transaction:', error);
     }
   };
-
   const resetFilters = () => {
     setFilters({
       description: '',

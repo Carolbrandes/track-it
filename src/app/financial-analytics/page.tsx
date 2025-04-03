@@ -30,7 +30,7 @@ export default function FinancialAnalyticsPage() {
     const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
     return (
-        <S.Container>
+        <S.PageContainer>
             <S.Title>Financial Analytics</S.Title>
 
             <S.FilterContainer>
@@ -64,6 +64,6 @@ export default function FinancialAnalyticsPage() {
             </S.FilterContainer>
 
             <FinancialPieChart month={selectedMonth} year={selectedYear} />
-        </S.Container>
+        </S.PageContainer>
     );
 }
