@@ -7,7 +7,7 @@ import dbConnect from '../../../lib/db';
 export async function PUT(
     request: Request,
     { params }: { params: { id: string } }
-) {
+): Promise<NextResponse> {
     try {
         await dbConnect();
 
