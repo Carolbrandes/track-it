@@ -61,7 +61,7 @@ export const Button = styled.button<{ $small?: boolean; $secondary?: boolean; $d
     background-color: ${({ $secondary, $danger, theme }) =>
     $danger ? theme.colors.danger :
       $secondary ? theme.colors.gray700 :
-        theme.colors.primaryDark};
+        theme.colors.primary};
   }
 
   &:disabled {

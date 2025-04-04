@@ -17,13 +17,7 @@ export interface TransactionToEdit {
   currency: string
   date: Date
   type: 'expense' | 'income'
-  category: {
-    _id: string
-    name: string
-    userId: string
-    createdAt: string
-
-  } | string,
+  category: string | { _id: string; name: string; createdAt?: Date | string }
   userId: string
   createdAt?: string
   updatedAt?: string
@@ -165,7 +159,7 @@ export default function Home() {
       </S.Section>
       {/* Transactions Table */}
       <TransactionList
-        transactions={transactions}
+        transactions={transactions as TransactionToEdit[]}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
         handleEdit={handleEdit}

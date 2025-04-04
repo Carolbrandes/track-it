@@ -1,17 +1,11 @@
 'use client';
 
-import { useCategories } from '@/app/hooks/useCategories';
-import { useUserData } from '@/app/hooks/useUserData';
+import { Category, useCategories } from '@/app/hooks/useCategories';
 import { useState } from 'react';
+import { useUserData } from '../../hooks/useUserData';
 import * as S from '../styles';
 
-interface Category {
-    _id: string
-    name: string
-    userId: string
-    createdAt: Date | string
 
-}
 
 export default function CategoryList({
     categories

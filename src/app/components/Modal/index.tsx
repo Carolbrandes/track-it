@@ -1,3 +1,5 @@
+'use client';
+
 import { Category } from '@/app/hooks/useCategories';
 import React, { useEffect, useState } from 'react';
 import { Transaction } from '../../hooks/useTransactions';
@@ -13,13 +15,11 @@ interface ModalProps {
 }
 
 interface CategoryObj {
-    _id: string
-    name: string
-    userId: string | Date
-    createdAt: string | Date
-
+    _id: string;
+    name: string;
+    userId: string;
+    createdAt: string;
 }
-
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, categories }) => {
     const [updatedTransaction, setUpdatedTransaction] = useState(transaction);
@@ -37,23 +37,22 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
     };
 
     const handleSave = () => {
-        // Verifica se category é um objeto ou string
-        let categoryToSave: string | { _id: string; name: string; userId: string; createdAt: string };
+        let categoryToSave: string | CategoryObj;
 
         if (typeof updatedTransaction.category === 'string') {
-            // Se for string, mantém como está
             categoryToSave = updatedTransaction.category;
         } else {
-            // Se for objeto, cria um novo objeto com todas propriedades necessárias
             const categoryObj = updatedTransaction.category || {};
             const selectedCategory = categories.find(cat => cat._id === categoryObj._id);
-            console.log("🚀 ~ handleSave ~ categoryObj:", categoryObj)
 
             categoryToSave = {
                 _id: categoryObj._id || selectedCategory?._id || '',
                 name: categoryObj.name || selectedCategory?.name || '',
                 userId: updatedTransaction.userId,
-                createdAt: (categoryObj as CategoryObj).createdAt || new Date().toISOString()
+                createdAt: String((categoryObj && 'createdAt' in categoryObj && categoryObj.createdAt instanceof Date)
+                    ? categoryObj.createdAt.toISOString()
+                    : (categoryObj && 'createdAt' in categoryObj ? categoryObj.createdAt : new Date().toISOString()))
+
             };
         }
 
@@ -67,7 +66,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
 
     if (!isOpen) return null;
 
-    // Obtém o valor do category para o select
     const categoryValue = typeof updatedTransaction.category === 'object'
         ? updatedTransaction.category._id
         : updatedTransaction.category || '';

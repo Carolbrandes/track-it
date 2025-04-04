@@ -32,7 +32,7 @@ export const TransactionMeta = styled.div`
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.textPrimarySecondary};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const TransactionAmount = styled.span<{ $type: 'income' | 'expense' }>`
@@ -59,7 +59,7 @@ export const RadioButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primaryDark : theme.colors.gray700};
+    $active ? theme.colors.primary : theme.colors.gray700};
   }
 `;
 
@@ -72,7 +72,7 @@ export const CurrencyInputContainer = styled.div`
     left: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: ${({ theme }) => theme.colors.textPrimarySecondary};
+    color: ${({ theme }) => theme.colors.textPrimary};
   }
 
   input {
@@ -99,19 +99,17 @@ export const CategorySelect = styled.select`
 declare module 'styled-components' {
   export interface DefaultTheme {
     colors: {
-      primary: string;
-      primaryDark: string;
-      secondary: string;
-      secondaryDark: string;
-      danger: string;
-      dangerDark: string;
-      success: string;
-      successDark: string;
-      text: string;
-      textSecondary: string;
-      background: string;
-      hover: string;
-      border: string;
+      background: string
+      textPrimary: string
+      textSecondary: string
+      primary: string
+      secondary: string
+      terciary: string
+      gray200: string
+      gray300: string
+      gray700: string
+      danger: string
+      success: string
     };
   }
 }

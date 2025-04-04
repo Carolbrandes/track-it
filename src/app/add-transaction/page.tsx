@@ -1,7 +1,7 @@
 'use client';
-import { Transaction, useTransactions } from '../hooks/useTransactions';
+import { useTransactions } from '../hooks/useTransactions';
 import { useUserData } from '../hooks/useUserData';
-import TransactionForm from './components/TransactionForm';
+import TransactionForm, { TransactionType } from './components/TransactionForm';
 import * as S from './styles';
 
 
@@ -14,19 +14,18 @@ export default function AddTransaction() {
         addTransaction,
     } = useTransactions(userData?.user?.id);
 
-    const handleAddTransaction = async (transaction: Transaction) => {
-        console.log("🚀 ~ handleAddTransaction ~ transaction:", transaction)
+    const handleAddTransaction = async (transaction: TransactionType) => { // ✅ Alterado para TransactionType
+        console.log("🚀 ~ handleAddTransaction ~ transaction:", transaction);
 
         const payload = {
             ...transaction,
             date: typeof transaction.date === 'string'
                 ? new Date(transaction.date)
-                : transaction.date
+                : transaction.date,
+            userId: userData?.user?.id, // ✅ Adicionando userId aqui
         };
-        await addTransaction({
-            ...payload,
-            userId: userData?.user?.id,
-        });
+
+        await addTransaction(payload); // ✅ Passando payload corretamente
     };
 
     return (

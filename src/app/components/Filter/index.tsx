@@ -1,32 +1,35 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
-import { useDeviceDetect } from '../../hooks/useDeviceDetect';
-
 import { Category } from '../../hooks/useCategories';
+import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 import * as S from './styles';
 
 interface IFilter {
     description?: { $regex: string; $options: string } | string;
-    category?: string | null;
-    type?: string | null;
-    amount?: { $gte?: number; $lte?: number } | string | null;
+    category?: string;
+    type?: string;
+    amount?: { $gte?: number; $lte?: number } | string;
     date?: { $gte?: Date; $lte?: Date } | Date;
-    userId?: string | null;
+    userId?: string;
+    minAmount?: number | string;
+    maxAmount?: number | string;
+    startDate?: string;
+    endDate?: string;
 }
 
 interface FilterProps {
-    filters: IFilter
-    categories: Category
-    handleFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
-    resetFilters: () => void
+    filters: IFilter;
+    categories: Category[];
+    handleFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    resetFilters: () => void;
 }
 
-export const Filter = ({ filters, categories, handleFilterChange, resetFilters }: FilterProps) => {
+export const Filter = ({ filters, categories = [], handleFilterChange, resetFilters }: FilterProps) => {
     const { isMobile } = useDeviceDetect();
-    const [showFilters, setShowFilters] = useState(false)
+    const [showFilters, setShowFilters] = useState(false);
 
     const filterContent = () => (
         <S.FilterForm>
@@ -35,7 +38,7 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
                     type="text"
                     name="description"
                     placeholder="Description"
-                    value={filters.description}
+                    value={String(filters.description) || ''}
                     onChange={handleFilterChange}
                 />
             </S.FilterGroup>
@@ -43,7 +46,7 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
             <S.FilterGroup>
                 <S.FilterSelect
                     name="category"
-                    value={filters.category}
+                    value={filters.category || ''}
                     onChange={handleFilterChange}
                 >
                     <option value="">All Categories</option>
@@ -58,7 +61,7 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
             <S.FilterGroup>
                 <S.FilterSelect
                     name="type"
-                    value={filters.type}
+                    value={filters.type || ''}
                     onChange={handleFilterChange}
                 >
                     <option value="">All Types</option>
@@ -72,14 +75,14 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
                     type="number"
                     name="minAmount"
                     placeholder="Min Amount"
-                    value={filters.minAmount}
+                    value={filters.minAmount || ''}
                     onChange={handleFilterChange}
                 />
                 <S.FilterInput
                     type="number"
                     name="maxAmount"
                     placeholder="Max Amount"
-                    value={filters.maxAmount}
+                    value={filters.maxAmount || ''}
                     onChange={handleFilterChange}
                 />
             </S.FilterGroup>
@@ -89,38 +92,37 @@ export const Filter = ({ filters, categories, handleFilterChange, resetFilters }
                     type="date"
                     name="startDate"
                     placeholder="Start Date"
-                    value={filters.startDate}
+                    value={filters.startDate || ''}
                     onChange={handleFilterChange}
                 />
                 <S.FilterInput
                     type="date"
                     name="endDate"
                     placeholder="End Date"
-                    value={filters.endDate}
+                    value={filters.endDate || ''}
                     onChange={handleFilterChange}
                 />
-                {/* Reset Filters Button */}
                 <S.ResetButton onClick={resetFilters}>Reset Filters</S.ResetButton>
             </S.FilterGroup>
-
-
         </S.FilterForm>
-    )
+    );
 
-    return isMobile ? (<S.FilterContainer>
-        <div className="filterButtonContainer">
-            <button onClick={() => setShowFilters(true)}>
-                <TfiFilter />
-            </button>
+    return isMobile ? (
+        <S.FilterContainer>
+            <div className="filterButtonContainer">
+                <button onClick={() => setShowFilters(true)}>
+                    <TfiFilter />
+                </button>
 
-            {showFilters && <button onClick={() => setShowFilters(false)}><RiChatDeleteLine />
-            </button>}
-        </div>
-
-        {
-            showFilters && filterContent()
-        }
-
-    </S.FilterContainer>)
-        : filterContent()
+                {showFilters && (
+                    <button onClick={() => setShowFilters(false)}>
+                        <RiChatDeleteLine />
+                    </button>
+                )}
+            </div>
+            {showFilters && filterContent()}
+        </S.FilterContainer>
+    ) : (
+        filterContent()
+    );
 };

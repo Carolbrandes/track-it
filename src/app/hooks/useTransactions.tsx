@@ -8,7 +8,7 @@ export interface Transaction {
     currency: string;
     date: Date;
     type: 'expense' | 'income';
-    category: string | { _id: string; name: string };
+    category: string | { _id: string; name: string, createdAt?: Date | string };
     userId: string;
 }
 

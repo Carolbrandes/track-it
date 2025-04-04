@@ -26,12 +26,12 @@ export const LoadingIndicator = styled.div`
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.textPrimarySecondary};
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.danger};
-  background-color: ${({ theme }) => theme.colors.dangerLight};
+  background-color: ${({ theme }) => theme.colors.danger};
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
@@ -63,7 +63,7 @@ export const Button = styled.button<{
     $disabled ?
       ($danger ? theme.colors.danger : $primary ? theme.colors.primary : theme.colors.secondary) :
       ($danger ? theme.colors.danger :
-        $primary ? theme.colors.primaryDark :
+        $primary ? theme.colors.primary :
           theme.colors.gray700)};
   }
 `;

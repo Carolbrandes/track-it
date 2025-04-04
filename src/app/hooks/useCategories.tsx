@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 export interface Category {
     _id: string;
     name: string;
+    createdAt?: Date | string
 }
 
 const fetchCategories = async (): Promise<Category[]> => {

@@ -10,16 +10,16 @@ export const Pagination = styled.div`
 export const PaginationButton = styled.button<{ $active?: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-        $active ? theme.colors.primary : theme.colors.background};
+    $active ? theme.colors.primary : theme.colors.background};
   color: ${({ $active, theme }) =>
-        $active ? 'white' : theme.colors.textPrimary};
+    $active ? 'white' : theme.colors.textPrimary};
   border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-        $active ? theme.colors.primaryDark : theme.colors.gray300};
+    $active ? theme.colors.primary : theme.colors.gray300};
   }
 
   &:disabled {

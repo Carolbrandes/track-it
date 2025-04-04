@@ -22,7 +22,7 @@ export const ResponsiveTable = styled.table`
   }
   
   tr:hover {
-    background-color: ${({ theme }) => theme.colors.gray100};
+    background-color: ${({ theme }) => theme.colors.gray200};
   }
 
   @media (min-width: 1200px) {
@@ -72,7 +72,7 @@ export const EditButton = styled.button`
   font-size: 0.875rem;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.primaryDark};
+    background-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 

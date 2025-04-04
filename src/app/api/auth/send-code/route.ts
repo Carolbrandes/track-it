@@ -4,10 +4,10 @@ import nodemailer from 'nodemailer';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 
-export async function POST(req) {
+export async function POST(request: Request) {
     await dbConnect();
-    const { email } = await req.json();
 
+    const { email } = await request.json();
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 

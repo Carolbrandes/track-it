@@ -4,10 +4,13 @@ import { useEffect, useState } from 'react';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
 import { useCategories } from '../../hooks/useCategories';
+import { Transaction } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
-import { Transaction } from '../page';
 
-export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transaction) => void }) {
+export type TransactionType = Omit<Transaction, '_id' | 'userId'>
+
+
+export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
     const { data: userData } = useUserData();
     const { categories } = useCategories(userData?.user?.id);
 
@@ -26,7 +29,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         if (categories.length > 0 && !categoryId) {
             setCategoryId(categories[0]._id);
         }
-    }, [categories]);
+    }, [categories, categoryId]);
 
     const handleAmountChange = (value: string) => {
         const numericValue = value.replace(/[^0-9.]/g, '');
@@ -50,7 +53,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
                 description,
                 amount: Number(amount),
                 currency,
-                date,
+                date: new Date(date),
                 type,
                 category: categoryId
             });
@@ -116,7 +119,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'radio-group',
             name: 'type',
             value: type,
-            onChange: setType,
+            onChange: (value: string) => setType(value as 'expense' | 'income'), // 🔥 Converte explicitamente para o tipo correto
             options: [
                 { value: 'expense', label: 'Expense' },
                 { value: 'income', label: 'Income' }

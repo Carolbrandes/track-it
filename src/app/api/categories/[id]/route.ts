@@ -1,30 +1,25 @@
 import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Category from '../../../../models/Category';
 import dbConnect from '../../../lib/db';
 
-export async function PUT(
-    request: Request,
-    { params }: { params: { id: string } }
-): Promise<NextResponse> {
+export async function PUT(request: NextRequest) {
     try {
         await dbConnect();
 
-        const id = params.id;
-
+        // Pegando o ID diretamente da URL
+        const id = request.nextUrl.pathname.split('/').pop();
         if (!id) {
             return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
         }
 
         const { name } = await request.json();
-
         if (!name) {
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
         }
 
         const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
-
         if (!authToken) {
             return NextResponse.json({ error: 'Token not found' }, { status: 401 });
         }
@@ -47,52 +42,39 @@ export async function PUT(
 
         return NextResponse.json(category);
     } catch (error: unknown) {
-        let errorMessage = 'Failed on operation';
-
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        } else if (typeof error === 'string') {
-            errorMessage = error;
-        }
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update category';
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 
-
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest) {
     try {
         await dbConnect();
-        const { id } = await params;
 
-
-        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
-
-        if (!authToken) {
-            return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
+        // Pegando o ID diretamente da URL
+        const id = request.nextUrl.pathname.split('/').pop();
+        if (!id) {
+            return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
         }
 
+        const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
+        if (!authToken) {
+            return NextResponse.json({ error: 'Token not found' }, { status: 401 });
+        }
 
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-
         const category = await Category.findOne({ _id: id, userId });
         if (!category) {
-            return NextResponse.json({ error: 'Categoria não encontrada ou não pertence ao usuário' }, { status: 404 });
+            return NextResponse.json({ error: 'Category not found or does not belong to user' }, { status: 404 });
         }
-
 
         await Category.findByIdAndDelete(id);
 
-        return NextResponse.json({ message: 'Categoria deletada com sucesso' });
+        return NextResponse.json({ message: 'Category deleted successfully' });
     } catch (error: unknown) {
-        let errorMessage = 'Failed on operation';
-
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        } else if (typeof error === 'string') {
-            errorMessage = error;
-        }
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete category';
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

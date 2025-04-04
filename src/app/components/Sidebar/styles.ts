@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const SidebarContainer = styled.div`
+interface SidebarContainerProps {
+  $isOpen: boolean
+}
+
+export const SidebarContainer = styled.div<SidebarContainerProps>`
   width: 250px;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background};
@@ -82,7 +86,11 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 `;
 
-export const Overlay = styled.div`
+interface OverlayProps {
+  $isOpen: boolean
+}
+
+export const Overlay = styled.div<OverlayProps>`
   position: fixed;
   top: 0;
   left: 0;

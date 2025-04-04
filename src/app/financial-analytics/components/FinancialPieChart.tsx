@@ -1,6 +1,6 @@
 'use client';
 
-import { ArcElement, Chart as ChartJS, Legend, Title, Tooltip } from 'chart.js';
+import { ArcElement, Chart as ChartJS, ChartOptions, Legend, Title, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
@@ -10,7 +10,7 @@ import * as S from '../styles';
 // Register necessary components from Chart.js
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-const FinancialPieChart = ({ month, year }) => {
+const FinancialPieChart = ({ month, year }: { month: string | number, year: string | number }) => {
     const { data: userData } = useUserData();
     const userId = userData?.user?.id;
     const { transactions } = useTransactions(userId, 1, 100);
@@ -27,12 +27,12 @@ const FinancialPieChart = ({ month, year }) => {
     }) || [];
 
     // Get categories actually used in transactions, grouped by type
-    const getCategoriesByType = (type) => {
+    const getCategoriesByType = (type: 'expense' | 'income') => {
         // Get unique category IDs from transactions of this type
         const categoryIds = [...new Set(
             filteredTransactions
-                .filter(txn => txn.type === type && txn.category?._id)
-                .map(txn => txn.category._id)
+                .filter(txn => txn.type === type && txn.category)
+                .map(txn => txn.category)
         )];
 
         // Return the full category objects that match these IDs
@@ -49,7 +49,7 @@ const FinancialPieChart = ({ month, year }) => {
         filteredTransactions
             .filter(txn =>
                 txn.type === 'expense' &&
-                txn.category?._id === category._id
+                txn.category === category.name
             )
             .reduce((acc, txn) => acc + txn.amount, 0)
     );
@@ -58,7 +58,7 @@ const FinancialPieChart = ({ month, year }) => {
         filteredTransactions
             .filter(txn =>
                 txn.type === 'income' &&
-                txn.category?._id === category._id
+                txn.category === category.name
             )
             .reduce((acc, txn) => acc + txn.amount, 0)
     );
@@ -95,7 +95,7 @@ const FinancialPieChart = ({ month, year }) => {
     };
 
     // Chart options
-    const chartOptions = {
+    const chartOptions: ChartOptions<'pie'> = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -107,9 +107,9 @@ const FinancialPieChart = ({ month, year }) => {
                 callbacks: {
                     label: function (context) {
                         const label = context.label || '';
-                        const value = context.raw || 0;
+                        const value = Number(context.raw) || 0;
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = Math.round((value / total) * 100);
+                        const percentage = Math.round((value / total) * 100); // The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
                         return `${label}: $${value} (${percentage}%)`;
                     }
                 }
@@ -142,7 +142,7 @@ const FinancialPieChart = ({ month, year }) => {
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>No expense data available for {new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                    <div>No expense data available for {new Date(+year, +month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
                 )}
             </S.ChartWrapper>
 
@@ -169,7 +169,7 @@ const FinancialPieChart = ({ month, year }) => {
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>No income data available for {new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                    <div>No income data available for {new Date(+year, +month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
                 )}
             </S.ChartWrapper>
         </S.ChartWrapperContainer>
