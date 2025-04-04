@@ -1,38 +1,35 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import { TbPigMoney } from "react-icons/tb";
 import { Spinner } from '../components/Spinner';
-import * as S from './styles';
+import styles from '../styles/Login.module.scss'; // Importando o SCSS Module
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [isCodeSent, setIsCodeSent] = useState(false);
-    const [isLoading, setIsLoading] = useState(false)
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSendCode = async () => {
         try {
-            setIsLoading(true)
+            setIsLoading(true);
 
             const res = await fetch('/api/auth/send-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
             });
+
             if (res.ok) {
                 setIsCodeSent(true);
             }
-
         } catch (error) {
-            console.error("🚀 ~ handleSendCode ~ error:", error)
-
+            console.error("🚀 ~ handleSendCode ~ error:", error);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     };
-
 
     const handleVerifyCode = async () => {
         setIsLoading(true);
@@ -59,15 +56,16 @@ export default function Login() {
     };
 
     return (
-        <S.LoginContainer>
-            <S.LoginHeader>
+        <div className={styles.loginContainer}>
+            <header className={styles.loginHeader}>
                 <TbPigMoney size={45} />
-                <h1>Track It </h1>
-            </S.LoginHeader>
+                <h1>Track It</h1>
+            </header>
 
-            <S.LoginBox>
-                <S.Title>Login</S.Title>
-                <S.Input
+            <div className={styles.loginBox}>
+                <h1 className={styles.title}>Login</h1>
+                <input
+                    className={styles.input}
                     type="email"
                     placeholder="Enter your email"
                     value={email}
@@ -75,20 +73,23 @@ export default function Login() {
                 />
                 {isCodeSent ? (
                     <>
-                        <S.Input
+                        <input
+                            className={styles.input}
                             type="text"
                             placeholder="Enter verification code"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                         />
-                        <S.Button onClick={handleVerifyCode}>{
-                            isLoading ? <Spinner /> : 'Verify Code'
-                        }</S.Button>
+                        <button className={styles.button} onClick={handleVerifyCode}>
+                            {isLoading ? <Spinner /> : 'Verify Code'}
+                        </button>
                     </>
                 ) : (
-                    <S.Button onClick={handleSendCode}>{isLoading ? <Spinner /> : 'Send Code'}</S.Button>
+                    <button className={styles.button} onClick={handleSendCode}>
+                        {isLoading ? <Spinner /> : 'Send Code'}
+                    </button>
                 )}
-            </S.LoginBox>
-        </S.LoginContainer>
+            </div>
+        </div>
     );
 }

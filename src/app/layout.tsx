@@ -7,6 +7,7 @@ import { Sidebar } from './components/Sidebar';
 import { ThemeProvider } from './hooks/useTheme';
 import * as S from "./styles";
 import { GlobalStyle } from './styles/global';
+import './styles/global.scss';
 
 const queryClient = new QueryClient();
 
