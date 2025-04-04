@@ -1,11 +1,20 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
+export interface IUser extends Document {
+    _id: mongoose.Types.ObjectId;
+    email: string;
+    selectedTheme: string;
+    currencyId: string;
+    verificationCode: string
+}
+
+const UserSchema = new Schema<IUser>({
     email: { type: String, required: true, unique: true },
-    verificationCode: { type: String },
     selectedTheme: { type: String, default: 'light' },
-    currencyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', default: '67e12322a2f7b8353bceb3f6' },
-    createdAt: { type: Date, default: Date.now },
+    currencyId: { type: String, required: true },
+    verificationCode: { type: String, required: true, default: '' },
 });
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+
+export default User;

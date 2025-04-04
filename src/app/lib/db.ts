@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable no-var */
 import mongoose from 'mongoose';
 
 interface MongooseCache {
@@ -5,33 +7,41 @@ interface MongooseCache {
     promise: Promise<typeof mongoose> | null;
 }
 
+// Evita recriar a conexão no modo hot-reload do Next.js
 declare global {
-    // eslint-disable-next-line no-var
     var mongoose: MongooseCache;
 }
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+    throw new Error('❌ MONGODB_URI não está definida nas variáveis de ambiente!');
 }
 
-
-let cached: MongooseCache = global.mongoose;
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
-}
+// Reutiliza a conexão no hot-reload do Next.js
+let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
 async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
         return cached.conn;
     }
 
-    cached.promise = cached.promise || mongoose.connect(MONGODB_URI!, { bufferCommands: false });
-    cached.conn = await mongoose.connect(MONGODB_URI!, { bufferCommands: true });
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(String(MONGODB_URI), {
+            bufferCommands: false, // ✅ Essa opção ainda é válida
+        }).then((mongoose) => {
+            console.log('✅ MongoDB conectado!');
+            return mongoose;
+        }).catch((err) => {
+            console.error('❌ Erro ao conectar no MongoDB:', err);
+            throw err;
+        });
+    }
 
-
+    cached.conn = await cached.promise;
     return cached.conn;
 }
+
+global.mongoose = cached;
+
 export default dbConnect;

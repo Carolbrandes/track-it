@@ -11,9 +11,11 @@ export async function POST(request: Request) {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Verifique se o usuário existe ou crie um novo usuário
     let user = await User.findOne({ email });
 
     if (!user) {
+        // Criar um novo usuário com o código de verificação
         user = await User.create({
             email,
             verificationCode: code,
@@ -21,9 +23,12 @@ export async function POST(request: Request) {
             currencyId: new mongoose.Types.ObjectId('67e12322a2f7b8353bceb3f6'),
         });
     } else {
+        // Se o usuário já existe, só atualize o código de verificação
         user.verificationCode = code;
         await user.save();
     }
+
+    console.log("🚀 ~ send code ~ user:", user)
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',

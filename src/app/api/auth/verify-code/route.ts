@@ -7,6 +7,9 @@ export async function POST(req: Request) {
     await dbConnect();
     const { email, code } = await req.json();
 
+    console.log("🚀 ~ POST ~ code:", code);
+    console.log("🚀 ~ POST ~ email:", email);
+
     if (!email || !code) {
         return NextResponse.json(
             { success: false, message: 'Email e código são obrigatórios' },
@@ -14,7 +17,10 @@ export async function POST(req: Request) {
         );
     }
 
+    // Encontrar o usuário com base no e-mail
     const user = await User.findOne({ email });
+    console.log("🚀 ~ verify code ~ user:", user);
+
     if (!user) {
         return NextResponse.json(
             { success: false, message: 'Usuário não encontrado' },
@@ -22,6 +28,7 @@ export async function POST(req: Request) {
         );
     }
 
+    // Comparar o código informado pelo usuário com o código salvo
     if (String(user.verificationCode) !== String(code)) {
         return NextResponse.json(
             { success: false, message: 'Código inválido' },
@@ -29,28 +36,26 @@ export async function POST(req: Request) {
         );
     }
 
-
+    // Limpar o código de verificação após a validação
     await User.findByIdAndUpdate(user._id, { $unset: { verificationCode: 1 } });
 
-
+    // Gerar o token JWT
     const token = await new SignJWT({ userId: user._id.toString() })
         .setProtectedHeader({ alg: 'HS256' })
         .setExpirationTime('7d')
         .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
-
 
     const response = NextResponse.json(
         { success: true },
         { status: 200 }
     );
 
-
     response.cookies.set({
         name: 'authToken',
         value: token,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax', // more compatible than 'strict'
+        sameSite: 'lax', // mais compatível que 'strict'
         maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
