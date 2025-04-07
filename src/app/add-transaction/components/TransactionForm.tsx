@@ -13,10 +13,11 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
     const { data: userData } = useUserData();
     const { categories } = useCategories(userData?.user?.id);
+    const { data: UserData } = useUserData()
+
 
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [currency, setCurrency] = useState('USD');
     const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [type, setType] = useState<'expense' | 'income'>('expense');
     const [categoryId, setCategoryId] = useState('');
@@ -52,7 +53,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             await onAdd({
                 description,
                 amount: Number(amount),
-                currency,
+                currency: UserData.currencyId,
                 date: new Date(date),
                 type,
                 category: categoryId
@@ -92,19 +93,6 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             onChange: handleAmountChange,
             required: true,
             placeholder: '0.00'
-        },
-        {
-            label: 'Currency',
-            type: 'select',
-            name: 'currency',
-            value: currency,
-            onChange: setCurrency,
-            options: [
-                { value: 'USD', label: 'USD ($)' },
-                { value: 'EUR', label: 'EUR (€)' },
-                { value: 'BRL', label: 'BRL (R$)' }
-            ],
-            required: true
         },
         {
             label: 'Date',

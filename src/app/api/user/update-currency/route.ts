@@ -1,25 +1,76 @@
+import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 
-export async function POST(req: Request) {
+export async function PUT(req: Request) {
     await dbConnect();
-    const { email, currencyId } = await req.json();
 
     try {
-        const user = await User.findOneAndUpdate(
-            { email },
-            { currencyId },
-            { new: true }
-        );
+        // Get token from cookies
+        const token = req.headers.get('cookie')?.split('; ')
+            .find(cookie => cookie.startsWith('authToken='))
+            ?.split('=')[1];
 
-        if (!user) {
-            return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+        if (!token) {
+            return NextResponse.json(
+                { success: false, message: 'Not authenticated' },
+                { status: 401 }
+            );
         }
 
-        return NextResponse.json({ success: true, user });
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as jwt.JwtPayload;
+        const userId = decoded.userId;
+
+        if (!userId) {
+            return NextResponse.json(
+                { success: false, message: 'Invalid token' },
+                { status: 401 }
+            );
+        }
+
+        // Get currencyId from request body
+        const { currencyId } = await req.json();
+
+        // Validate currencyId
+        if (!currencyId) {
+            return NextResponse.json(
+                { success: false, message: 'Currency ID is required' },
+                { status: 400 }
+            );
+        }
+
+        // Update user's currency preference
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { currencyId },
+            { new: true }
+        ).select('-password -verificationCode');
+
+        if (!user) {
+            return NextResponse.json(
+                { success: false, message: 'User not found' },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json({
+            success: true,
+            user: {
+                _id: user._id,
+                email: user.email,
+                currencyId: user.currencyId
+            }
+        });
     } catch (error) {
-        console.error("🚀 ~ POST ~ update currency error:", error)
-        return NextResponse.json({ success: false, message: 'Failed to update currency' }, { status: 500 });
+        console.error("Currency update error:", error);
+        return NextResponse.json(
+            {
+                success: false,
+                message: error instanceof Error ? error.message : 'Failed to update currency'
+            },
+            { status: 500 }
+        );
     }
 }

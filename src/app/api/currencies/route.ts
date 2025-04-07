@@ -1,16 +1,14 @@
-import Currency from '@/models/Currency';
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
+import Currency from '../../../models/Currency';
 import dbConnect from '../../lib/db';
 
 export async function GET() {
     try {
-
         await dbConnect();
 
-
         if (mongoose.connection.readyState !== 1) {
-            throw new Error('Conecction is not established');
+            throw new Error('Connection is not established');
         }
 
         const currencies = await Currency.find({}, { _id: 1, name: 1, code: 1 }).lean();
@@ -25,7 +23,6 @@ export async function GET() {
             }
         );
     } catch (error: unknown) {
-
         let errorMessage = 'Failed on operation';
 
         if (error instanceof Error) {
@@ -39,7 +36,6 @@ export async function GET() {
             connectionState: mongoose.connection.readyState,
             connectionInfo: mongoose.connection
         });
-
 
         return NextResponse.json(
             {
