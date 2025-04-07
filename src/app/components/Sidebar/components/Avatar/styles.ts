@@ -1,11 +1,6 @@
 import { styled } from "styled-components";
 
-export const UserInfo = styled.div`
-  display: flex;
-  align-items: end;
-  margin-bottom: 2rem;
-  height: 13rem;
-`;
+
 
 export const User = styled.div`
   display: flex;
@@ -13,8 +8,8 @@ export const User = styled.div`
 `
 
 export const UserAvatar = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.colors.primary};
   display: flex;
@@ -22,9 +17,10 @@ export const UserAvatar = styled.div`
   justify-content: center;
   color: white;
   font-weight: bold;
+  font-size: 0.8rem;
 `;
 
 export const UserEmail = styled.div`
-  margin-left: 10px;
+  margin-left: 0.5rem;
 `;
 

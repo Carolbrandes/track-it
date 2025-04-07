@@ -59,8 +59,7 @@ export const UserSection = styled.div`
 export const SettingsOption = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px;
-  margin: 5px 0;
+  margin-bottom: 1rem;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;

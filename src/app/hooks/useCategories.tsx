@@ -7,8 +7,8 @@ export interface Category {
     createdAt?: Date | string
 }
 
-const fetchCategories = async (): Promise<Category[]> => {
-    const response = await fetch('/api/categories', {
+const fetchCategories = async (userId: string): Promise<Category[]> => {
+    const response = await fetch(`/api/categories?userId=${userId}`, {
         credentials: 'include'
     });
 
@@ -60,11 +60,12 @@ const deleteCategory = async ({ id }: { id: string }): Promise<string> => {
 };
 
 export const useCategories = (userId: string) => {
+    console.log("🚀 ~ useCategories ~ userId:", userId)
     const queryClient = useQueryClient();
 
     const { data: categories, isLoading, isError, error } = useQuery<Category[]>({
         queryKey: ['categories', userId],
-        queryFn: () => fetchCategories(),
+        queryFn: () => fetchCategories(userId),
         enabled: !!userId,
     });
 

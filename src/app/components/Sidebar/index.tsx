@@ -49,13 +49,15 @@ export const Sidebar = () => {
                 <S.UserSection>
                     <h4>User Settings</h4>
                     <S.SettingsOption>
-                        <ThemeButton />
+                        <Avatar />
                     </S.SettingsOption>
                     <S.SettingsOption>
                         <CurrencySelect />
                     </S.SettingsOption>
                     <Logout />
-                    <Avatar />
+                    <S.SettingsOption>
+                        <ThemeButton />
+                    </S.SettingsOption>
                 </S.UserSection>
             </S.SidebarContainer>
         </>

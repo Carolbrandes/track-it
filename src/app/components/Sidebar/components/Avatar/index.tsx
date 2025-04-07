@@ -14,11 +14,11 @@ export const Avatar = () => {
     }
 
     return (
-        <S.UserInfo>
-            <S.User>
-                <S.UserAvatar>{data?.email?.charAt(0)?.toUpperCase()}</S.UserAvatar>
-                <S.UserEmail>{data?.email?.match(/^([^@]{1,14})[^@]*@/)?.[1]}</S.UserEmail>
-            </S.User>
-        </S.UserInfo>
+
+        <S.User>
+            <S.UserAvatar>{data?.email?.charAt(0)?.toUpperCase()}</S.UserAvatar>
+            <S.UserEmail>{data?.email?.match(/^([^@]{1,14})[^@]*@/)?.[1]}</S.UserEmail>
+        </S.User>
+
     );
 };

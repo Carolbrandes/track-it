@@ -8,6 +8,7 @@ import * as S from './styles';
 
 export default function Categories() {
     const { data: userData } = useUserData()
+    console.log("🚀 ~ Categories ~ userData:", userData)
 
     const {
         categories,
@@ -15,7 +16,7 @@ export default function Categories() {
         isError,
         error,
         addCategory
-    } = useCategories(userData?.user?.id);
+    } = useCategories(userData?._id);
 
     const handleAddCategory = (name: string) => {
         addCategory(name);

@@ -7,6 +7,9 @@ import styled from 'styled-components';
 export const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
+  position: fixed;
+  bottom: 1rem;
+  
 `;
 
 export const SwitchWrapper = styled.div`
