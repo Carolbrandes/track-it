@@ -13,6 +13,8 @@ export const ErrorMessage = CommonStyles.ErrorMessage;
 export const PageLayoutContainer = styled.div`
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    height: 100vh;
     gap: 3rem;
     
    @media (min-width: 1200px){
