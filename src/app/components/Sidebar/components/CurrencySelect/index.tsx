@@ -1,58 +1,14 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useState } from "react";
 import { TfiMoney } from "react-icons/tfi";
+import { useCurrency } from '../../../../hooks/useCurrency';
 import { useUserData } from '../../../../hooks/useUserData';
 import * as S from './styles';
 
-interface CurrencyProps {
-    _id: string
-    name: string
-    code: string
-}
-
-interface DataCurrencies {
-    success: boolean
-    currencies: CurrencyProps[]
-}
-
 export const CurrencySelect = () => {
-    const [currencies, setCurrencies] = useState<CurrencyProps[]>([]);
-    const [selectedCurrency, setSelectedCurrency] = useState<string>('');
+    const { currencies, selectedCurrencyCode, userLoading } = useCurrency();
+    const [selectedCurrency, setSelectedCurrency] = useState<string>(selectedCurrencyCode);
     const [isUpdating, setIsUpdating] = useState(false);
-    const { data: userData, isLoading: userLoading, refetch: refetchUser } = useUserData();
-
-    // Initialize selectedCurrency when userData is available
-    useEffect(() => {
-        if (userData?.currencyId) {
-            setSelectedCurrency(userData.currencyId);
-        } else {
-            setSelectedCurrency(''); // Reset if no currency selected
-        }
-    }, [userData?.currencyId]);
-
-    // Fetch available currencies
-    useEffect(() => {
-        const fetchCurrencies = async () => {
-            try {
-                const response = await fetch('/api/currencies');
-                if (!response.ok) throw new Error('Failed to fetch currencies');
-
-                const data: DataCurrencies = await response.json();
-
-                if (data.success) {
-                    const sortedCurrencies = [...data.currencies].sort((a, b) =>
-                        a.name.localeCompare(b.name)
-                    );
-                    setCurrencies(sortedCurrencies);
-                }
-            } catch (error) {
-                console.error('Currency fetch error:', error);
-            }
-        };
-
-        fetchCurrencies();
-    }, []);
+    const { refetch: refetchUser } = useUserData();
 
     const handleCurrencyChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newCurrencyId = event.target.value;
@@ -70,24 +26,15 @@ export const CurrencySelect = () => {
                 body: JSON.stringify({ currencyId: newCurrencyId }),
             });
 
-            if (!response.ok) {
-                throw new Error('Update failed');
-            }
+            if (!response.ok) throw new Error('Update failed');
 
             const data = await response.json();
-            if (!data.success) {
-                throw new Error(data.message || 'Currency update failed');
-            }
+            if (!data.success) throw new Error(data.message || 'Currency update failed');
 
-            // Update local state and refetch user data
             setSelectedCurrency(newCurrencyId);
             await refetchUser();
         } catch (error) {
             console.error('Update failed:', error);
-            // Revert to previous value if update fails
-            if (userData?.currencyId) {
-                setSelectedCurrency(userData.currencyId);
-            }
         } finally {
             setIsUpdating(false);
         }
@@ -103,7 +50,7 @@ export const CurrencySelect = () => {
             <select
                 value={selectedCurrency}
                 onChange={handleCurrencyChange}
-                disabled={isUpdating || !userData}
+                disabled={isUpdating}
             >
                 <option value="">Select currency</option>
                 {currencies.map((currency) => (

@@ -95,7 +95,7 @@ export const useTransactions = (
     } = useQuery({
         queryKey: ['transactions', userId, page, limit, filters],
         queryFn: () => fetchTransactions(userId, page, limit, filters),
-        enabled: !!userId,
+        enabled: Boolean(userId),
         placeholderData: (previousData) => previousData,
     });
 

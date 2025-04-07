@@ -12,7 +12,7 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 const FinancialPieChart = ({ month, year }: { month: string | number, year: string | number }) => {
     const { data: userData } = useUserData();
-    const userId = userData?.user?.id;
+    const userId = userData?._id;
     const { transactions } = useTransactions(userId, 1, 100);
     const { categories } = useCategories(userId);
 

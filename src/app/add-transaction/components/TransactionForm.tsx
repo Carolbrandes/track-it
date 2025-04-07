@@ -12,7 +12,7 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
     const { data: userData } = useUserData();
-    const { categories } = useCategories(userData?.user?.id);
+    const { categories } = useCategories(userData?._id);
     const { data: UserData } = useUserData()
 
 

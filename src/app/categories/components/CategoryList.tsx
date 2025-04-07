@@ -19,7 +19,7 @@ export default function CategoryList({
     const [error, setError] = useState<string | null>(null);
     const { data: userData } = useUserData()
     const { updateCategory,
-        deleteCategory, } = useCategories(userData?.user?.id)
+        deleteCategory, } = useCategories(userData?._id)
 
     const handleEdit = (category: Category) => {
         setEditingId(category._id);

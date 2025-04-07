@@ -54,14 +54,14 @@ export default function Home() {
     updateTransaction,
     deleteTransaction
   } = useTransactions(
-    userData?.user?.id,
+    userData?._id,
     currentPage,
     10, // items per page
     filters
   );
 
 
-  const { categories } = useCategories(userData?.user?.id);
+  const { categories } = useCategories(userData?._id);
 
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -135,6 +135,7 @@ export default function Home() {
   };
 
 
+  if (!userData) return null;
 
   if (isLoading) return <S.LoadingIndicator>Loading...</S.LoadingIndicator>;
   if (isError) return <S.ErrorMessage>{error?.message}</S.ErrorMessage>;

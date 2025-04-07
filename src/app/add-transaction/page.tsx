@@ -12,7 +12,7 @@ export default function AddTransaction() {
         isError,
         error,
         addTransaction,
-    } = useTransactions(userData?.user?.id);
+    } = useTransactions(userData?._id);
 
     const handleAddTransaction = async (transaction: TransactionType) => { // ✅ Alterado para TransactionType
         console.log("🚀 ~ handleAddTransaction ~ transaction:", transaction);
@@ -22,7 +22,7 @@ export default function AddTransaction() {
             date: typeof transaction.date === 'string'
                 ? new Date(transaction.date)
                 : transaction.date,
-            userId: userData?.user?.id, // ✅ Adicionando userId aqui
+            userId: userData?._id, // ✅ Adicionando userId aqui
         };
 
         await addTransaction(payload); // ✅ Passando payload corretamente

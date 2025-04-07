@@ -1,19 +1,18 @@
-'use client'
-
+import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import * as S from './styles';
 
 interface TransactionListProps {
-    transactions: Transaction[]
-    handleEdit: (transaction: Transaction) => void
-    handleDelete: (id: string) => void
-    isUpdating: boolean
-    isDeleting: boolean
+    transactions: Transaction[];
+    handleEdit: (transaction: Transaction) => void;
+    handleDelete: (id: string) => void;
+    isUpdating: boolean;
+    isDeleting: boolean;
 }
 
 export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEdit, handleDelete }: TransactionListProps) => {
-
+    const { selectedCurrencyCode } = useCurrency();
 
     return (
         <S.TableContainer>
@@ -45,7 +44,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
                             </td>
                             <td>
                                 <S.Amount $type={transaction.type}>
-                                    {formatCurrency(transaction.amount, transaction.currency)}
+                                    {formatCurrency(transaction.amount, selectedCurrencyCode)}
                                 </S.Amount>
                             </td>
                             <td>
