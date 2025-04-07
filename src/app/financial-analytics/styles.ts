@@ -22,7 +22,7 @@ export const ChartWrapperContainer = styled.div`
 export const Title = styled.h1`
   font-size: 2rem;
   font-weight: bold;
-  color: #333;
+  color: ${({ theme }) => theme.colors.textPrimary};
   margin-bottom: 1rem;
 `;
 
@@ -47,7 +47,7 @@ export const FilterGroup = styled.div`
 export const FilterLabel = styled.label`
   font-size: 1rem;
   font-weight: 600;
-  color: #555;
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 // Filter select dropdown
@@ -78,13 +78,14 @@ export const ChartWrapper = styled.div`
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 // Title for each pie chart
 export const ChartTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 600;
-  color: #444;
+  color: ${({ theme }) => theme.colors.textSecondary};
   margin-bottom: 1rem;
 `;
 
@@ -103,7 +104,7 @@ export const LegendItem = styled.div`
   align-items: center;
   gap: 10px;
   font-size: 1rem;
-  color: #555;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 // Color box in the legend
@@ -122,7 +123,7 @@ export const LoadingWrapper = styled.div`
   width: 100%;
   height: 300px;
   font-size: 1.5rem;
-  color: #888;
+  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 // Pie chart container (ensuring it doesn't distort when resized)

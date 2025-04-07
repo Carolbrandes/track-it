@@ -2,99 +2,67 @@
 
 import { ArcElement, Chart as ChartJS, ChartOptions, Legend, Title, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { useCategories } from '../../hooks/useCategories';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
 import * as S from '../styles';
 
-// Register necessary components from Chart.js
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-const FinancialPieChart = ({ month, year }: { month: string | number, year: string | number }) => {
+const FinancialPieChart = ({ month, year }: { month: number, year: number }) => {
     const { data: userData } = useUserData();
     const userId = userData?._id;
-    const { transactions } = useTransactions(userId, 1, 100);
-    const { categories } = useCategories(userId);
+    const { transactions = [] } = useTransactions(userId, 1, 100) || {};
 
-    // Filter transactions by selected month and year
-    const filteredTransactions = transactions?.filter(txn => {
-        if (!txn.date) return false;
+    console.log('🚀 All transactions:', transactions);
+    console.log('🚀 Selected month/year:', month, year);
+
+    // Fixed timezone-aware date filtering
+    const filteredTransactions = transactions.filter(txn => {
+        if (!txn.date) {
+            console.log('Transaction missing date:', txn);
+            return false;
+        }
+
+        // Parse date in UTC to avoid timezone issues
         const txnDate = new Date(txn.date);
-        return (
-            txnDate.getMonth() + 1 === month &&
-            txnDate.getFullYear() === year
-        );
-    }) || [];
+        const utcDate = new Date(Date.UTC(
+            txnDate.getUTCFullYear(),
+            txnDate.getUTCMonth(),
+            txnDate.getUTCDate()
+        ));
 
-    // Get categories actually used in transactions, grouped by type
-    const getCategoriesByType = (type: 'expense' | 'income') => {
-        // Get unique category IDs from transactions of this type
-        const categoryIds = [...new Set(
-            filteredTransactions
-                .filter(txn => txn.type === type && txn.category)
-                .map(txn => txn.category)
-        )];
+        const txnMonth = utcDate.getUTCMonth() + 1;
+        const txnYear = utcDate.getUTCFullYear();
 
-        // Return the full category objects that match these IDs
-        return categories.filter(cat =>
-            categoryIds.includes(cat._id)
-        );
-    };
+        console.log(`🚀 Transaction UTC date: ${utcDate}, month: ${txnMonth}, year: ${txnYear}`);
 
-    const expenseCategories = getCategoriesByType('expense');
-    const incomeCategories = getCategoriesByType('income');
+        return txnMonth === month && txnYear === year;
+    });
 
-    // Prepare data - group transactions by category for each type
-    const expenseData = expenseCategories.map(category =>
-        filteredTransactions
-            .filter(txn =>
-                txn.type === 'expense' &&
-                txn.category === category.name
-            )
-            .reduce((acc, txn) => acc + txn.amount, 0)
-    );
+    console.log('🚀 Filtered transactions:', filteredTransactions);
 
-    const incomeData = incomeCategories.map(category =>
-        filteredTransactions
-            .filter(txn =>
-                txn.type === 'income' &&
-                txn.category === category.name
-            )
-            .reduce((acc, txn) => acc + txn.amount, 0)
-    );
+    // Calculate totals by type
+    const expenseTotal = filteredTransactions
+        .filter(txn => txn.type === 'expense')
+        .reduce((sum, txn) => sum + (txn.amount || 0), 0);
 
-    // Calculate totals
-    const expenseTotal = expenseData.reduce((acc, val) => acc + val, 0);
-    const incomeTotal = incomeData.reduce((acc, val) => acc + val, 0);
+    const incomeTotal = filteredTransactions
+        .filter(txn => txn.type === 'income')
+        .reduce((sum, txn) => sum + (txn.amount || 0), 0);
 
-    // Prepare chart datasets
-    const expenseChartData = {
-        labels: expenseCategories.map(cat => cat.name),
+    console.log('🚀 Expense total:', expenseTotal);
+    console.log('🚀 Income total:', incomeTotal);
+
+    // Prepare chart data
+    const typeChartData = {
+        labels: ['Income', 'Expenses'],
         datasets: [{
-            data: expenseData,
-            backgroundColor: [
-                '#FF7043', '#FFA726', '#EF5350',
-                '#EC407A', '#AB47BC', '#7E57C2',
-                '#5C6BC0', '#42A5F5', '#26C6DA'
-            ],
+            data: [incomeTotal, expenseTotal],
+            backgroundColor: ['#66BB6A', '#EF5350'],
             hoverOffset: 4,
         }],
     };
 
-    const incomeChartData = {
-        labels: incomeCategories.map(cat => cat.name),
-        datasets: [{
-            data: incomeData,
-            backgroundColor: [
-                '#66BB6A', '#81C784', '#4CAF50',
-                '#26A69A', '#00897B', '#7E57C2',
-                '#5C6BC0', '#42A5F5', '#26C6DA'
-            ],
-            hoverOffset: 4,
-        }],
-    };
-
-    // Chart options
     const chartOptions: ChartOptions<'pie'> = {
         responsive: true,
         maintainAspectRatio: false,
@@ -107,10 +75,10 @@ const FinancialPieChart = ({ month, year }: { month: string | number, year: stri
                 callbacks: {
                     label: function (context) {
                         const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = Math.round((value / total) * 100); // The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
-                        return `${label}: $${value} (${percentage}%)`;
+                        const value = context.raw as number;
+                        const total = incomeTotal + expenseTotal;
+                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                        return `${label}: $${value.toFixed(2)} (${percentage}%)`;
                     }
                 }
             }
@@ -120,56 +88,33 @@ const FinancialPieChart = ({ month, year }: { month: string | number, year: stri
     return (
         <S.ChartWrapperContainer>
             <S.ChartWrapper>
-                <S.ChartTitle>Expenses by Category</S.ChartTitle>
-                {expenseTotal > 0 ? (
+                <S.ChartTitle>Income vs Expenses</S.ChartTitle>
+                {filteredTransactions.length > 0 ? (
                     <>
                         <S.ChartContainer>
-                            <Pie data={expenseChartData} options={chartOptions} />
+                            <Pie data={typeChartData} options={chartOptions} />
                         </S.ChartContainer>
                         <S.LegendContainer>
-                            {expenseCategories.map((category, index) => (
-                                <S.LegendItem key={category._id}>
-                                    <S.ColorBox style={{
-                                        backgroundColor: expenseChartData.datasets[0].backgroundColor[index]
-                                    }} />
-                                    {category.name}: ${expenseData[index]} (
-                                    {expenseData[index] > 0 ?
-                                        Math.round((expenseData[index] / expenseTotal) * 100) :
-                                        0
-                                    }%)
-                                </S.LegendItem>
-                            ))}
+                            <S.LegendItem>
+                                <S.ColorBox style={{ backgroundColor: '#66BB6A' }} />
+                                Income: ${incomeTotal.toFixed(2)} (
+                                {incomeTotal + expenseTotal > 0 ?
+                                    Math.round((incomeTotal / (incomeTotal + expenseTotal)) * 100) :
+                                    0
+                                }%)
+                            </S.LegendItem>
+                            <S.LegendItem>
+                                <S.ColorBox style={{ backgroundColor: '#EF5350' }} />
+                                Expenses: ${expenseTotal.toFixed(2)} (
+                                {incomeTotal + expenseTotal > 0 ?
+                                    Math.round((expenseTotal / (incomeTotal + expenseTotal)) * 100) :
+                                    0
+                                }%)
+                            </S.LegendItem>
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>No expense data available for {new Date(+year, +month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
-                )}
-            </S.ChartWrapper>
-
-            <S.ChartWrapper>
-                <S.ChartTitle>Income by Category</S.ChartTitle>
-                {incomeTotal > 0 ? (
-                    <>
-                        <S.ChartContainer>
-                            <Pie data={incomeChartData} options={chartOptions} />
-                        </S.ChartContainer>
-                        <S.LegendContainer>
-                            {incomeCategories.map((category, index) => (
-                                <S.LegendItem key={category._id}>
-                                    <S.ColorBox style={{
-                                        backgroundColor: incomeChartData.datasets[0].backgroundColor[index]
-                                    }} />
-                                    {category.name}: ${incomeData[index]} (
-                                    {incomeData[index] > 0 ?
-                                        Math.round((incomeData[index] / incomeTotal) * 100) :
-                                        0
-                                    }%)
-                                </S.LegendItem>
-                            ))}
-                        </S.LegendContainer>
-                    </>
-                ) : (
-                    <div>No income data available for {new Date(+year, +month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                    <div>No transactions available for {new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
                 )}
             </S.ChartWrapper>
         </S.ChartWrapperContainer>
