@@ -3,11 +3,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
+import StyledComponentsRegistry from '../../StyledComponentsRegistry';
 import { Sidebar } from './components/Sidebar';
 import { ThemeProvider } from './hooks/useTheme';
 import * as S from "./styles";
 import { GlobalStyle } from './styles/global';
-import './styles/global.scss';
+
 
 const queryClient = new QueryClient();
 
@@ -25,11 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body>
           <GlobalStyle />
           <QueryClientProvider client={queryClient}>
-            <S.PageLayoutContainer>
-              {!isLoginPage && <Sidebar />}
+            <StyledComponentsRegistry>
+              <S.PageLayoutContainer>
+                {!isLoginPage && <Sidebar />}
 
-              {children}
-            </S.PageLayoutContainer>
+                {children}
+              </S.PageLayoutContainer>
+            </StyledComponentsRegistry>
 
           </QueryClientProvider>
         </body>
