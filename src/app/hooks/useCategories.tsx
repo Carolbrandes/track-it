@@ -60,7 +60,7 @@ const deleteCategory = async ({ id }: { id: string }): Promise<string> => {
 };
 
 export const useCategories = (userId: string) => {
-    console.log("🚀 ~ useCategories ~ userId:", userId)
+
     const queryClient = useQueryClient();
 
     const { data: categories, isLoading, isError, error } = useQuery<Category[]>({

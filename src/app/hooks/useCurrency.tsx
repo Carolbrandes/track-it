@@ -17,6 +17,7 @@ interface CurrencyResponse {
 export const useCurrency = () => {
     const [currencies, setCurrencies] = useState<Currency[]>([]);
     const [selectedCurrencyCode, setSelectedCurrencyCode] = useState<string>('USD');
+
     const { data: userData, isLoading: userLoading } = useUserData();
 
     useEffect(() => {
@@ -43,7 +44,9 @@ export const useCurrency = () => {
     useEffect(() => {
         if (userData?.currencyId && currencies.length > 0) {
             const selectedCurrency = currencies.find(c => c._id === userData.currencyId);
-            setSelectedCurrencyCode(selectedCurrency?.code || 'USD');
+            if (selectedCurrency) {
+                setSelectedCurrencyCode(selectedCurrency.code);
+            }
         }
     }, [userData?.currencyId, currencies]);
 

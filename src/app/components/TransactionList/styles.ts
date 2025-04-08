@@ -22,7 +22,7 @@ export const ResponsiveTable = styled.table`
   }
   
   tr:hover {
-    background-color: ${({ theme }) => theme.colors.gray200};
+    background-color: ${({ theme }) => theme.colors.secondary};
   }
 
   @media (min-width: 1200px) {

@@ -13,13 +13,11 @@ const FinancialPieChart = ({ month, year }: { month: number, year: number }) => 
     const userId = userData?._id;
     const { transactions = [] } = useTransactions(userId, 1, 100) || {};
 
-    console.log('🚀 All transactions:', transactions);
-    console.log('🚀 Selected month/year:', month, year);
+
 
     // Fixed timezone-aware date filtering
     const filteredTransactions = transactions.filter(txn => {
         if (!txn.date) {
-            console.log('Transaction missing date:', txn);
             return false;
         }
 
@@ -34,12 +32,12 @@ const FinancialPieChart = ({ month, year }: { month: number, year: number }) => 
         const txnMonth = utcDate.getUTCMonth() + 1;
         const txnYear = utcDate.getUTCFullYear();
 
-        console.log(`🚀 Transaction UTC date: ${utcDate}, month: ${txnMonth}, year: ${txnYear}`);
+
 
         return txnMonth === month && txnYear === year;
     });
 
-    console.log('🚀 Filtered transactions:', filteredTransactions);
+
 
     // Calculate totals by type
     const expenseTotal = filteredTransactions
@@ -50,8 +48,7 @@ const FinancialPieChart = ({ month, year }: { month: number, year: number }) => 
         .filter(txn => txn.type === 'income')
         .reduce((sum, txn) => sum + (txn.amount || 0), 0);
 
-    console.log('🚀 Expense total:', expenseTotal);
-    console.log('🚀 Income total:', incomeTotal);
+
 
     // Prepare chart data
     const typeChartData = {

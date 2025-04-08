@@ -12,7 +12,7 @@ export default function CategoryList({
 }: {
     categories: Category[]
 }) {
-    console.log("🚀 ~ categories:", categories)
+
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState('');

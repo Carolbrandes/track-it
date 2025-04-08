@@ -8,7 +8,7 @@ import * as S from './styles';
 
 export default function Categories() {
     const { data: userData } = useUserData()
-    console.log("🚀 ~ Categories ~ userData:", userData)
+
 
     const {
         categories,

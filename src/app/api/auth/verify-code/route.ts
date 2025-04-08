@@ -7,8 +7,7 @@ export async function POST(req: Request) {
     await dbConnect();
     const { email, code } = await req.json();
 
-    console.log("🚀 ~ POST ~ code:", code);
-    console.log("🚀 ~ POST ~ email:", email);
+
 
     if (!email || !code) {
         return NextResponse.json(
@@ -19,7 +18,7 @@ export async function POST(req: Request) {
 
     // Encontrar o usuário com base no e-mail
     const user = await User.findOne({ email });
-    console.log("🚀 ~ verify code ~ user:", user);
+
 
     if (!user) {
         return NextResponse.json(

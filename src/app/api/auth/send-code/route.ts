@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         await user.save();
     }
 
-    console.log("🚀 ~ send code ~ user:", user)
+
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
