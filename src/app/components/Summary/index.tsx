@@ -10,7 +10,7 @@ interface SummaryProps {
 }
 
 export const Summary = ({ transactions, totalCount }: SummaryProps) => {
-    console.log("🚀 ~ Summary ~ transactions:", transactions)
+
 
     const calculateTotals = () => {
         return transactions.reduce((acc, transaction) => {
