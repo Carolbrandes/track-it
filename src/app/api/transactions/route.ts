@@ -32,6 +32,21 @@ export async function GET(request: Request) {
             userId: userId || null
         };
 
+        const currentDate = new Date();
+        const month = currentDate.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+        const year = currentDate.getFullYear();
+
+        // Set the start date to the first of the month
+        const startDate = new Date(year, month - 1, 1); // April 1, 2025
+        // Set the end date to the last day of the month
+        const endDate = new Date(year, month, 0); // April 30, 2025
+
+        filterQuery.date = {
+            $gte: startDate, // from April 1, 2025
+            $lte: endDate    // until April 30, 2025
+        };
+
+
         // Handle description filter
         const descriptionParam = url.searchParams.get('description');
         if (descriptionParam) {

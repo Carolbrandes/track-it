@@ -10,16 +10,22 @@ interface SummaryProps {
 }
 
 export const Summary = ({ transactions, totalCount }: SummaryProps) => {
+    console.log("🚀 ~ Summary ~ transactions:", transactions)
 
-    const totals = transactions.reduce((acc, transaction) => {
-        if (transaction.type === 'income') {
-            acc.income += transaction.amount;
-        } else {
-            acc.expense += transaction.amount;
-        }
-        acc.balance = acc.income - acc.expense;
-        return acc;
-    }, { income: 0, expense: 0, balance: 0 });
+    const calculateTotals = () => {
+        return transactions.reduce((acc, transaction) => {
+            if (transaction.type === 'income') {
+                acc.income += transaction.amount;
+            } else {
+                acc.expense += transaction.amount;
+            }
+            acc.balance = acc.income - acc.expense;
+            return acc;
+        }, { income: 0, expense: 0, balance: 0 });
+    };
+
+    // Get totals from all transactions
+    const totals = calculateTotals();
 
 
     return (

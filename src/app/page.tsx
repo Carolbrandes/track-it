@@ -28,14 +28,19 @@ export interface TransactionToEdit {
 export default function Home() {
   const { data: userData } = useUserData();
   const [currentPage, setCurrentPage] = useState(1);
+
+  const currentDate = new Date();
+  const month = currentDate.getMonth() + 1; // Current month (1-12)
+  const year = currentDate.getFullYear();
+
   const [filters, setFilters] = useState({
     description: '',
     category: '',
     type: '',
     minAmount: '',
     maxAmount: '',
-    startDate: '',
-    endDate: ''
+    startDate: new Date(year, month - 1, 1).toISOString().slice(0, 10),
+    endDate: new Date(year, month, 0).toISOString().slice(0, 10)
   });
   const [transactionToEdit, setTransactionToEdit] = useState<TransactionToEdit | null>(null);
 
@@ -44,6 +49,7 @@ export default function Home() {
 
   const {
     transactions,
+    allTransactions,
     totalCount,
     totalPages,
     isLoading,
@@ -128,8 +134,8 @@ export default function Home() {
       type: '',
       minAmount: '',
       maxAmount: '',
-      startDate: '',
-      endDate: ''
+      startDate: new Date(year, month - 1, 1).toISOString().slice(0, 10),
+      endDate: new Date(year, month, 0).toISOString().slice(0, 10)
     });
     setCurrentPage(1); // Reset to first page when filters are reset
   };
@@ -146,7 +152,7 @@ export default function Home() {
 
       {/* Summary Section */}
       <S.Section>
-        <Summary transactions={transactions} totalCount={totalCount} />
+        <Summary transactions={allTransactions} totalCount={totalCount} />
       </S.Section>
 
       {/* Filters Section */}

@@ -51,6 +51,39 @@ const fetchTransactions = async (
     return response.json();
 };
 
+const fetchAllTransactions = async (
+    userId: string,
+    page: number = 1,
+    filters: TransactionFilters = {}
+): Promise<TransactionResponse> => {
+    const stringFilters = Object.fromEntries(
+        Object.entries(filters).map(([key, value]) => [key, String(value)])
+    );
+
+    const totalResponse = await fetch(`/api/transactions?userId=${userId}&${new URLSearchParams(stringFilters).toString()}`);
+
+    if (!totalResponse.ok) throw new Error('Failed to fetch total transactions');
+
+    const totalData = await totalResponse.json();
+    const totalCount = totalData.totalCount;
+
+    const params = new URLSearchParams({
+        page: page.toString(),
+        limit: totalCount.toString(), // Set limit to total transactions count
+        ...(filters.description && { description: filters.description }),
+        ...(filters.category && { category: filters.category }),
+        ...(filters.type && { type: filters.type }),
+        ...(filters.minAmount && { minAmount: filters.minAmount }),
+        ...(filters.maxAmount && { maxAmount: filters.maxAmount }),
+        ...(filters.startDate && { startDate: filters.startDate }),
+        ...(filters.endDate && { endDate: filters.endDate }),
+    });
+
+    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`);
+    if (!response.ok) throw new Error('Failed to fetch transactions');
+    return response.json();
+};
+
 const addTransaction = async (transaction: Omit<Transaction, '_id'>): Promise<Transaction> => {
     const response = await fetch('/api/transactions', {
         method: 'POST',
@@ -99,6 +132,14 @@ export const useTransactions = (
         placeholderData: (previousData) => previousData,
     });
 
+
+
+    const { data: allTransactionsData } = useQuery({
+        queryKey: ['allTransactions', userId, filters],
+        queryFn: () => fetchAllTransactions(userId, 1, filters), // Pass as a function
+        enabled: Boolean(userId), // This ensures the query only runs when userId is defined
+    });
+
     const addMutation = useMutation({
         mutationFn: addTransaction,
         onSuccess: () => {
@@ -128,6 +169,7 @@ export const useTransactions = (
 
     return {
         transactions: transactionsData?.data || [],
+        allTransactions: allTransactionsData?.data || [],
         totalCount: transactionsData?.totalCount || 0,
         totalPages: transactionsData?.totalPages || 1,
         isLoading,
