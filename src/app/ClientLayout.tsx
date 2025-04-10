@@ -13,7 +13,7 @@ const queryClient = new QueryClient();
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isLoginPage = pathname?.includes("login") || false;
-    console.log("🚀 ~ ClientLayout ~ isLoginPage:", isLoginPage)
+
 
     return (
         <ThemeProvider>
