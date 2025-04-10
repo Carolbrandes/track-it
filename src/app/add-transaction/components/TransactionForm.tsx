@@ -11,9 +11,8 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 
 
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
-    const { data: userData } = useUserData();
+    const { data: userData } = useUserData()
     const { categories } = useCategories(userData?._id);
-    const { data: UserData } = useUserData()
 
 
     const [description, setDescription] = useState('');
@@ -53,7 +52,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             await onAdd({
                 description,
                 amount: Number(amount),
-                currency: UserData.currencyId,
+                currency: userData.currencyId,
                 date: new Date(date),
                 type,
                 category: categoryId

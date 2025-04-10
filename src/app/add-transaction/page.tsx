@@ -30,7 +30,7 @@ export default function AddTransaction() {
     return (
         <S.PageContainer>
 
-            {isError && <S.ErrorMessage>{error?.message}</S.ErrorMessage>}
+            {isError && error?.message !== "Failed to fetch transactions" && <S.ErrorMessage>{error?.message}</S.ErrorMessage>}
 
             <S.Section>
                 <S.SectionTitle>Add New Transaction</S.SectionTitle>

@@ -60,7 +60,6 @@ const deleteCategory = async ({ id }: { id: string }): Promise<string> => {
 };
 
 export const useCategories = (userId: string) => {
-
     const queryClient = useQueryClient();
 
     const { data: categories, isLoading, isError, error } = useQuery<Category[]>({
@@ -68,6 +67,9 @@ export const useCategories = (userId: string) => {
         queryFn: () => fetchCategories(userId),
         enabled: Boolean(userId),
     });
+
+    // Sort the categories alphabetically by name
+    const sortedCategories = categories ? [...categories].sort((a, b) => a.name.localeCompare(b.name)) : [];
 
     const addMutation = useMutation<Category, Error, { name: string; userId: string }>({
         mutationFn: addCategory,
@@ -91,7 +93,7 @@ export const useCategories = (userId: string) => {
     });
 
     return {
-        categories: categories || [],
+        categories: sortedCategories,
         isLoading,
         isError,
         error,
