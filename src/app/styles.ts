@@ -10,7 +10,11 @@ export const SectionTitle = CommonStyles.SectionTitle;
 export const LoadingIndicator = CommonStyles.LoadingIndicator;
 export const ErrorMessage = CommonStyles.ErrorMessage;
 
-export const PageLayoutContainer = styled.div`
+interface PageLayoutContainerProps {
+    isLoginPage: boolean
+}
+
+export const PageLayoutContainer = styled.div<PageLayoutContainerProps>`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -18,7 +22,7 @@ export const PageLayoutContainer = styled.div`
     gap: 3rem;
     
    @media (min-width: 1200px){
-    display: grid;
+    display: ${(props) => props.isLoginPage ? 'flex' : 'grid'};
     grid-template-columns: 15rem 1fr;
    }
 

@@ -40,7 +40,7 @@ export const Summary = ({ transactions, totalCount }: SummaryProps) => {
             </S.SummaryItem>
             <S.SummaryItem>
                 <span>Balance:</span>
-                <S.AmountBalance $positive={totals.balance >= 0}>
+                <S.AmountBalance $positive={totals.balance > 0}>
                     {formatCurrency(totals.balance)}
                 </S.AmountBalance>
             </S.SummaryItem>

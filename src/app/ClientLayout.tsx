@@ -13,6 +13,7 @@ const queryClient = new QueryClient();
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isLoginPage = pathname?.includes("login") || false;
+    console.log("🚀 ~ ClientLayout ~ isLoginPage:", isLoginPage)
 
     return (
         <ThemeProvider>
@@ -26,7 +27,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     <GlobalStyle />
                     <QueryClientProvider client={queryClient}>
                         <StyledComponentsRegistry>
-                            <S.PageLayoutContainer>
+                            <S.PageLayoutContainer isLoginPage={isLoginPage}>
                                 {!isLoginPage && <Sidebar />}
                                 {children}
                             </S.PageLayoutContainer>
