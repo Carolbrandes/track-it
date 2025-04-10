@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     }
 
     // Encontrar o usuário com base no e-mail
+    // @ts-expect-error: Ignoring union type compatibility issue with findById method
     const user = await User.findOne({ email });
 
 
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
     }
 
     // Limpar o código de verificação após a validação
+    // @ts-expect-error: Ignoring union type compatibility issue with findById method
     await User.findByIdAndUpdate(user._id, { $unset: { verificationCode: 1 } });
 
     // Gerar o token JWT

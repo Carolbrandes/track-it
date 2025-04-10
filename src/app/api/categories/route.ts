@@ -17,7 +17,7 @@ export async function GET() {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const categories = await Category.find({ userId }).sort({ createdAt: -1 });
 
         return NextResponse.json(categories);
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const existingCategory = await Category.findOne({ name, userId });
         if (existingCategory) {
             return NextResponse.json({ error: 'Categoria já existe para este usuário' }, { status: 400 });

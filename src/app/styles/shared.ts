@@ -1,3 +1,4 @@
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 export const PageContainer = styled.div`
@@ -119,6 +120,15 @@ export const RadioButton = styled.button<{ $active: boolean }>`
   &:active {
     transform: translateY(0);
   }
+`;
+
+export const StyledNumericFormat = styled(NumericFormat)`
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 4px;
+ 
 `;
 
 

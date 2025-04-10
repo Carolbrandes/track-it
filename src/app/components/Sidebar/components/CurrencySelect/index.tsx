@@ -53,7 +53,7 @@ export const CurrencySelect = () => {
         if (currencieId) {
             setSelectedCurrency(currencieId);
         }
-    }, [selectedCurrencyCode]);
+    }, [selectedCurrencyCode, currencies]);
 
 
 

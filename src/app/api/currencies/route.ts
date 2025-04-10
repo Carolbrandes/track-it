@@ -10,7 +10,7 @@ export async function GET() {
         if (mongoose.connection.readyState !== 1) {
             throw new Error('Connection is not established');
         }
-
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const currencies = await Currency.find({}, { _id: 1, name: 1, code: 1 }).lean();
 
         return NextResponse.json(

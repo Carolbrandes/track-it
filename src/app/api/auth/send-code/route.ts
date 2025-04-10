@@ -12,10 +12,12 @@ export async function POST(request: Request) {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Verifique se o usuário existe ou crie um novo usuário
+    // @ts-expect-error: Ignoring union type compatibility issue with findById method
     let user = await User.findOne({ email });
 
     if (!user) {
         // Criar um novo usuário com o código de verificação
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         user = await User.create({
             email,
             verificationCode: code,

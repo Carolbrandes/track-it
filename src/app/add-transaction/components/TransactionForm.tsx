@@ -1,6 +1,7 @@
 'use client';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
+import { NumberFormatValues } from 'react-number-format';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
 import { useCategories } from '../../hooks/useCategories';
@@ -34,10 +35,33 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         }
     }, [categories, categoryId]);
 
-    const handleAmountChange = (values: any) => {
+    const handleAmountChange = (values: NumberFormatValues) => {
         const { value } = values;
         setAmount(value);
     };
+
+    const handleFieldChange = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value } = event.target;
+        switch (name) {
+            case 'description':
+                setDescription(value);
+                break;
+            case 'date':
+                setDate(value);
+                break;
+            case 'type':
+                setType(value as 'expense' | 'income');
+                break;
+            case 'category':
+                setCategoryId(value);
+                break;
+            default:
+                break;
+        }
+    };
+
 
 
     const handleSubmit = async () => {
@@ -82,7 +106,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'text',
             name: 'description',
             value: description,
-            onChange: setDescription,
+            onChange: handleFieldChange,
             required: true,
             placeholder: 'e.g. Salary, Groceries'
         },
@@ -91,7 +115,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'custom',
             name: 'amount',
             value: amount,
-            onChange: handleAmountChange,
+            onAmountChange: handleAmountChange,
             required: true,
             placeholder: '0.00',
             component: (
@@ -112,7 +136,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'date',
             name: 'date',
             value: date,
-            onChange: setDate,
+            onChange: handleFieldChange,
             required: true
         },
         {
@@ -120,7 +144,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'radio-group',
             name: 'type',
             value: type,
-            onChange: (value: string) => setType(value as 'expense' | 'income'), // 🔥 Converte explicitamente para o tipo correto
+            onChange: handleFieldChange,
             options: [
                 { value: 'expense', label: 'Expense' },
                 { value: 'income', label: 'Income' }
@@ -132,7 +156,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'select',
             name: 'category',
             value: categoryId,
-            onChange: setCategoryId,
+            onChange: handleFieldChange,
             options: categories.map(category => ({
                 value: category._id,
                 label: category.name

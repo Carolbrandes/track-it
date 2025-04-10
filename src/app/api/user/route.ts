@@ -31,7 +31,7 @@ export async function GET() {
         }
 
         console.log(`🔍 Buscando usuário com ID: ${payload.userId}`);
-
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const user = await User.findById(payload.userId).lean().exec() as IUser | null; // ⚡ Type Assertion para evitar erro de tipagem
 
         if (!user) {

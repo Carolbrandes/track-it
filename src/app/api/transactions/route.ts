@@ -103,7 +103,7 @@ export async function GET(request: Request) {
 
         const totalCount = await Transaction.countDocuments(filterQuery);
         const totalPages = Math.ceil(totalCount / limit);
-
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const transactions = await Transaction.find(filterQuery)
             .populate('category')
             .sort({ date: -1 })

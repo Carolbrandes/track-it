@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client';
 
 import { Category } from '@/app/hooks/useCategories';
@@ -37,12 +38,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
     };
 
     const handleSave = () => {
-        let categoryToSave: string | CategoryObj;
+        let categoryToSave: string | CategoryObj | null;
 
         if (typeof updatedTransaction.category === 'string') {
             categoryToSave = updatedTransaction.category;
         } else {
-            const categoryObj = updatedTransaction.category || {};
+            const categoryObj = updatedTransaction.category;
             const selectedCategory = categories.find(cat => cat._id === categoryObj._id);
 
             categoryToSave = {

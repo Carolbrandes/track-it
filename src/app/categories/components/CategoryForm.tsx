@@ -35,13 +35,16 @@ export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void 
     };
 
 
+    const handleName = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setName(event.target.value)
+
+
     const fields: FormField[] = [
         {
             label: 'Category Name',
             type: 'text' as const,
             name: 'name',
             value: name,
-            onChange: setName,
+            onChange: handleName,
             required: true,
             placeholder: 'Enter category name'
         }

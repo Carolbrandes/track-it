@@ -42,6 +42,7 @@ export async function PUT(req: Request) {
         }
 
         // Update user's currency preference
+        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const user = await User.findByIdAndUpdate(
             userId,
             { currencyId },
