@@ -1,3 +1,4 @@
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 export * from '../categories/styles';
 
@@ -93,6 +94,15 @@ export const CategorySelect = styled.select`
   font-size: 1rem;
   background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.textPrimary};
+`;
+
+export const StyledNumericFormat = styled(NumericFormat)`
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 4px;
+ 
 `;
 
 

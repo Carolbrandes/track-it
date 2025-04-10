@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
 import { useCategories } from '../../hooks/useCategories';
+import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
+import * as S from '../styles';
 
 export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 
@@ -13,6 +15,7 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
     const { data: userData } = useUserData()
     const { categories } = useCategories(userData?._id);
+    const { selectedCurrencyCode } = useCurrency();
 
 
     const [description, setDescription] = useState('');
@@ -31,12 +34,11 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         }
     }, [categories, categoryId]);
 
-    const handleAmountChange = (value: string) => {
-        const numericValue = value.replace(/[^0-9.]/g, '');
-        if (/^\d*\.?\d{0,2}$/.test(numericValue)) {
-            setAmount(numericValue);
-        }
+    const handleAmountChange = (values: any) => {
+        const { value } = values;
+        setAmount(value);
     };
+
 
     const handleSubmit = async () => {
         setError(null);
@@ -51,7 +53,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
 
             await onAdd({
                 description,
-                amount: Number(amount),
+                amount: Number(amount.replace(/[^0-9.-]+/g, "")),
                 currency: userData.currencyId,
                 date: new Date(date),
                 type,
@@ -86,12 +88,24 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         },
         {
             label: 'Amount',
-            type: 'text',
+            type: 'custom',
             name: 'amount',
             value: amount,
             onChange: handleAmountChange,
             required: true,
-            placeholder: '0.00'
+            placeholder: '0.00',
+            component: (
+                <S.StyledNumericFormat
+                    value={amount}
+                    onValueChange={handleAmountChange}
+                    thousandSeparator={true}
+                    prefix={selectedCurrencyCode + ' '}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    allowNegative={false}
+                    placeholder="0.00"
+                />
+            )
         },
         {
             label: 'Date',
