@@ -36,6 +36,8 @@ export default function Form({
   isSubmitting = false,
   error = null
 }: FormProps) {
+  console.log("🚀 ~ Form ~ fields:", fields);
+
   const { selectedCurrencyCode } = useCurrency();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,41 +58,16 @@ export default function Form({
           {field.type === 'custom' ? (
             <React.Fragment>
               {field.component}
-              {field.onAmountChange && (
-                <S.StyledNumericFormat
-                  value={field.value as string}
-                  onValueChange={field.onAmountChange}
-                  thousandSeparator={true}
-                  prefix={selectedCurrencyCode + ' '}
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  allowNegative={false}
-                  placeholder="0.00"
-                />
-              )}
             </React.Fragment>
           ) : field.type === 'text' || field.type === 'number' || field.type === 'date' ? (
-            field.name === 'amount' ? (
-              <S.StyledNumericFormat
-                value={field.value}
-                onValueChange={field.onAmountChange}
-                thousandSeparator={true}
-                prefix={selectedCurrencyCode + ' '}
-                decimalScale={2}
-                fixedDecimalScale={true}
-                allowNegative={false}
-                placeholder="0.00"
-              />
-            ) : (
-              <S.Input
-                type={field.type}
-                id={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                required={field.required}
-                placeholder={field.placeholder}
-              />
-            )
+            <S.Input
+              type={field.type}
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              required={field.required}
+              placeholder={field.placeholder}
+            />
           )
             : field.type === 'select' ? (
               <S.Input

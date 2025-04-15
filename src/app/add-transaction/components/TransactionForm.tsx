@@ -1,6 +1,6 @@
 'use client';
 import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
@@ -44,8 +44,12 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value } = event.target;
+        console.log("🚀 ~ TransactionForm ~ event.target:", event.target)
+        console.log("🚀 ~ TransactionForm ~ name:", name) // undefine nao imprime nada
+        console.log("🚀 ~ TransactionForm ~ value:", value) // imprime cada letra separamente, nao a palavra.
         switch (name) {
             case 'description':
+                console.log("description")
                 setDescription(value);
                 break;
             case 'date':
@@ -106,7 +110,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'text',
             name: 'description',
             value: description,
-            onChange: handleFieldChange,
+            onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
             required: true,
             placeholder: 'e.g. Salary, Groceries'
         },
