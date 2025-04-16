@@ -2,7 +2,6 @@
 'use client';
 import React from 'react';
 import { NumberFormatValues } from 'react-number-format';
-import { useCurrency } from '../../hooks/useCurrency';
 import * as S from '../../styles/shared';
 
 
@@ -38,7 +37,7 @@ export default function Form({
 }: FormProps) {
   console.log("🚀 ~ Form ~ fields:", fields);
 
-  const { selectedCurrencyCode } = useCurrency();
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
