@@ -13,7 +13,7 @@ export interface FormField {
   type: FieldType;
   name: string;
   value: FieldValue;
-  onChange?: (value: FieldValue | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onAmountChange?: (values: NumberFormatValues) => void;
   options?: { value: string; label: string }[];
   required?: boolean;
@@ -37,6 +37,16 @@ export default function Form({
 }: FormProps) {
   console.log("🚀 ~ Form ~ fields:", fields);
 
+
+  const handleRadioChange = (field: FormField, value: string) => {
+    if (field.onChange) {
+      // Create a synthetic event
+      const syntheticEvent = {
+        target: { name: field.name, value },
+      } as React.ChangeEvent<HTMLInputElement>;
+      field.onChange(syntheticEvent);
+    }
+  };
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -72,8 +82,9 @@ export default function Form({
               <S.Input
                 as="select"
                 id={field.name}
+                name={field.name}
                 value={field.value}
-                onChange={(e) => field.onChange(e.target.value)}
+                onChange={(e) => field.onChange && field.onChange(e)}
                 required={field.required}
               >
                 {field.options?.map((option) => (
@@ -89,7 +100,8 @@ export default function Form({
                     key={option.value}
                     $active={field.value === option.value}
                     type="button"
-                    onClick={() => field.onChange(option.value)}
+                    name={field.name}
+                    onClick={() => handleRadioChange(field, option.value)}
                   >
                     {option.label}
                   </S.RadioButton>

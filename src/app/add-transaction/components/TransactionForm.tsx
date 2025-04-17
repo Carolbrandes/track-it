@@ -43,13 +43,21 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
     const handleFieldChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = event.target;
-        console.log("🚀 ~ TransactionForm ~ event.target:", event.target)
-        console.log("🚀 ~ TransactionForm ~ name:", name) // undefine nao imprime nada
-        console.log("🚀 ~ TransactionForm ~ value:", value) // imprime cada letra separamente, nao a palavra.
+        console.log("Event received: ", event);
+
+        const target = event.target as HTMLInputElement | HTMLSelectElement;
+
+        if (!target) {
+            console.error("event.target is undefined");
+            return;
+        }
+
+        const { name, value } = target;
+        console.log("🚀 ~ TransactionForm ~ name:", name);
+        console.log("🚀 ~ TransactionForm ~ value:", value);
+
         switch (name) {
             case 'description':
-                console.log("description")
                 setDescription(value);
                 break;
             case 'date':
@@ -140,7 +148,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'date',
             name: 'date',
             value: date,
-            onChange: handleFieldChange,
+            onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
             required: true
         },
         {
@@ -148,7 +156,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             type: 'radio-group',
             name: 'type',
             value: type,
-            onChange: handleFieldChange,
+            onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
             options: [
                 { value: 'expense', label: 'Expense' },
                 { value: 'income', label: 'Income' }
