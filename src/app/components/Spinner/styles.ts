@@ -12,11 +12,10 @@ const spin = keyframes`
 
 
 export const Spinner = styled.div`
-  border: 8px solid ${({ theme }) => theme.colors.primary}; 
-  border-top: 8px solid ${({ theme }) => theme.colors.primary};
+  border: 2px solid rgba(255, 255, 255, 0.3); 
+  border-top: 2px solid #FFFFFF;
   border-radius: 50%;
-  width: 0.85rem;
-  height: 0.85rem;
-  animation: ${spin} 1s linear infinite; 
-  margin: 0 auto;
+  width: 1rem;
+  height: 1rem;
+  animation: ${spin} 0.8s linear infinite; 
 `;

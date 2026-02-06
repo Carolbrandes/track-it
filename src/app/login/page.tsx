@@ -81,12 +81,26 @@ export default function Login() {
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                         />
-                        <S.Button onClick={handleVerifyCode}>{
-                            isLoading ? <Spinner /> : 'Verify Code'
-                        }</S.Button>
+                        <S.Button onClick={handleVerifyCode} disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Spinner /> Verifying Code...
+                                </>
+                            ) : (
+                                'Verify Code'
+                            )}
+                        </S.Button>
                     </>
                 ) : (
-                    <S.Button onClick={handleSendCode}>{isLoading ? <Spinner /> : 'Send Code'}</S.Button>
+                    <S.Button onClick={handleSendCode} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Spinner /> Sending Code...
+                            </>
+                        ) : (
+                            'Send Code'
+                        )}
+                    </S.Button>
                 )}
             </S.LoginBox>
         </S.LoginContainer>

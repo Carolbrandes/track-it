@@ -69,8 +69,18 @@ export const Button = styled.button`
   color: ${(props) => props.theme.colors.textPrimary};
   cursor: pointer;
   transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 
   &:hover {
     background-color: ${(props) => props.theme.colors.secondary};
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 `;
