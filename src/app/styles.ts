@@ -11,7 +11,7 @@ export const LoadingIndicator = CommonStyles.LoadingIndicator;
 export const ErrorMessage = CommonStyles.ErrorMessage;
 
 interface PageLayoutContainerProps {
-    isLoginPage: boolean
+    $isLoginPage: boolean
 }
 
 export const PageLayoutContainer = styled.div<PageLayoutContainerProps>`
@@ -22,7 +22,7 @@ export const PageLayoutContainer = styled.div<PageLayoutContainerProps>`
     gap: 3rem;
     
    @media (min-width: 1200px){
-    display: ${(props) => props.isLoginPage ? 'flex' : 'grid'};
+    display: ${(props) => props.$isLoginPage ? 'flex' : 'grid'};
     grid-template-columns: 15rem 1fr;
    }
 

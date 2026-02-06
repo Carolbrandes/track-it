@@ -46,8 +46,12 @@ export const Input = styled.input`
   margin: 10px 0;
   border-radius: 8px;
   border: 1px solid ${(props) => props.theme.colors.primary};
-  background-color: ${(props) => props.theme.colors.background};
-  color: ${(props) => props.theme.colors.textPrimary};
+  background-color: #FFFFFF;
+  color: #000000;
+  
+  &::placeholder {
+    color: #666666;
+  }
   
   &:focus {
     outline: none;

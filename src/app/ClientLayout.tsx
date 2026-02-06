@@ -27,7 +27,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     <GlobalStyle />
                     <QueryClientProvider client={queryClient}>
                         <StyledComponentsRegistry>
-                            <S.PageLayoutContainer isLoginPage={isLoginPage}>
+                            <S.PageLayoutContainer $isLoginPage={isLoginPage}>
                                 {!isLoginPage && <Sidebar />}
                                 {children}
                             </S.PageLayoutContainer>

@@ -10,10 +10,15 @@ declare global {
     var mongoose: MongooseCache | undefined;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI?.trim();
 
 if (!MONGODB_URI) {
     throw new Error('❌ MONGODB_URI não está definida nas variáveis de ambiente!');
+}
+
+if (!MONGODB_URI.startsWith('mongodb://') && !MONGODB_URI.startsWith('mongodb+srv://')) {
+    console.error('❌ MONGODB_URI inválida:', MONGODB_URI.substring(0, 20) + '...');
+    throw new Error('❌ MONGODB_URI deve começar com "mongodb://" ou "mongodb+srv://"');
 }
 
 const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
