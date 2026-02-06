@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import Currency from '@/models/Currency';
 import dbConnect from '@/app/lib/db';
+import Currency from '@/models/Currency';
+import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -22,12 +22,13 @@ export async function GET() {
             console.log('Seed: Moedas inseridas com sucesso!');
         }
 
+        // @ts-expect-error: Ignoring union type compatibility issue with Mongoose find method
         const currencies = await Currency.find({}, { _id: 1, name: 1, code: 1 }).lean();
 
-        return NextResponse.json({ 
-            success: true, 
+        return NextResponse.json({
+            success: true,
             message: currenciesCount === 0 ? 'Moedas cadastradas com sucesso!' : 'Moedas já existiam no banco.',
-            currencies 
+            currencies
         });
     } catch (error) {
         console.error('Error in currencies seed:', error);
