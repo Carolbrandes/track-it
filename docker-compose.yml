@@ -1,0 +1,70 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trackit-app
+    restart: unless-stopped
+    expose:
+      - "3000"
+    env_file:
+      - .env
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - trackit-network
+
+  mongo:
+    image: mongo:8
+    container_name: trackit-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: trackit
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - trackit-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: trackit-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - certbot_webroot:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    depends_on:
+      - app
+    networks:
+      - trackit-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: trackit-certbot
+    volumes:
+      - certbot_webroot:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    networks:
+      - trackit-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  certbot_webroot:
+    driver: local
+  certbot_certs:
+    driver: local
+
+networks:
+  trackit-network:
+    driver: bridge
