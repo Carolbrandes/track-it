@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
     await dbConnect();
@@ -30,18 +32,8 @@ export async function POST(request: Request) {
         await user.save();
     }
 
-
-
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
-    await transporter.sendMail({
-        from: `"Track It" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+        from: 'Track It <noreply@trackit.tec.br>',
         to: email,
         subject: 'Seu Código de Verificação',
         text: `Seu código de verificação é ${code}.`,
