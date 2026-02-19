@@ -138,8 +138,7 @@ export async function POST(request: Request) {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        const { description, amount, currency, date, type, category } = await request.json();
-
+        const { description, amount, currency, date, type, category, is_fixed } = await request.json();
 
         if (!description || !amount || !currency || !date || !type || !category) {
             return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
@@ -151,6 +150,7 @@ export async function POST(request: Request) {
             currency,
             date: new Date(date),
             type,
+            is_fixed: is_fixed ?? null,
             category,
             userId
         });

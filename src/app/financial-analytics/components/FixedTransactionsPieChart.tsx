@@ -9,14 +9,14 @@ import * as S from '../styles';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-const FinancialPieChart = ({ month, year }: { month: number; year: number }) => {
+const FixedTransactionsPieChart = ({ month, year }: { month: number; year: number }) => {
     const { t } = useTranslation();
     const { data: userData } = useUserData();
     const userId = userData?._id;
     const { transactions = [] } = useTransactions(userId, 1, 100) || {};
 
     const filteredTransactions = transactions.filter(txn => {
-        if (!txn.date) return false;
+        if (!txn.date || !txn.is_fixed) return false;
 
         const txnDate = new Date(txn.date);
         const utcDate = new Date(Date.UTC(
@@ -40,7 +40,7 @@ const FinancialPieChart = ({ month, year }: { month: number; year: number }) => 
         labels: [t.analytics.income, t.analytics.expenses],
         datasets: [{
             data: [incomeTotal, expenseTotal],
-            backgroundColor: ['#66BB6A', '#EF5350'],
+            backgroundColor: ['#42A5F5', '#FF7043'],
             hoverOffset: 4,
         }],
     };
@@ -69,7 +69,7 @@ const FinancialPieChart = ({ month, year }: { month: number; year: number }) => 
     return (
         <S.ChartWrapperContainer>
             <S.ChartWrapper>
-                <S.ChartTitle>{t.analytics.incomeVsExpenses}</S.ChartTitle>
+                <S.ChartTitle>{t.analytics.fixedIncomeVsExpenses}</S.ChartTitle>
                 {filteredTransactions.length > 0 ? (
                     <>
                         <S.ChartContainer>
@@ -77,14 +77,14 @@ const FinancialPieChart = ({ month, year }: { month: number; year: number }) => 
                         </S.ChartContainer>
                         <S.LegendContainer>
                             <S.LegendItem>
-                                <S.ColorBox style={{ backgroundColor: '#66BB6A' }} />
+                                <S.ColorBox style={{ backgroundColor: '#42A5F5' }} />
                                 {t.analytics.income}: ${incomeTotal.toFixed(2)} (
                                 {incomeTotal + expenseTotal > 0
                                     ? Math.round((incomeTotal / (incomeTotal + expenseTotal)) * 100)
                                     : 0}%)
                             </S.LegendItem>
                             <S.LegendItem>
-                                <S.ColorBox style={{ backgroundColor: '#EF5350' }} />
+                                <S.ColorBox style={{ backgroundColor: '#FF7043' }} />
                                 {t.analytics.expenses}: ${expenseTotal.toFixed(2)} (
                                 {incomeTotal + expenseTotal > 0
                                     ? Math.round((expenseTotal / (incomeTotal + expenseTotal)) * 100)
@@ -93,11 +93,11 @@ const FinancialPieChart = ({ month, year }: { month: number; year: number }) => 
                         </S.LegendContainer>
                     </>
                 ) : (
-                    <div>{t.analytics.noTransactions} {monthLabel}</div>
+                    <div>{t.analytics.noFixedTransactions} {monthLabel}</div>
                 )}
             </S.ChartWrapper>
         </S.ChartWrapperContainer>
     );
 };
 
-export default FinancialPieChart;
+export default FixedTransactionsPieChart;

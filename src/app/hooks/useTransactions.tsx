@@ -8,6 +8,7 @@ export interface Transaction {
     currency: string;
     date: Date;
     type: 'expense' | 'income';
+    is_fixed?: boolean | null;
     category: string | { _id: string; name: string, createdAt?: Date | string };
     userId: string;
 }

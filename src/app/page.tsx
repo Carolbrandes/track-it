@@ -8,6 +8,7 @@ import { TransactionList } from './components/TransactionList';
 import { useCategories } from './hooks/useCategories';
 import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
+import { useTranslation } from './i18n/LanguageContext';
 import * as S from './styles';
 
 export interface TransactionToEdit {
@@ -17,15 +18,16 @@ export interface TransactionToEdit {
   currency: string
   date: Date
   type: 'expense' | 'income'
+  is_fixed?: boolean | null
   category: string | { _id: string; name: string; createdAt?: Date | string }
   userId: string
   createdAt?: string
   updatedAt?: string
-
 }
 
 
 export default function Home() {
+  const { t } = useTranslation();
   const { data: userData } = useUserData();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -99,7 +101,7 @@ export default function Home() {
 
   const handleDelete = async (id: string) => {
 
-    const isConfirmed = window.confirm('Are you sure you want to delete this transaction?');
+    const isConfirmed = window.confirm(t.transactions.confirmDelete);
 
     if (isConfirmed) {
       try {
@@ -143,12 +145,12 @@ export default function Home() {
 
   if (!userData) return null;
 
-  if (isLoading) return <S.LoadingIndicator>Loading...</S.LoadingIndicator>;
+  if (isLoading) return <S.LoadingIndicator>{t.common.loading}</S.LoadingIndicator>;
   if (isError) return <S.ErrorMessage>{error?.message}</S.ErrorMessage>;
 
   return (
     <S.PageContainer>
-      <S.Title>Transactions</S.Title>
+      <S.Title>{t.transactions.title}</S.Title>
 
       {/* Summary Section */}
       <S.Section>

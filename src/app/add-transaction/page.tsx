@@ -1,12 +1,14 @@
 'use client';
 import { useTransactions } from '../hooks/useTransactions';
 import { useUserData } from '../hooks/useUserData';
+import { useTranslation } from '../i18n/LanguageContext';
 import TransactionForm, { TransactionType } from './components/TransactionForm';
 import * as S from './styles';
 
 
 
 export default function AddTransaction() {
+    const { t } = useTranslation();
     const { data: userData } = useUserData();
     const {
         isError,
@@ -33,7 +35,7 @@ export default function AddTransaction() {
             {isError && error?.message !== "Failed to fetch transactions" && <S.ErrorMessage>{error?.message}</S.ErrorMessage>}
 
             <S.Section>
-                <S.SectionTitle>Add New Transaction</S.SectionTitle>
+                <S.SectionTitle>{t.transactionForm.addTitle}</S.SectionTitle>
                 <TransactionForm onAdd={handleAddTransaction} />
             </S.Section>
 

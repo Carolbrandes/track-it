@@ -1,10 +1,14 @@
+'use client'
+
 import { useRouter } from 'next/navigation';
 import { CiLogout } from "react-icons/ci";
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 import * as S from '../../styles';
 
 export const Logout = () => {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const handleLogout = async () => {
 
@@ -22,7 +26,7 @@ export const Logout = () => {
     return (
         <S.SettingsOption onClick={handleLogout}>
             <CiLogout />
-            <span style={{ marginLeft: '10px' }}>Logout</span>
+            <span style={{ marginLeft: '10px' }}>{t.sidebar.logout}</span>
         </S.SettingsOption>
     );
 };

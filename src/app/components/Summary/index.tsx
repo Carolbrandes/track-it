@@ -2,6 +2,7 @@
 
 import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency } from '../../utils/formatters';
+import { useTranslation } from '../../i18n/LanguageContext';
 import * as S from './styles';
 
 interface SummaryProps {
@@ -10,7 +11,7 @@ interface SummaryProps {
 }
 
 export const Summary = ({ transactions, totalCount }: SummaryProps) => {
-
+    const { t } = useTranslation();
 
     const calculateTotals = () => {
         return transactions.reduce((acc, transaction) => {
@@ -31,21 +32,21 @@ export const Summary = ({ transactions, totalCount }: SummaryProps) => {
     return (
         <S.SummaryCard>
             <S.SummaryItem>
-                <span>Income:</span>
+                <span>{t.summary.income}</span>
                 <S.AmountPositive>{formatCurrency(totals.income)}</S.AmountPositive>
             </S.SummaryItem>
             <S.SummaryItem>
-                <span>Expense:</span>
+                <span>{t.summary.expense}</span>
                 <S.AmountNegative>{formatCurrency(totals.expense)}</S.AmountNegative>
             </S.SummaryItem>
             <S.SummaryItem>
-                <span>Balance:</span>
+                <span>{t.summary.balance}</span>
                 <S.AmountBalance $positive={totals.balance > 0}>
                     {formatCurrency(totals.balance)}
                 </S.AmountBalance>
             </S.SummaryItem>
             <S.SummaryItem>
-                <span>Number of Transactions:</span>
+                <span>{t.summary.transactionCount}</span>
                 <span>{totalCount}</span>
             </S.SummaryItem>
         </S.SummaryCard>

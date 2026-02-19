@@ -2,6 +2,7 @@
 
 import { Category, useCategories } from '@/app/hooks/useCategories';
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useUserData } from '../../hooks/useUserData';
 import * as S from '../styles';
 
@@ -12,7 +13,7 @@ export default function CategoryList({
 }: {
     categories: Category[]
 }) {
-
+    const { t } = useTranslation();
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState('');
@@ -58,7 +59,7 @@ export default function CategoryList({
             {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
 
             {categories.length === 0 ? (
-                <S.EmptyMessage>No categories found</S.EmptyMessage>
+                <S.EmptyMessage>{t.categories.noCategoriesFound}</S.EmptyMessage>
             ) : (
                 <S.List>
                     {categories.map((category) => (
@@ -78,14 +79,14 @@ export default function CategoryList({
                                                 name: editName,
                                             })}
                                         >
-                                            Save
+                                            {t.categories.save}
                                         </S.Button>
                                         <S.Button
                                             $small
                                             $secondary
                                             onClick={handleCancel}
                                         >
-                                            Cancel
+                                            {t.categories.cancel}
                                         </S.Button>
                                     </S.ButtonGroup>
                                 </S.EditForm>
@@ -97,14 +98,14 @@ export default function CategoryList({
                                             $small
                                             onClick={() => handleEdit(category)}
                                         >
-                                            Edit
+                                            {t.categories.edit}
                                         </S.Button>
                                         <S.Button
                                             $small
                                             $danger
                                             onClick={() => handleDeleteCategory(category._id)}
                                         >
-                                            Delete
+                                            {t.categories.delete}
                                         </S.Button>
                                     </S.ButtonGroup>
                                 </>

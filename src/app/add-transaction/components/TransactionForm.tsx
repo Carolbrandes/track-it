@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { useCategories } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
@@ -14,6 +15,7 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 
 
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
+    const { t } = useTranslation();
     const { data: userData } = useUserData()
     const { categories } = useCategories(userData?._id);
     const { selectedCurrencyCode } = useCurrency();
@@ -24,6 +26,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
     const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [type, setType] = useState<'expense' | 'income'>('expense');
     const [categoryId, setCategoryId] = useState('');
+    const [isFixed, setIsFixed] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -84,7 +87,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         try {
 
             if (!description || !amount || !date || !categoryId) {
-                throw new Error('All fields are required');
+                throw new Error(t.transactionForm.allFieldsRequired);
             }
 
             await onAdd({
@@ -93,20 +96,22 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
                 currency: userData.currencyId,
                 date: new Date(date),
                 type,
+                is_fixed: isFixed,
                 category: categoryId
             });
 
-            setSuccessMsg('Transaction successfully registered!');
+            setSuccessMsg(t.transactionForm.success);
 
 
             setDescription('');
             setAmount('');
             setType('expense');
+            setIsFixed(false);
 
             setTimeout(() => setSuccessMsg(null), 3000);
         } catch (err) {
             console.error("🚀 ~ handleSubmit ~ err:", err)
-            setError("Error on save new transaction");
+            setError(t.transactionForm.saveError);
         } finally {
             setIsSubmitting(false);
         }
@@ -114,16 +119,16 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
 
     const fields: FormField[] = [
         {
-            label: 'Description',
+            label: t.transactionForm.description,
             type: 'text',
             name: 'description',
             value: description,
             onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
             required: true,
-            placeholder: 'e.g. Salary, Groceries'
+            placeholder: t.transactionForm.descriptionPlaceholder
         },
         {
-            label: 'Amount',
+            label: t.transactionForm.amount,
             type: 'custom',
             name: 'amount',
             value: amount,
@@ -144,7 +149,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             )
         },
         {
-            label: 'Date',
+            label: t.transactionForm.date,
             type: 'date',
             name: 'date',
             value: date,
@@ -152,19 +157,19 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             required: true
         },
         {
-            label: 'Type',
+            label: t.transactionForm.type,
             type: 'radio-group',
             name: 'type',
             value: type,
             onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
             options: [
-                { value: 'expense', label: 'Expense' },
-                { value: 'income', label: 'Income' }
+                { value: 'expense', label: t.transactions.expense },
+                { value: 'income', label: t.transactions.income }
             ],
             required: true
         },
         {
-            label: 'Category',
+            label: t.transactionForm.category,
             type: 'select',
             name: 'category',
             value: categoryId,
@@ -174,6 +179,23 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
                 label: category.name
             })),
             required: true
+        },
+        {
+            label: t.transactionForm.fixedTransaction,
+            type: 'custom' as const,
+            name: 'is_fixed',
+            value: isFixed ? 'true' : 'false',
+            component: (
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input
+                        type="checkbox"
+                        checked={isFixed}
+                        onChange={(e) => setIsFixed(e.target.checked)}
+                        style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                    />
+                    {t.transactionForm.fixedTransaction}
+                </label>
+            )
         }
     ];
 
@@ -182,7 +204,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             <Form
                 fields={fields}
                 onSubmit={handleSubmit}
-                submitText={isSubmitting ? 'Adding...' : 'Add Transaction'}
+                submitText={isSubmitting ? t.transactionForm.adding : t.transactionForm.addButton}
                 isSubmitting={isSubmitting}
                 error={error}
             />

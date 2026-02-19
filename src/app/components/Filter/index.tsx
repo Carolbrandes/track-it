@@ -5,6 +5,7 @@ import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
 import { Category } from '../../hooks/useCategories';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
+import { useTranslation } from '../../i18n/LanguageContext';
 import * as S from './styles';
 
 interface IFilter {
@@ -30,6 +31,7 @@ interface FilterProps {
 export const Filter = ({ filters, categories = [], handleFilterChange, resetFilters }: FilterProps) => {
     const { isMobile } = useDeviceDetect();
     const [showFilters, setShowFilters] = useState(false);
+    const { t } = useTranslation();
 
     const filterContent = () => (
         <S.FilterForm>
@@ -37,7 +39,7 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                 <S.FilterInput
                     type="text"
                     name="description"
-                    placeholder="Description"
+                    placeholder={t.filter.description}
                     value={String(filters.description) || ''}
                     onChange={handleFilterChange}
                 />
@@ -49,7 +51,7 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     value={filters.category || ''}
                     onChange={handleFilterChange}
                 >
-                    <option value="">All Categories</option>
+                    <option value="">{t.filter.allCategories}</option>
                     {categories.map(category => (
                         <option key={category._id} value={category._id}>
                             {category.name}
@@ -64,9 +66,9 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     value={filters.type || ''}
                     onChange={handleFilterChange}
                 >
-                    <option value="">All Types</option>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
+                    <option value="">{t.filter.allTypes}</option>
+                    <option value="income">{t.filter.income}</option>
+                    <option value="expense">{t.filter.expense}</option>
                 </S.FilterSelect>
             </S.FilterGroup>
 
@@ -74,14 +76,14 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                 <S.FilterInput
                     type="number"
                     name="minAmount"
-                    placeholder="Min Amount"
+                    placeholder={t.filter.minAmount}
                     value={filters.minAmount || ''}
                     onChange={handleFilterChange}
                 />
                 <S.FilterInput
                     type="number"
                     name="maxAmount"
-                    placeholder="Max Amount"
+                    placeholder={t.filter.maxAmount}
                     value={filters.maxAmount || ''}
                     onChange={handleFilterChange}
                 />
@@ -102,7 +104,7 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     value={filters.endDate || ''}
                     onChange={handleFilterChange}
                 />
-                <S.ResetButton onClick={resetFilters}>Reset Filters</S.ResetButton>
+                <S.ResetButton onClick={resetFilters}>{t.filter.resetFilters}</S.ResetButton>
             </S.FilterGroup>
         </S.FilterForm>
     );

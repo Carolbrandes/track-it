@@ -7,12 +7,12 @@ const transactionSchema = new Schema({
     date: {
         type: Date,
         required: true,
-        default: () => new Date(new Date().toISOString().split('T')[0]) // Ensure stored in UTC
+        default: () => new Date(new Date().toISOString().split('T')[0])
     },
     type: { type: String, required: true, enum: ['expense', 'income'] },
+    is_fixed: { type: Boolean, default: null },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     userId: { type: Schema.Types.ObjectId, required: true },
 }, { timestamps: true });
-
 
 export default models.Transaction || model('Transaction', transactionSchema);

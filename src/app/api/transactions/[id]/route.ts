@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'Transaction ID is required' }, { status: 400 });
         }
 
-        const { description, amount, currency, type, category } = await request.json();
+        const { description, amount, currency, type, category, is_fixed } = await request.json();
         if (!description || !amount || !currency || !type || !category) {
             return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
         }
@@ -37,6 +37,7 @@ export async function PUT(request: NextRequest) {
         transaction.currency = currency;
         transaction.type = type;
         transaction.category = category;
+        transaction.is_fixed = is_fixed ?? null;
 
         await transaction.save();
         return NextResponse.json(transaction);

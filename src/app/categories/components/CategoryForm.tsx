@@ -1,9 +1,11 @@
 'use client';
 import { useState } from 'react';
 import Form, { FormField } from '../../components/Form';
+import { useTranslation } from '../../i18n/LanguageContext';
 import { Toast } from '../../components/Toast';
 
 export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void }) {
+    const { t } = useTranslation();
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,7 +19,7 @@ export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void 
         try {
             await onAdd(name);
             setName('');
-            setSuccessMsg('Category successfully registered!');
+            setSuccessMsg(t.categories.success);
 
             setTimeout(() => setSuccessMsg(null), 3000);
         } catch (error: unknown) {
@@ -40,13 +42,13 @@ export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void 
 
     const fields: FormField[] = [
         {
-            label: 'Category Name',
+            label: t.categories.categoryName,
             type: 'text' as const,
             name: 'name',
             value: name,
             onChange: handleName,
             required: true,
-            placeholder: 'Enter category name'
+            placeholder: t.categories.namePlaceholder
         }
     ];
     return (
@@ -54,7 +56,7 @@ export default function CategoryForm({ onAdd }: { onAdd: (name: string) => void 
             <Form
                 fields={fields}
                 onSubmit={handleSubmit}
-                submitText={isSubmitting ? 'Adding...' : 'Add Category'}
+                submitText={isSubmitting ? t.categories.adding : t.categories.addButton}
                 isSubmitting={isSubmitting}
                 error={error}
             />

@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 import FinancialPieChart from './components/FinancialPieChart';
+import FixedTransactionsPieChart from './components/FixedTransactionsPieChart';
 import * as S from './styles';
 
 export default function FinancialAnalyticsPage() {
+    const { t } = useTranslation();
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
@@ -12,30 +15,17 @@ export default function FinancialAnalyticsPage() {
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
     const [selectedYear, setSelectedYear] = useState(currentYear);
 
-    const months = [
-        { value: 1, name: 'January' },
-        { value: 2, name: 'February' },
-        { value: 3, name: 'March' },
-        { value: 4, name: 'April' },
-        { value: 5, name: 'May' },
-        { value: 6, name: 'June' },
-        { value: 7, name: 'July' },
-        { value: 8, name: 'August' },
-        { value: 9, name: 'September' },
-        { value: 10, name: 'October' },
-        { value: 11, name: 'November' },
-        { value: 12, name: 'December' }
-    ];
+    const months = t.analytics.months.map((name, i) => ({ value: i + 1, name }));
 
     const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
     return (
         <S.PageContainer>
-            <S.Title>Financial Analytics</S.Title>
+            <S.Title>{t.analytics.title}</S.Title>
 
             <S.FilterContainer>
                 <S.FilterGroup>
-                    <S.FilterLabel>Month</S.FilterLabel>
+                    <S.FilterLabel>{t.analytics.month}</S.FilterLabel>
                     <S.FilterSelect
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
@@ -49,7 +39,7 @@ export default function FinancialAnalyticsPage() {
                 </S.FilterGroup>
 
                 <S.FilterGroup>
-                    <S.FilterLabel>Year</S.FilterLabel>
+                    <S.FilterLabel>{t.analytics.year}</S.FilterLabel>
                     <S.FilterSelect
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(parseInt(e.target.value))}
@@ -64,6 +54,7 @@ export default function FinancialAnalyticsPage() {
             </S.FilterContainer>
 
             <FinancialPieChart month={selectedMonth} year={selectedYear} />
+            <FixedTransactionsPieChart month={selectedMonth} year={selectedYear} />
         </S.PageContainer>
     );
 }

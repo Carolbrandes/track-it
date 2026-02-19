@@ -1,16 +1,20 @@
+'use client'
+
 import { useUserData } from '../../../../hooks/useUserData';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import * as S from './styles';
 
 
 export const Avatar = () => {
     const { data, isLoading, isError } = useUserData();
+    const { t } = useTranslation();
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <div>{t.avatar.loading}</div>;
     }
 
     if (isError) {
-        return <div>Error fetching user data</div>;
+        return <div>{t.avatar.error}</div>;
     }
 
     return (

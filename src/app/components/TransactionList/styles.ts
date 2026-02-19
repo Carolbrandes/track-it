@@ -35,8 +35,9 @@ export const ResponsiveTable = styled.table`
     th:nth-child(2) { width: 25%; } /* Description */
     th:nth-child(3) { width: 20%; } /* Category */
     th:nth-child(4) { width: 10%; } /* Type */
-    th:nth-child(5) { width: 15%; } /* Amount */
-    th:nth-child(6) { width: 15%; } /* Actions */
+    th:nth-child(5) { width: 8%; }  /* Fixed */
+    th:nth-child(6) { width: 15%; } /* Amount */
+    th:nth-child(7) { width: 15%; } /* Actions */
   }
 `;
 

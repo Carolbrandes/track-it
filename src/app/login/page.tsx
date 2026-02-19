@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { TbPigMoney } from "react-icons/tb";
 import { Spinner } from '../components/Spinner';
+import { useTranslation } from '../i18n/LanguageContext';
 import * as S from './styles';
 
 export default function Login() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [isCodeSent, setIsCodeSent] = useState(false);
@@ -66,10 +68,10 @@ export default function Login() {
             </S.LoginHeader>
 
             <S.LoginBox>
-                <S.Title>Login</S.Title>
+                <S.Title>{t.login.title}</S.Title>
                 <S.Input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t.login.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -77,17 +79,17 @@ export default function Login() {
                     <>
                         <S.Input
                             type="text"
-                            placeholder="Enter verification code"
+                            placeholder={t.login.codePlaceholder}
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                         />
                         <S.Button onClick={handleVerifyCode} disabled={isLoading}>
                             {isLoading ? (
                                 <>
-                                    <Spinner /> Verifying Code...
+                                    <Spinner /> {t.login.verifyingCode}
                                 </>
                             ) : (
-                                'Verify Code'
+                                t.login.verifyCode
                             )}
                         </S.Button>
                     </>
@@ -95,10 +97,10 @@ export default function Login() {
                     <S.Button onClick={handleSendCode} disabled={isLoading}>
                         {isLoading ? (
                             <>
-                                <Spinner /> Sending Code...
+                                <Spinner /> {t.login.sendingCode}
                             </>
                         ) : (
-                            'Send Code'
+                            t.login.sendCode
                         )}
                     </S.Button>
                 )}

@@ -1,12 +1,15 @@
+'use client'
+
 import { useEffect, useState } from "react";
 import { TfiMoney } from "react-icons/tfi";
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useUserData } from '../../../../hooks/useUserData';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import * as S from './styles';
 
 export const CurrencySelect = () => {
     const { currencies, selectedCurrencyCode, userLoading } = useCurrency();
-
+    const { t } = useTranslation();
 
     const [selectedCurrency, setSelectedCurrency] = useState<string>(selectedCurrencyCode);
 
@@ -58,7 +61,7 @@ export const CurrencySelect = () => {
 
 
     if (userLoading) {
-        return <div>Loading user data...</div>;
+        return <div>{t.currency.loadingUser}</div>;
     }
 
     return (
@@ -69,14 +72,14 @@ export const CurrencySelect = () => {
                 onChange={handleCurrencyChange}
                 disabled={isUpdating}
             >
-                <option value="">Select currency</option>
+                <option value="">{t.currency.select}</option>
                 {currencies.map((currency) => (
                     <option key={currency._id} value={currency._id}>
                         {currency.name} ({currency.code})
                     </option>
                 ))}
             </select>
-            {isUpdating && <span>Updating...</span>}
+            {isUpdating && <span>{t.currency.updating}</span>}
         </S.CurrencySelect>
     );
 };
