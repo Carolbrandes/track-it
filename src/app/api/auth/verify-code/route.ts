@@ -2,22 +2,23 @@ import { SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
+import { formatZodError, verifyCodeSchema } from '../../../lib/validations';
 
 export async function POST(req: Request) {
     await dbConnect();
-    const { email, code } = await req.json();
+    const body = await req.json();
+    const result = verifyCodeSchema.safeParse(body);
 
-
-
-    if (!email || !code) {
+    if (!result.success) {
         return NextResponse.json(
-            { success: false, message: 'Email e código são obrigatórios' },
+            { success: false, message: formatZodError(result.error) },
             { status: 400 }
         );
     }
 
+    const { email, code } = result.data;
+
     // Encontrar o usuário com base no e-mail
-    // @ts-expect-error: Ignoring union type compatibility issue with findById method
     const user = await User.findOne({ email });
 
 
@@ -37,7 +38,6 @@ export async function POST(req: Request) {
     }
 
     // Limpar o código de verificação após a validação
-    // @ts-expect-error: Ignoring union type compatibility issue with findById method
     await User.findByIdAndUpdate(user._id, { $unset: { verificationCode: 1 } });
 
     // Gerar o token JWT

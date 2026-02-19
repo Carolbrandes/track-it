@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client';
 import React from 'react';
 import { NumberFormatValues } from 'react-number-format';
@@ -35,9 +34,6 @@ export default function Form({
   isSubmitting = false,
   error = null
 }: FormProps) {
-  console.log("🚀 ~ Form ~ fields:", fields);
-
-
   const handleRadioChange = (field: FormField, value: string) => {
     if (field.onChange) {
       // Create a synthetic event

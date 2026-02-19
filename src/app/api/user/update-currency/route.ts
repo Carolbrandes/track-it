@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
+import { formatZodError, updateCurrencySchema } from '../../../lib/validations';
 
 export async function PUT(req: Request) {
     await dbConnect();
@@ -30,19 +31,19 @@ export async function PUT(req: Request) {
             );
         }
 
-        // Get currencyId from request body
-        const { currencyId } = await req.json();
+        const body = await req.json();
+        const parseResult = updateCurrencySchema.safeParse(body);
 
-        // Validate currencyId
-        if (!currencyId) {
+        if (!parseResult.success) {
             return NextResponse.json(
-                { success: false, message: 'Currency ID is required' },
+                { success: false, message: formatZodError(parseResult.error) },
                 { status: 400 }
             );
         }
 
+        const { currencyId } = parseResult.data;
+
         // Update user's currency preference
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const user = await User.findByIdAndUpdate(
             userId,
             { currencyId },

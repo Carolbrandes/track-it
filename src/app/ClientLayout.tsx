@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import StyledComponentsRegistry from '../../StyledComponentsRegistry';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sidebar } from './components/Sidebar';
 import { ThemeProvider } from './hooks/useTheme';
 import { LanguageProvider } from './i18n/LanguageContext';
@@ -27,10 +28,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                         <GlobalStyle />
                         <QueryClientProvider client={queryClient}>
                             <StyledComponentsRegistry>
-                                <S.PageLayoutContainer $isLoginPage={isLoginPage}>
-                                    {!isLoginPage && <Sidebar />}
-                                    {children}
-                                </S.PageLayoutContainer>
+                                <ErrorBoundary>
+                                    <S.PageLayoutContainer $isLoginPage={isLoginPage}>
+                                        {!isLoginPage && <Sidebar />}
+                                        {children}
+                                    </S.PageLayoutContainer>
+                                </ErrorBoundary>
                             </StyledComponentsRegistry>
                         </QueryClientProvider>
                     </body>

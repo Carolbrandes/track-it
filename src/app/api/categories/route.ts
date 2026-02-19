@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Category from '../../../models/Category';
 import dbConnect from '../../lib/db';
+import { createCategorySchema, formatZodError } from '../../lib/validations';
 
 export async function GET() {
     try {
@@ -17,7 +18,6 @@ export async function GET() {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const categories = await Category.find({ userId }).sort({ createdAt: -1 });
 
         return NextResponse.json(categories);
@@ -38,7 +38,14 @@ export async function POST(request: Request) {
     try {
         await dbConnect();
 
-        const { name } = await request.json();
+        const body = await request.json();
+        const parseResult = createCategorySchema.safeParse(body);
+
+        if (!parseResult.success) {
+            return NextResponse.json({ error: formatZodError(parseResult.error) }, { status: 400 });
+        }
+
+        const { name } = parseResult.data;
 
         const authToken = (await headers()).get('cookie')?.split('authToken=')[1]?.split(';')[0];
 
@@ -49,7 +56,6 @@ export async function POST(request: Request) {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const existingCategory = await Category.findOne({ name, userId });
         if (existingCategory) {
             return NextResponse.json({ error: 'Categoria já existe para este usuário' }, { status: 400 });

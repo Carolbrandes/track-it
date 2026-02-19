@@ -1,11 +1,11 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 export interface IUser extends Document {
-    _id: mongoose.Types.ObjectId;
+    _id: Types.ObjectId;
     email: string;
     selectedTheme: string;
     currencyId: string;
-    verificationCode: string
+    verificationCode: string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -15,6 +15,7 @@ const UserSchema = new Schema<IUser>({
     verificationCode: { type: String, required: true, default: '' },
 });
 
-const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+const User: Model<IUser> =
+    mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;

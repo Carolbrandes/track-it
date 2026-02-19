@@ -22,7 +22,6 @@ export async function GET() {
             console.log('Seed: Moedas inseridas com sucesso!');
         }
 
-        // @ts-expect-error: Ignoring union type compatibility issue with Mongoose find method
         const currencies = await Currency.find({}, { _id: 1, name: 1, code: 1 }).lean();
 
         return NextResponse.json({

@@ -41,10 +41,9 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ isLoggedIn: false, message: 'Invalid User ID format' }, { status: 400 });
         }
 
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const user = await User.findById(userId)
             .select('-verificationCode')
-            .exec() as unknown as IUser | null;
+            .exec() as IUser | null;
 
         if (!user) {
             return NextResponse.json({ isLoggedIn: false }, { status: 401 });

@@ -1,4 +1,4 @@
-'use-cliente'
+'use client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Transaction {

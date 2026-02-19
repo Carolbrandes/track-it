@@ -1,6 +1,20 @@
-import { Schema, model, models } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-const transactionSchema = new Schema({
+export interface ITransaction extends Document {
+    _id: Types.ObjectId;
+    description: string;
+    amount: number;
+    currency: string;
+    date: Date;
+    type: 'expense' | 'income';
+    is_fixed: boolean | null;
+    category: Types.ObjectId;
+    userId: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const transactionSchema = new Schema<ITransaction>({
     description: { type: String, required: true },
     amount: { type: Number, required: true },
     currency: { type: String, required: true, default: 'USD' },
@@ -15,4 +29,7 @@ const transactionSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, required: true },
 }, { timestamps: true });
 
-export default models.Transaction || model('Transaction', transactionSchema);
+const Transaction: Model<ITransaction> =
+    mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', transactionSchema);
+
+export default Transaction;

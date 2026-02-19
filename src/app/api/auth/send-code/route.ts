@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
+import { formatZodError, sendCodeSchema } from '../../../lib/validations';
 
 export async function POST(request: Request) {
     try {
@@ -10,23 +11,24 @@ export async function POST(request: Request) {
 
         await dbConnect();
 
-        const { email } = await request.json();
+        const body = await request.json();
+        const result = sendCodeSchema.safeParse(body);
 
-        if (!email) {
+        if (!result.success) {
             return NextResponse.json(
-                { success: false, message: 'Email é obrigatório' },
+                { success: false, message: formatZodError(result.error) },
                 { status: 400 }
             );
         }
 
+        const { email } = result.data;
+
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         console.log(`[DEV] Verification code for ${email}: ${code}`);
 
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         let user = await User.findOne({ email });
 
         if (!user) {
-            // @ts-expect-error: Ignoring union type compatibility issue with findById method
             user = await User.create({
                 email,
                 verificationCode: code,

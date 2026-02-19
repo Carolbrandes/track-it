@@ -46,8 +46,6 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
     const handleFieldChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        console.log("Event received: ", event);
-
         const target = event.target as HTMLInputElement | HTMLSelectElement;
 
         if (!target) {
@@ -56,8 +54,6 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         }
 
         const { name, value } = target;
-        console.log("🚀 ~ TransactionForm ~ name:", name);
-        console.log("🚀 ~ TransactionForm ~ value:", value);
 
         switch (name) {
             case 'description':

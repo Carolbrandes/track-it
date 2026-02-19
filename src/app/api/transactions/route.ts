@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '../../lib/db';
+import { createTransactionSchema, formatZodError } from '../../lib/validations';
 
 interface FilterQuery {
     description?: { $regex: string; $options: string } | string;
@@ -103,7 +104,6 @@ export async function GET(request: Request) {
 
         const totalCount = await Transaction.countDocuments(filterQuery);
         const totalPages = Math.ceil(totalCount / limit);
-        // @ts-expect-error: Ignoring union type compatibility issue with findById method
         const transactions = await Transaction.find(filterQuery)
             .populate('category')
             .sort({ date: -1 })
@@ -138,11 +138,14 @@ export async function POST(request: Request) {
         const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
         const userId = payload.userId;
 
-        const { description, amount, currency, date, type, category, is_fixed } = await request.json();
+        const body = await request.json();
+        const result = createTransactionSchema.safeParse(body);
 
-        if (!description || !amount || !currency || !date || !type || !category) {
-            return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+        if (!result.success) {
+            return NextResponse.json({ error: formatZodError(result.error) }, { status: 400 });
         }
+
+        const { description, amount, currency, date, type, category, is_fixed } = result.data;
 
         const newTransaction = new Transaction({
             description,
