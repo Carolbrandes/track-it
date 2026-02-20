@@ -24,9 +24,9 @@ export const Logout = () => {
     };
 
     return (
-        <S.SettingsOption onClick={handleLogout}>
+        <S.DropdownItem onClick={handleLogout}>
             <CiLogout />
             <span style={{ marginLeft: '10px' }}>{t.sidebar.logout}</span>
-        </S.SettingsOption>
+        </S.DropdownItem>
     );
 };
