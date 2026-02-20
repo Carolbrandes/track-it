@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Montserrat } from 'next/font/google';
 import { usePathname } from 'next/navigation';
 import StyledComponentsRegistry from '../../StyledComponentsRegistry';
+import { CookieConsent } from './components/CookieConsent';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sidebar } from './components/Sidebar';
 import { ThemeProvider } from './hooks/useTheme';
@@ -21,7 +22,7 @@ const queryClient = new QueryClient();
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const isLoginPage = pathname?.includes("login") || false;
+    const isPublicPage = pathname?.includes("login") || pathname?.includes("terms") || false;
 
     return (
         <ThemeProvider>
@@ -35,11 +36,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                         <QueryClientProvider client={queryClient}>
                             <StyledComponentsRegistry>
                                 <ErrorBoundary>
-                                    <S.PageLayoutContainer $isLoginPage={isLoginPage}>
-                                        {!isLoginPage && <Sidebar />}
+                                    <S.PageLayoutContainer $isLoginPage={isPublicPage}>
+                                        {!isPublicPage && <Sidebar />}
                                         {children}
                                     </S.PageLayoutContainer>
                                 </ErrorBoundary>
+                                <CookieConsent />
                             </StyledComponentsRegistry>
                         </QueryClientProvider>
                     </body>

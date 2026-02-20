@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styled from 'styled-components';
 
 export const LoginContainer = styled.div`
@@ -87,5 +88,17 @@ export const Button = styled.button`
   &:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+  }
+`;
+
+export const TermsLink = styled(Link)`
+  margin-top: 1.25rem;
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-decoration: none;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+    text-decoration: underline;
   }
 `;

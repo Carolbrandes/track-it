@@ -105,6 +105,9 @@ export default function Login() {
                     </S.Button>
                 )}
             </S.LoginBox>
+            <S.TermsLink href="/terms">
+                {t.terms.pageTitle}
+            </S.TermsLink>
         </S.LoginContainer>
     );
 }
