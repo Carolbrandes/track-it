@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
         const user = await User.findById(userId)
             .select('-verificationCode')
-            .exec() as IUser | null;
+            .exec() as unknown as IUser | null;
 
         if (!user) {
             return NextResponse.json({ isLoggedIn: false }, { status: 401 });

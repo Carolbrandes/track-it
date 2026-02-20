@@ -31,7 +31,7 @@ export async function GET() {
         }
 
         console.log(`🔍 Buscando usuário com ID: ${payload.userId}`);
-        const user = await User.findById(payload.userId).lean().exec() as IUser | null;
+        const user = await User.findById(payload.userId).lean().exec() as unknown as IUser | null;
 
         if (!user) {
             return NextResponse.json(
