@@ -1,4 +1,5 @@
 import { jwtVerify } from 'jose';
+import { Types } from 'mongoose';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import Transaction from '../../../../models/Transaction';
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest) {
         transaction.amount = amount;
         transaction.currency = currency;
         transaction.type = type;
-        transaction.category = category;
+        transaction.category = new Types.ObjectId(category);
         transaction.is_fixed = is_fixed ?? null;
 
         await transaction.save();
