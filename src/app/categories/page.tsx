@@ -9,8 +9,7 @@ import * as S from './styles';
 
 export default function Categories() {
     const { t } = useTranslation();
-    const { data: userData } = useUserData()
-
+    const { data: userData } = useUserData();
 
     const {
         categories,
@@ -24,28 +23,30 @@ export default function Categories() {
         addCategory(name);
     };
 
-
     return (
         <S.PageContainer>
             <S.Title>{t.categories.title}</S.Title>
 
             {isError && <S.ErrorMessage>{error?.message}</S.ErrorMessage>}
 
-
             <S.Section>
                 <S.SectionTitle>{t.categories.addNew}</S.SectionTitle>
-                <CategoryForm onAdd={handleAddCategory} />
+                <S.Card>
+                    <CategoryForm onAdd={handleAddCategory} />
+                </S.Card>
             </S.Section>
 
             <S.Section>
                 <S.SectionTitle>{t.categories.existing}</S.SectionTitle>
-                {isLoading ? (
-                    <S.LoadingIndicator>{t.categories.loading}</S.LoadingIndicator>
-                ) : categories && categories.length > 0 ? (
-                    <CategoryList
-                        categories={categories}
-                    />
-                ) : (<p>{t.categories.noCategories}</p>)}
+                <S.Card>
+                    {isLoading ? (
+                        <S.LoadingIndicator>{t.categories.loading}</S.LoadingIndicator>
+                    ) : categories && categories.length > 0 ? (
+                        <CategoryList categories={categories} />
+                    ) : (
+                        <S.EmptyMessage>{t.categories.noCategories}</S.EmptyMessage>
+                    )}
+                </S.Card>
             </S.Section>
         </S.PageContainer>
     );

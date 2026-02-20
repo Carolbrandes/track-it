@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
+import AiInsightsSection from './components/AiInsightsSection';
 import FinancialPieChart from './components/FinancialPieChart';
 import FixedTransactionsPieChart from './components/FixedTransactionsPieChart';
 import * as S from './styles';
@@ -53,8 +54,21 @@ export default function FinancialAnalyticsPage() {
                 </S.FilterGroup>
             </S.FilterContainer>
 
-            <FinancialPieChart month={selectedMonth} year={selectedYear} />
-            <FixedTransactionsPieChart month={selectedMonth} year={selectedYear} />
+            <S.AnalyticsLayout>
+                <AiInsightsSection />
+
+                <S.ChartsColumn>
+                    <S.ChartSection>
+                        <S.ChartSectionTitle>{t.analytics.generalChart}</S.ChartSectionTitle>
+                        <FinancialPieChart month={selectedMonth} year={selectedYear} />
+                    </S.ChartSection>
+
+                    <S.ChartSection>
+                        <S.ChartSectionTitle>{t.analytics.fixedChart}</S.ChartSectionTitle>
+                        <FixedTransactionsPieChart month={selectedMonth} year={selectedYear} />
+                    </S.ChartSection>
+                </S.ChartsColumn>
+            </S.AnalyticsLayout>
         </S.PageContainer>
     );
 }

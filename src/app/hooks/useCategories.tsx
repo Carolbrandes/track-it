@@ -98,7 +98,7 @@ export const useCategories = (userId: string) => {
         isError,
         error,
         addError: addMutation.error,
-        addCategory: (name: string) => addMutation.mutate({ name, userId }),
+        addCategory: (name: string) => addMutation.mutateAsync({ name, userId }),
         updateCategory: (id: string, name: string) => updateMutation.mutate({ id, name }),
         deleteCategory: (id: string) => deleteMutation.mutate({ id, userId }),
     };

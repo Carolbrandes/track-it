@@ -4,8 +4,8 @@ export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400; 
+    font-family: inherit, sans-serif;
+    font-weight: 400;
     background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.textPrimary};
   }
@@ -22,5 +22,9 @@ export const GlobalStyle = createGlobalStyle`
 
   * {
     box-sizing: border-box;
+  }
+
+  input, select, textarea, button {
+    font-family: inherit;
   }
 `;

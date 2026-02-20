@@ -9,36 +9,65 @@ export const TableContainer = styled.div`
 export const ResponsiveTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  
+
   th, td {
     padding: 0.75rem;
     text-align: left;
     border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
   }
-  
+
   th {
-    background-color: ${({ theme }) => theme.colors.background};
-    font-weight: bold;
+    background-color: ${({ theme }) => theme.colors.surface};
+    font-weight: 600;
+    color: ${({ theme }) => theme.colors.textSecondary};
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
-  
+
+  td {
+    color: ${({ theme }) => theme.colors.textPrimary};
+  }
+
   tr:hover {
-    background-color: ${({ theme }) => theme.colors.secondary};
+    background-color: ${({ theme }) => theme.colors.gray200};
   }
 
   @media (min-width: 1200px) {
     th, td {
-      white-space: nowrap; /* Only prevent wrapping on desktop */
+      white-space: nowrap;
     }
-    
-    /* Optional: Set specific column widths for desktop */
-    th:nth-child(1) { width: 15%; } /* Date */
-    th:nth-child(2) { width: 25%; } /* Description */
-    th:nth-child(3) { width: 20%; } /* Category */
-    th:nth-child(4) { width: 10%; } /* Type */
-    th:nth-child(5) { width: 8%; }  /* Fixed */
-    th:nth-child(6) { width: 15%; } /* Amount */
-    th:nth-child(7) { width: 15%; } /* Actions */
+    th:nth-child(1) { width: 15%; }
+    th:nth-child(2) { width: 25%; }
+    th:nth-child(3) { width: 20%; }
+    th:nth-child(4) { width: 10%; }
+    th:nth-child(5) { width: 8%; }
+    th:nth-child(6) { width: 15%; }
+    th:nth-child(7) { width: 15%; }
   }
+`;
+
+export const SortableTh = styled.th<{ $active: boolean }>`
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+  color: ${({ $active, theme }) =>
+    $active ? theme.colors.primary : theme.colors.textSecondary} !important;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary} !important;
+  }
+
+  & > svg {
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+`;
+
+export const SortIconInactive = styled.span`
+  display: inline-block;
+  width: 14px;
+  margin-left: 4px;
 `;
 
 export const ActionButtons = styled.div`
@@ -48,13 +77,14 @@ export const ActionButtons = styled.div`
 
 export const TypeBadge = styled.span<{ $type: 'income' | 'expense' }>`
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: bold;
+  font-weight: 600;
   background-color: ${({ theme, $type }) =>
+    $type === 'income' ? `${theme.colors.success}22` : `${theme.colors.danger}22`};
+  color: ${({ theme, $type }) =>
     $type === 'income' ? theme.colors.success : theme.colors.danger};
-  color: ${({ theme }) => theme.colors.background};
 `;
 
 export const Amount = styled.span<{ $type: 'income' | 'expense' }>`
@@ -64,29 +94,34 @@ export const Amount = styled.span<{ $type: 'income' | 'expense' }>`
 `;
 
 export const EditButton = styled.button`
-  padding: 0.25rem 0.5rem;
+  padding: 0.3rem 0.65rem;
   background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.primary};
+    opacity: 0.85;
   }
 `;
 
 export const DeleteButton = styled.button`
-  padding: 0.25rem 0.5rem;
-  background-color: ${({ theme }) => theme.colors.gray700};
+  padding: 0.3rem 0.65rem;
+  background-color: ${({ theme }) => theme.colors.gray300};
   color: ${({ theme }) => theme.colors.textPrimary};
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.danger};
+    color: white;
   }
 `;

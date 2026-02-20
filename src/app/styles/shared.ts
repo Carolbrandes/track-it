@@ -2,19 +2,27 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 export const PageContainer = styled.div`
-  padding: 2rem;
-  margin-block: 2rem;
+  padding: 1rem;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  flex: 1;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 `;
 
 export const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 4rem;
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
   color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 export const Section = styled.section`
-  margin-bottom: 3rem;
-  
+  margin-bottom: 2rem;
 `;
 
 export const SectionTitle = styled.h2`
@@ -27,45 +35,40 @@ export const LoadingIndicator = styled.div`
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.textPrimary};
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 export const ErrorMessage = styled.div`
   color: ${({ theme }) => theme.colors.danger};
-  background-color: ${({ theme }) => theme.colors.danger};
+  background-color: ${({ theme }) => theme.colors.surface};
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   margin-bottom: 1rem;
   border: 1px solid ${({ theme }) => theme.colors.danger};
 `;
-
 
 export const Button = styled.button<{
   $primary?: boolean;
   $danger?: boolean;
   $disabled?: boolean;
 }>`
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   background-color: ${({ $primary, $danger, theme }) =>
     $danger ? theme.colors.danger :
       $primary ? theme.colors.primary :
-        theme.colors.secondary};
-  color: white;
+        theme.colors.gray300};
+  color: ${({ $primary, $danger }) =>
+    $danger || $primary ? '#fff' : 'inherit'};
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
   opacity: ${({ $disabled }) => ($disabled ? 0.7 : 1)};
   transition: all 0.2s ease;
   width: fit-content;
-  max-width: 10rem;
+  font-weight: 500;
 
   &:hover {
-    background-color: ${({ $primary, $danger, $disabled, theme }) =>
-    $disabled ?
-      ($danger ? theme.colors.danger : $primary ? theme.colors.primary : theme.colors.secondary) :
-      ($danger ? theme.colors.danger :
-        $primary ? theme.colors.primary :
-          theme.colors.gray700)};
+    opacity: 0.85;
   }
 `;
 
@@ -83,14 +86,29 @@ export const FormGroup = styled.div`
 `;
 
 export const Label = styled.label`
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 export const Input = styled.input`
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSecondary};
+  }
 `;
 
 export const RadioGroup = styled.div`
@@ -102,33 +120,35 @@ export const RadioGroup = styled.div`
 export const RadioButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.terciary : theme.colors.gray300};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
+    $active ? theme.colors.primary : theme.colors.gray200};
+  color: ${({ $active, theme }) =>
+    $active ? '#fff' : theme.colors.textSecondary};
+  border: 1px solid ${({ $active, theme }) =>
+    $active ? theme.colors.primary : theme.colors.gray300};
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: ${({ $active }) => ($active ? '600' : '400')};
-  box-shadow: ${({ $active }) => ($active ? '0 2px 4px rgba(0,0,0,0.1)' : 'none')};
-  transform: ${({ $active }) => ($active ? 'translateY(-1px)' : 'none')};
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.secondary};
-    color: white;
-  }
-
-  &:active {
-    transform: translateY(0);
+    background-color: ${({ $active, theme }) =>
+      $active ? theme.colors.primary : theme.colors.gray300};
   }
 `;
 
 export const StyledNumericFormat = styled(NumericFormat)`
   width: 100%;
-  padding: 10px;
-  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
   border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
- 
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
 `;
-
-

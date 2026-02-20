@@ -1,3 +1,4 @@
+import { NumericFormat } from "react-number-format";
 import styled from "styled-components";
 
 export const FilterContainer = styled.div`
@@ -13,65 +14,173 @@ export const FilterContainer = styled.div`
       height: 2rem;
       width: 2rem;
       border-radius: 8px;
+      color: ${({ theme }) => theme.colors.primary};
     }
   }
-`
+`;
 
 export const FilterForm = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  
-  @media (min-width: 1200px){
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
 
+  @media (min-width: 900px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
   }
 `;
 
-export const FilterGroup = styled.div`
+export const FilterColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 10px;
+`;
+
+export const FilterBottomRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (min-width: 900px) {
+    grid-column: 1 / -1;
+  }
 `;
 
 export const FilterInput = styled.input`
-  padding: 0.5rem;
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   width: 100%;
+  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-family: inherit;
+  transition: border-color 0.2s;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSecondary};
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
 `;
 
 export const FilterSelect = styled.select`
-  padding: 0.5rem;
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   width: 100%;
+  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-family: inherit;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
+`;
+
+export const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  color: ${({ theme }) => theme.colors.textPrimary};
+
+  input {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+    accent-color: ${({ theme }) => theme.colors.primary};
+  }
 `;
 
 export const ResetButton = styled.button`
-  background-color: #f0f0f0; 
-  color: #007bff; 
-  border: 1px solid #007bff;
-  padding: 8px 16px;
-  font-size: 14px;
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  border-radius: 8px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
 
- 
   &:hover {
-    background-color: #007bff; 
+    background-color: ${({ theme }) => theme.colors.primary};
     color: #fff;
-    border-color: #0056b3; 
   }
 
- 
   &:disabled {
-    background-color: #e0e0e0;
-    color: #b0b0b0;
-    border-color: #b0b0b0;
+    opacity: 0.5;
     cursor: not-allowed;
+  }
+`;
+
+const filterFieldCss = `
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  width: 100%;
+  font-family: inherit;
+  transition: border-color 0.2s;
+`;
+
+export const FilterNumericFormat = styled(NumericFormat)`
+  ${filterFieldCss}
+  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  color: ${({ theme }) => theme.colors.textPrimary};
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSecondary};
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
+`;
+
+export const DateFieldWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+`;
+
+export const DateLabel = styled.span`
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const FilterDateInput = styled.input`
+  ${filterFieldCss}
+  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  color: ${({ theme }) => theme.colors.textPrimary};
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
+  }
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
   }
 `;

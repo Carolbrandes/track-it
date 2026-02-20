@@ -2,18 +2,17 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 export * from '../categories/styles';
 
-
 export const TransactionItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.surface};
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gray300};
+    background-color: ${({ theme }) => theme.colors.gray200};
   }
 `;
 
@@ -33,7 +32,7 @@ export const TransactionMeta = styled.div`
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.textPrimary};
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 export const TransactionAmount = styled.span<{ $type: 'income' | 'expense' }>`
@@ -51,16 +50,19 @@ export const RadioGroup = styled.div`
 export const RadioButton = styled.button<{ $active: boolean }>`
   padding: 0.5rem 1rem;
   background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.secondary};
-  color: white;
-  border: none;
-  border-radius: 4px;
+    $active ? theme.colors.primary : theme.colors.gray200};
+  color: ${({ $active, theme }) =>
+    $active ? '#fff' : theme.colors.textSecondary};
+  border: 1px solid ${({ $active, theme }) =>
+    $active ? theme.colors.primary : theme.colors.gray300};
+  border-radius: 999px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-family: inherit;
+  transition: all 0.2s;
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.gray700};
+    $active ? theme.colors.primary : theme.colors.gray300};
   }
 `;
 
@@ -73,7 +75,7 @@ export const CurrencyInputContainer = styled.div`
     left: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: ${({ theme }) => theme.colors.textPrimary};
+    color: ${({ theme }) => theme.colors.textSecondary};
   }
 
   input {
@@ -88,39 +90,22 @@ export const DatePickerWrapper = styled.div`
 `;
 
 export const CategorySelect = styled.select`
-  padding: 0.5rem;
+  padding: 0.6rem 0.75rem;
   border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.textPrimary};
+  font-family: inherit;
 `;
 
 export const StyledNumericFormat = styled(NumericFormat)`
   width: 100%;
-  padding: 10px;
-  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
   border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
- 
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-family: inherit;
 `;
-
-
-declare module 'styled-components' {
-  export interface DefaultTheme {
-    colors: {
-      background: string
-      textPrimary: string
-      textSecondary: string
-      primary: string
-      secondary: string
-      terciary: string
-      gray200: string
-      gray300: string
-      gray700: string
-      danger: string
-      success: string
-    };
-  }
-}
-

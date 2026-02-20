@@ -2,7 +2,9 @@
 'use client';
 
 import { Category } from '@/app/hooks/useCategories';
+import { useCurrency } from '@/app/hooks/useCurrency';
 import React, { useEffect, useState } from 'react';
+import { NumberFormatValues } from 'react-number-format';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Transaction } from '../../hooks/useTransactions';
 import { TransactionToEdit } from '../../page';
@@ -16,15 +18,9 @@ interface ModalProps {
     categories: Category[];
 }
 
-interface CategoryObj {
-    _id: string;
-    name: string;
-    userId: string;
-    createdAt: string;
-}
-
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, categories }) => {
     const { t } = useTranslation();
+    const { selectedCurrencyCode } = useCurrency();
     const [updatedTransaction, setUpdatedTransaction] = useState(transaction);
 
     useEffect(() => {
@@ -39,29 +35,21 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
         }));
     };
 
+    const handleAmountChange = (values: NumberFormatValues) => {
+        setUpdatedTransaction((prev) => ({
+            ...prev,
+            amount: Number(values.value) || 0,
+        }));
+    };
+
     const handleSave = () => {
-        let categoryToSave: string | CategoryObj | null;
-
-        if (typeof updatedTransaction.category === 'string') {
-            categoryToSave = updatedTransaction.category;
-        } else {
-            const categoryObj = updatedTransaction.category;
-            const selectedCategory = categories.find(cat => cat._id === categoryObj._id);
-
-            categoryToSave = {
-                _id: categoryObj._id || selectedCategory?._id || '',
-                name: categoryObj.name || selectedCategory?.name || '',
-                userId: updatedTransaction.userId,
-                createdAt: String((categoryObj && 'createdAt' in categoryObj && categoryObj.createdAt instanceof Date)
-                    ? categoryObj.createdAt.toISOString()
-                    : (categoryObj && 'createdAt' in categoryObj ? categoryObj.createdAt : new Date().toISOString()))
-
-            };
-        }
+        const categoryId = typeof updatedTransaction.category === 'string'
+            ? updatedTransaction.category
+            : updatedTransaction.category?._id || '';
 
         const transactionToSave: TransactionToEdit = {
             ...updatedTransaction,
-            category: categoryToSave
+            category: categoryId,
         };
 
         onSave(transactionToSave);
@@ -81,41 +69,58 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                     <S.CloseButton onClick={onClose}>X</S.CloseButton>
                 </S.ModalHeader>
                 <S.ModalBody>
-                    <S.Input
-                        type="text"
-                        name="description"
-                        value={updatedTransaction.description}
-                        onChange={handleInputChange}
-                        placeholder={t.editModal.description}
-                    />
-                    <S.Select
-                        name="category"
-                        value={categoryValue}
-                        onChange={handleInputChange}
-                    >
-                        <option value="">{t.editModal.selectCategory}</option>
-                        {categories.map((category) => (
-                            <option key={category._id} value={category._id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </S.Select>
-                    <S.Select
-                        name="type"
-                        value={updatedTransaction.type}
-                        onChange={handleInputChange}
-                    >
-                        <option value="income">{t.editModal.income}</option>
-                        <option value="expense">{t.editModal.expense}</option>
-                    </S.Select>
-                    <S.Input
-                        type="number"
-                        name="amount"
-                        value={updatedTransaction.amount}
-                        onChange={handleInputChange}
-                        placeholder={t.editModal.amount}
-                    />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: '10px' }}>
+                    <S.FormGroup>
+                        <S.Label>{t.editModal.description}</S.Label>
+                        <S.Input
+                            type="text"
+                            name="description"
+                            value={updatedTransaction.description}
+                            onChange={handleInputChange}
+                        />
+                    </S.FormGroup>
+
+                    <S.FormGroup>
+                        <S.Label>{t.editModal.selectCategory}</S.Label>
+                        <S.Select
+                            name="category"
+                            value={categoryValue}
+                            onChange={handleInputChange}
+                        >
+                            <option value="">{t.editModal.selectCategory}</option>
+                            {categories.map((category) => (
+                                <option key={category._id} value={category._id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </S.Select>
+                    </S.FormGroup>
+
+                    <S.FormGroup>
+                        <S.Label>{t.transactionForm.type}</S.Label>
+                        <S.Select
+                            name="type"
+                            value={updatedTransaction.type}
+                            onChange={handleInputChange}
+                        >
+                            <option value="income">{t.editModal.income}</option>
+                            <option value="expense">{t.editModal.expense}</option>
+                        </S.Select>
+                    </S.FormGroup>
+
+                    <S.FormGroup>
+                        <S.Label>{t.editModal.amount}</S.Label>
+                        <S.StyledNumericFormat
+                            value={updatedTransaction.amount}
+                            onValueChange={handleAmountChange}
+                            thousandSeparator={true}
+                            prefix={selectedCurrencyCode + ' '}
+                            decimalScale={2}
+                            fixedDecimalScale={true}
+                            allowNegative={false}
+                        />
+                    </S.FormGroup>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: '4px' }}>
                         <input
                             type="checkbox"
                             checked={updatedTransaction.is_fixed || false}
@@ -124,8 +129,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                         />
                         {t.transactionForm.fixedTransaction}
                     </label>
-                    <S.Button onClick={handleSave}>{t.editModal.save}</S.Button>
-                    <S.Button onClick={onClose}>{t.editModal.cancel}</S.Button>
+
+                    <S.ButtonGroup>
+                        <S.SaveButton onClick={handleSave}>{t.editModal.save}</S.SaveButton>
+                        <S.CancelButton onClick={onClose}>{t.editModal.cancel}</S.CancelButton>
+                    </S.ButtonGroup>
                 </S.ModalBody>
             </S.ModalContainer>
         </S.ModalOverlay>

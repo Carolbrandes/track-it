@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Montserrat } from 'next/font/google';
 import { usePathname } from 'next/navigation';
 import StyledComponentsRegistry from '../../StyledComponentsRegistry';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -9,6 +10,12 @@ import { ThemeProvider } from './hooks/useTheme';
 import { LanguageProvider } from './i18n/LanguageContext';
 import * as S from "./styles";
 import { GlobalStyle } from './styles/global';
+
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    weight: ['400', '500', '700'],
+    display: 'swap',
+});
 
 const queryClient = new QueryClient();
 
@@ -19,9 +26,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
         <ThemeProvider>
             <LanguageProvider>
-                <html lang="en">
+                <html lang="en" className={montserrat.className}>
                     <head>
-                        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                     </head>
                     <body>

@@ -8,18 +8,21 @@ export const Pagination = styled.div`
 `;
 
 export const PaginationButton = styled.button<{ $active?: boolean }>`
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.85rem;
   background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.background};
+    $active ? theme.colors.primary : theme.colors.surface};
   color: ${({ $active, theme }) =>
     $active ? 'white' : theme.colors.textPrimary};
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 4px;
+  border: 1px solid ${({ $active, theme }) =>
+    $active ? theme.colors.primary : theme.colors.gray300};
+  border-radius: 8px;
   cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
 
   &:hover {
     background-color: ${({ $active, theme }) =>
-    $active ? theme.colors.primary : theme.colors.gray300};
+    $active ? theme.colors.primary : theme.colors.gray200};
   }
 
   &:disabled {

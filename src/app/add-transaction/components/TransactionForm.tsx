@@ -2,10 +2,11 @@
 import { format } from 'date-fns';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
+import CategoryAutocomplete from '../../components/CategoryAutocomplete';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { useCategories } from '../../hooks/useCategories';
+import { Category, useCategories } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
@@ -17,7 +18,7 @@ export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 export default function TransactionForm({ onAdd }: { onAdd: (transaction: TransactionType) => void }) {
     const { t } = useTranslation();
     const { data: userData } = useUserData()
-    const { categories } = useCategories(userData?._id);
+    const { categories, addCategory: addCategoryMutation } = useCategories(userData?._id);
     const { selectedCurrencyCode } = useCurrency();
 
 
@@ -166,14 +167,23 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         },
         {
             label: t.transactionForm.category,
-            type: 'select',
+            type: 'custom' as const,
             name: 'category',
             value: categoryId,
-            onChange: handleFieldChange,
-            options: categories.map(category => ({
-                value: category._id,
-                label: category.name
-            })),
+            component: (
+                <CategoryAutocomplete
+                    categories={categories}
+                    selectedId={categoryId}
+                    onSelect={(id) => setCategoryId(id)}
+                    onCreateNew={async (name): Promise<Category | void> => {
+                        const newCat = await addCategoryMutation(name);
+                        if (newCat?._id) {
+                            setCategoryId(newCat._id);
+                            return newCat;
+                        }
+                    }}
+                />
+            ),
             required: true
         },
         {

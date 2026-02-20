@@ -4,6 +4,7 @@ declare module 'styled-components' {
     export interface DefaultTheme {
         colors: {
             background: string
+            surface: string
             textPrimary: string
             textSecondary: string
             primary: string
@@ -14,6 +15,7 @@ declare module 'styled-components' {
             gray700: string
             danger: string
             success: string
+            warning: string
         };
     }
 }

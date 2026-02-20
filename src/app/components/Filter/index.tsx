@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { NumberFormatValues } from 'react-number-format';
 import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
 import { Category } from '../../hooks/useCategories';
+import { useCurrency } from '../../hooks/useCurrency';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 import { useTranslation } from '../../i18n/LanguageContext';
 import * as S from './styles';
@@ -19,23 +21,47 @@ interface IFilter {
     maxAmount?: number | string;
     startDate?: string;
     endDate?: string;
+    fixedOnly?: boolean;
 }
 
 interface FilterProps {
     filters: IFilter;
     categories: Category[];
     handleFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    onFixedOnlyChange: (checked: boolean) => void;
     resetFilters: () => void;
 }
 
-export const Filter = ({ filters, categories = [], handleFilterChange, resetFilters }: FilterProps) => {
+function getCurrencyConfig(code: string) {
+    switch (code) {
+        case 'BRL': return { prefix: 'R$ ', thousandSeparator: '.', decimalSeparator: ',' };
+        case 'EUR': return { prefix: '€ ', thousandSeparator: '.', decimalSeparator: ',' };
+        default:    return { prefix: '$ ', thousandSeparator: ',', decimalSeparator: '.' };
+    }
+}
+
+export const Filter = ({ filters, categories = [], handleFilterChange, onFixedOnlyChange, resetFilters }: FilterProps) => {
     const { isMobile } = useDeviceDetect();
     const [showFilters, setShowFilters] = useState(false);
     const { t } = useTranslation();
+    const { selectedCurrencyCode } = useCurrency();
+
+    const currencyConfig = getCurrencyConfig(selectedCurrencyCode);
+
+    const fireSyntheticChange = useCallback((name: string, value: string) => {
+        const syntheticEvent = {
+            target: { name, value },
+        } as React.ChangeEvent<HTMLInputElement>;
+        handleFilterChange(syntheticEvent);
+    }, [handleFilterChange]);
+
+    const handleAmountChange = useCallback((name: string) => (values: NumberFormatValues) => {
+        fireSyntheticChange(name, values.value);
+    }, [fireSyntheticChange]);
 
     const filterContent = () => (
         <S.FilterForm>
-            <S.FilterGroup>
+            <S.FilterColumn>
                 <S.FilterInput
                     type="text"
                     name="description"
@@ -43,9 +69,6 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     value={String(filters.description) || ''}
                     onChange={handleFilterChange}
                 />
-            </S.FilterGroup>
-
-            <S.FilterGroup>
                 <S.FilterSelect
                     name="category"
                     value={filters.category || ''}
@@ -58,9 +81,6 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                         </option>
                     ))}
                 </S.FilterSelect>
-            </S.FilterGroup>
-
-            <S.FilterGroup>
                 <S.FilterSelect
                     name="type"
                     value={filters.type || ''}
@@ -70,42 +90,60 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     <option value="income">{t.filter.income}</option>
                     <option value="expense">{t.filter.expense}</option>
                 </S.FilterSelect>
-            </S.FilterGroup>
+                <S.DateFieldWrapper>
+                    <S.DateLabel>{t.filter.startDate}</S.DateLabel>
+                    <S.FilterDateInput
+                        type="date"
+                        name="startDate"
+                        value={String(filters.startDate || '')}
+                        onChange={handleFilterChange}
+                    />
+                </S.DateFieldWrapper>
+                <S.DateFieldWrapper>
+                    <S.DateLabel>{t.filter.endDate}</S.DateLabel>
+                    <S.FilterDateInput
+                        type="date"
+                        name="endDate"
+                        value={String(filters.endDate || '')}
+                        onChange={handleFilterChange}
+                    />
+                </S.DateFieldWrapper>
+            </S.FilterColumn>
 
-            <S.FilterGroup>
-                <S.FilterInput
-                    type="number"
-                    name="minAmount"
+            <S.FilterColumn>
+                <S.FilterNumericFormat
                     placeholder={t.filter.minAmount}
                     value={filters.minAmount || ''}
-                    onChange={handleFilterChange}
+                    onValueChange={handleAmountChange('minAmount')}
+                    thousandSeparator={currencyConfig.thousandSeparator}
+                    decimalSeparator={currencyConfig.decimalSeparator}
+                    prefix={currencyConfig.prefix}
+                    decimalScale={2}
+                    allowNegative={false}
                 />
-                <S.FilterInput
-                    type="number"
-                    name="maxAmount"
+                <S.FilterNumericFormat
                     placeholder={t.filter.maxAmount}
                     value={filters.maxAmount || ''}
-                    onChange={handleFilterChange}
+                    onValueChange={handleAmountChange('maxAmount')}
+                    thousandSeparator={currencyConfig.thousandSeparator}
+                    decimalSeparator={currencyConfig.decimalSeparator}
+                    prefix={currencyConfig.prefix}
+                    decimalScale={2}
+                    allowNegative={false}
                 />
-            </S.FilterGroup>
+            </S.FilterColumn>
 
-            <S.FilterGroup>
-                <S.FilterInput
-                    type="date"
-                    name="startDate"
-                    placeholder="Start Date"
-                    value={filters.startDate || ''}
-                    onChange={handleFilterChange}
-                />
-                <S.FilterInput
-                    type="date"
-                    name="endDate"
-                    placeholder="End Date"
-                    value={filters.endDate || ''}
-                    onChange={handleFilterChange}
-                />
+            <S.FilterBottomRow>
+                <S.CheckboxLabel>
+                    <input
+                        type="checkbox"
+                        checked={filters.fixedOnly || false}
+                        onChange={(e) => onFixedOnlyChange(e.target.checked)}
+                    />
+                    {t.filter.fixedOnly}
+                </S.CheckboxLabel>
                 <S.ResetButton onClick={resetFilters}>{t.filter.resetFilters}</S.ResetButton>
-            </S.FilterGroup>
+            </S.FilterBottomRow>
         </S.FilterForm>
     );
 

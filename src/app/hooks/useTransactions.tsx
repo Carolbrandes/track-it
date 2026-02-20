@@ -177,11 +177,11 @@ export const useTransactions = (
         isError,
         error,
         addTransaction: (transaction: Omit<Transaction, '_id'>) =>
-            addMutation.mutate(transaction),
+            addMutation.mutateAsync(transaction),
         updateTransaction: (id: string, transaction: Partial<Transaction>) =>
-            updateMutation.mutate({ id, ...transaction }),
+            updateMutation.mutateAsync({ id, ...transaction }),
         deleteTransaction: (id: string) =>
-            deleteMutation.mutate(id),
+            deleteMutation.mutateAsync(id),
         isAdding: addMutation.isPending,
         isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
