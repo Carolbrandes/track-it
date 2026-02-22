@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
+import { isPlayStoreReviewEmail } from '../../../lib/playstore-review-account';
 import { formatZodError, sendCodeSchema } from '../../../lib/validations';
 
 export async function POST(request: Request) {
@@ -22,6 +23,11 @@ export async function POST(request: Request) {
         }
 
         const { email } = result.data;
+
+        // Conta de teste Google Play: não envia e-mail; o avaliador usa o código fixo 123456
+        if (isPlayStoreReviewEmail(email)) {
+            return NextResponse.json({ success: true });
+        }
 
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         console.log(`[DEV] Verification code for ${email}: ${code}`);
