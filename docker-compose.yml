@@ -16,7 +16,7 @@ services:
       - trackit-network
 
   mongo:
-    image: mongo:8
+    image: mongo:latest
     container_name: trackit-mongo
     restart: unless-stopped
     environment:

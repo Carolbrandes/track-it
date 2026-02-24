@@ -49,3 +49,4 @@ notes.txt
 
 
 test-mongodb-connection.js
+*.md
