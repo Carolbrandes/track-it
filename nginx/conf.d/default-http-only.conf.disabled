@@ -1,5 +1,6 @@
 # Use ESTE arquivo como default.conf na PRIMEIRA VEZ (antes de ter certificados).
-# Depois de rodar o certbot, volte a usar default.conf com SSL e redirect.
+# Renomeie para default.conf temporariamente: mv default-http-only.conf.disabled default.conf
+# (.disabled evita que o Nginx carregue este arquivo junto com default.conf)
 server {
     listen 80;
     server_name trackit.tec.br www.trackit.tec.br;

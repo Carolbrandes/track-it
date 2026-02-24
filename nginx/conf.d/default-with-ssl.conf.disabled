@@ -1,3 +1,6 @@
+# Config completa com SSL e redirect. Use como default.conf após gerar certificados.
+# Para ativar: cp default-with-ssl.conf.disabled default.conf && nginx -s reload
+# (.disabled evita que o Nginx carregue este arquivo junto com default.conf)
 # Redirecionamento HTTP → HTTPS
 server {
     listen 80;
