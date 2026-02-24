@@ -2,7 +2,7 @@
 
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { generateInsightsCore } from '../lib/generateInsightsCore';
+import { generateInsightsCore, type InsightsResponse } from '../lib/generateInsightsCore';
 
 export type {
     CategoryBreakdown,
