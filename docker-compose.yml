@@ -22,7 +22,8 @@ services:
     environment:
       MONGO_INITDB_DATABASE: trackit
     volumes:
-      - mongodb_data:/data/db
+      # Persistência no host (sobrevive a reinicializações e recriação de containers)
+      - ./data/mongodb:/data/db
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh --quiet
       interval: 10s
@@ -58,8 +59,6 @@ services:
       - trackit-network
 
 volumes:
-  mongodb_data:
-    driver: local
   certbot_webroot:
     driver: local
   certbot_certs:

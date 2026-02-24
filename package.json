@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed:john": "node scripts/seed-john-transactions.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -48,6 +49,7 @@
     "eslint-config-next": "15.2.3",
     "happy-dom": "^20.6.3",
     "typescript": "^5",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "dotenv": "^16.4.5"
   }
 }
