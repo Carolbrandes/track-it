@@ -177,6 +177,7 @@ const en = {
     rateLimitError: 'AI quota exceeded. Please wait a moment and try again.',
     timeoutError: 'Analysis took too long. Try a smaller image or try again.',
     imageTooLarge: 'Image too large. Use a smaller photo (max 10 MB).',
+    sessionExpired: 'Session expired. Please log in again and try again.',
     genericError: 'Could not read the receipt. Please try again with a clearer photo.',
     saveError: 'Error saving transactions. Please try again.',
     invalidFormat: 'Invalid format. Please use JPG, PNG or WebP.',

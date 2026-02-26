@@ -6,6 +6,8 @@ server {
     listen 80 default_server;
     server_name _;
 
+    client_max_body_size 10M;
+
     # Certbot challenge (para depois gerar certificado)
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;

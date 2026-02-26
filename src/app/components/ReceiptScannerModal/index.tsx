@@ -124,15 +124,28 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                 body: formData,
                 credentials: 'include',
             });
-            const result = await res.json();
+
+            if (res.status === 401) {
+                setError(scan.sessionExpired);
+                setStep('upload');
+                return;
+            }
+            if (res.status === 413) {
+                setError(scan.imageTooLarge);
+                setStep('upload');
+                return;
+            }
+
+            const result = await res.json().catch(() => ({ success: false, error: '' }));
 
             if (!result.success) {
-                    const err = result.error ?? '';
+                    const err = String(result.error ?? '');
                     const isTimeout = err.includes('timed out') || err.includes('timeout') || err === 'REQUEST_TIMEOUT';
                     const isTooLarge = err.includes('too large') || err.includes('10MB') || err.includes('Payload');
                     const errorMap: Record<string, string> = {
                         NOT_A_RECEIPT: scan.notAReceipt,
                         RATE_LIMIT: scan.rateLimitError,
+                        Unauthorized: scan.sessionExpired,
                     };
                     let message = errorMap[err] || scan.genericError;
                     if (isTimeout) message = scan.timeoutError;

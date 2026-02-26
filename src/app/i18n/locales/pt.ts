@@ -179,6 +179,7 @@ const pt: Translations = {
     rateLimitError: 'Cota da IA excedida. Aguarde um momento e tente novamente.',
     timeoutError: 'A análise demorou demais. Tente uma imagem menor ou tente novamente.',
     imageTooLarge: 'Imagem muito grande. Use uma foto menor (máx. 10 MB).',
+    sessionExpired: 'Sessão expirada. Faça login novamente e tente de novo.',
     genericError: 'Não foi possível ler o comprovante. Tente novamente com uma foto mais nítida.',
     saveError: 'Erro ao salvar transações. Tente novamente.',
     invalidFormat: 'Formato inválido. Use JPG, PNG ou WebP.',
