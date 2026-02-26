@@ -108,7 +108,7 @@ export async function generateInsightsCore(
         }).lean();
 
         if (cached?.data) {
-            return { success: true, data: cached.data as InsightsData };
+            return { success: true, data: cached.data as unknown as InsightsData };
         }
 
         const now = new Date();
