@@ -149,7 +149,7 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     setTotalDescription(result.data.storeName || '');
                     setEditedItems([...result.data.items]);
 
-                    const allIndexes = new Set(result.data.items.map((_, i) => i));
+                    const allIndexes = new Set<number>(result.data.items.map((_, i) => i));
                     setSelectedItems(allIndexes);
 
                     const matchedId = findBestCategoryMatch(result.data.suggestedCategory, categories);
