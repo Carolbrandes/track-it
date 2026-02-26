@@ -135,10 +135,27 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
             return { success: false, error: 'NOT_A_RECEIPT' };
         }
 
-        return {
-            success: true,
-            data: parsed as unknown as ParsedReceipt,
+        // Build a plain object to avoid any circular refs or non-JSON-serializable data (e.g. "Maximum array nesting" / serialization errors)
+        const items = Array.isArray(parsed.items)
+            ? (parsed.items as unknown[]).map((it: unknown) => {
+                const o = it && typeof it === 'object' ? it as Record<string, unknown> : {};
+                return {
+                    description: typeof o.description === 'string' ? o.description : String(o.description ?? ''),
+                    amount: Number(o.amount) || 0,
+                    quantity: typeof o.quantity === 'number' ? o.quantity : undefined,
+                };
+            })
+            : [];
+        const data: ParsedReceipt = {
+            storeName: typeof parsed.storeName === 'string' ? parsed.storeName : String(parsed.storeName ?? ''),
+            date: typeof parsed.date === 'string' ? parsed.date : String(parsed.date ?? ''),
+            items,
+            total: Number(parsed.total) || 0,
+            type: parsed.type === 'income' ? 'income' : 'expense',
+            suggestedCategory: typeof parsed.suggestedCategory === 'string' ? parsed.suggestedCategory : String(parsed.suggestedCategory ?? ''),
+            currency: typeof parsed.currency === 'string' ? parsed.currency : String(parsed.currency ?? 'BRL'),
         };
+        return { success: true, data };
     } catch (error) {
         // Log detalhado: ver no terminal do backend exatamente o que o Gemini retorna
         console.error('[parseReceiptCore] Error parsing receipt (full):', error);

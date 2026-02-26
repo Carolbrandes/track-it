@@ -134,7 +134,15 @@ export async function POST(request: NextRequest) {
             parseReceiptCore(base64Image, mimeType, locale, existingCategories),
             PARSE_TIMEOUT_MS
         );
-        return NextResponse.json(result);
+        try {
+            return NextResponse.json(result);
+        } catch (serializeErr) {
+            console.error('[Receipt Parse] Response serialization failed:', serializeErr);
+            return NextResponse.json(
+                { success: false, error: 'Could not serialize result. Try again.' },
+                { status: 500 }
+            );
+        }
     } catch (error) {
         // Log detalhado para ver no terminal EXATAMENTE o que a API do provedor (Gemini) retorna
         console.error('Receipt parse API error (full):', error);
