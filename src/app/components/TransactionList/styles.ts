@@ -125,3 +125,145 @@ export const DeleteButton = styled.button`
     color: white;
   }
 `;
+
+/* ---- Mobile: cards (só visível abaixo do breakpoint) ---- */
+export const MobileCardsList = styled.div`
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+
+  @media (max-width: 859px) {
+    display: flex;
+  }
+`;
+
+export const MobileCard = styled.div`
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+`;
+
+export const MobileCardHeader = styled.div`
+  padding: 1rem;
+`;
+
+export const MobileCardTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+`;
+
+export const MobileCardDescription = styled.div`
+  font-weight: 600;
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.textPrimary};
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+`;
+
+export const MobileCardAmount = styled.span<{ $type: 'income' | 'expense' }>`
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: ${({ theme, $type }) =>
+    $type === 'income' ? theme.colors.success : theme.colors.danger};
+`;
+
+export const MobileCardDate = styled.div`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-bottom: 0.5rem;
+`;
+
+export const MobileCardVerMais = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
+  margin-top: 0.25rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+export const MobileCardExpanded = styled.div`
+  padding: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray300};
+`;
+
+export const MobileCardDetailRow = styled.div`
+  margin-top: 0.75rem;
+
+  &:first-child {
+    margin-top: 0;
+  }
+`;
+
+export const MobileCardDetailLabel = styled.div`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-bottom: 0.15rem;
+`;
+
+export const MobileCardDetailValue = styled.div`
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textPrimary};
+`;
+
+export const MobileCardActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+`;
+
+export const MobileCardEditBtn = styled.button`
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  background: none;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary};
+    color: white;
+  }
+`;
+
+export const MobileCardDeleteBtn = styled.button`
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: ${({ theme }) => theme.colors.danger};
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+/* Container da tabela: esconder no mobile */
+export const TableWrapper = styled.div`
+  @media (max-width: 859px) {
+    display: none;
+  }
+`;

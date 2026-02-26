@@ -1,57 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import {
     FiAlertTriangle, FiBarChart2, FiCheckCircle, FiCpu,
     FiDollarSign, FiEye, FiRefreshCw, FiTarget,
     FiTrendingUp, FiZap,
 } from 'react-icons/fi';
-import { generateFinancialInsights, InsightsData } from '@/app/actions/generateInsights';
+import { useQuery } from '@tanstack/react-query';
+import { generateFinancialInsights } from '@/app/actions/generateInsights';
 import { useTranslation } from '@/app/i18n/LanguageContext';
 import * as S from '../styles';
+
+const INSIGHTS_STALE_MS = 3 * 60 * 60 * 1000; // 3 horas
+
+function getInsightsErrorMessage(
+    errorCode: string | undefined,
+    insights: { noTransactions: string; rateLimitError: string; timeoutError: string; genericError: string }
+): string {
+    const err = errorCode ?? '';
+    const isTimeout = err.includes('timed out') || err.includes('timeout') || err === 'REQUEST_TIMEOUT';
+    const errorMap: Record<string, string> = {
+        NO_TRANSACTIONS: insights.noTransactions,
+        RATE_LIMIT: insights.rateLimitError,
+    };
+    return isTimeout ? insights.timeoutError : (errorMap[err] || insights.genericError);
+}
 
 export default function AiInsightsSection() {
     const { t, locale } = useTranslation();
     const insights = t.insights;
-    const [data, setData] = useState<InsightsData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    const fetchInsights = async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        refetch,
+        isRefetching,
+    } = useQuery({
+        queryKey: ['insights', locale],
+        queryFn: async () => {
             const result = await generateFinancialInsights(locale);
+            if (!result.success) throw new Error(result.error ?? '');
+            if (!result.data) throw new Error(insights.genericError);
+            return result.data;
+        },
+        staleTime: INSIGHTS_STALE_MS,
+        gcTime: INSIGHTS_STALE_MS,
+    });
 
-            if (!result.success) {
-                const errorMap: Record<string, string> = {
-                    NO_TRANSACTIONS: insights.noTransactions,
-                    RATE_LIMIT: insights.rateLimitError,
-                };
-                setError(errorMap[result.error ?? ''] || insights.genericError);
-                setData(null);
-                return;
-            }
+    const loading = isLoading || isRefetching;
+    let errorMessage: string | null = null;
+    if (isError && error instanceof Error) {
+        errorMessage = getInsightsErrorMessage(error.message, insights);
+    }
 
-            if (result.data) {
-                setData(result.data);
-            }
-        } catch {
-            setError(insights.genericError);
-            setData(null);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchInsights();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
+    const localeForNumber = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : 'en-US';
     const formatCurrency = (value: number) => {
-        return value.toLocaleString(locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es-ES' : 'en-US', {
+        return value.toLocaleString(localeForNumber, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
@@ -64,12 +69,12 @@ export default function AiInsightsSection() {
                     <FiCpu size={20} />
                     {insights.title}
                 </S.InsightsSectionTitle>
-                <S.RefreshButton onClick={fetchInsights} disabled={isLoading} title={insights.generateButton}>
-                    <FiRefreshCw size={16} className={isLoading ? 'spinning' : ''} />
+                <S.RefreshButton onClick={() => refetch()} disabled={loading} title={insights.generateButton}>
+                    <FiRefreshCw size={16} className={loading ? 'spinning' : ''} />
                 </S.RefreshButton>
             </S.InsightsPanelHeader>
 
-            {isLoading && (
+            {loading && (
                 <S.InsightsGrid>
                     <S.SkeletonCard />
                     <S.SkeletonCard />
@@ -78,13 +83,13 @@ export default function AiInsightsSection() {
                 </S.InsightsGrid>
             )}
 
-            {error && !isLoading && (
+            {errorMessage && !loading && (
                 <S.ErrorCard>
-                    <S.ErrorText>{error}</S.ErrorText>
+                    <S.ErrorText>{errorMessage}</S.ErrorText>
                 </S.ErrorCard>
             )}
 
-            {data && !isLoading && (
+            {data && !loading && (
                 <S.InsightsGrid>
                     <S.InsightCard>
                         <S.InsightCardTitle>

@@ -62,34 +62,36 @@ const deleteCategory = async ({ id }: { id: string }): Promise<string> => {
 export const useCategories = (userId: string) => {
     const queryClient = useQueryClient();
 
+    const STALE_MS = 5 * 60 * 1000; // 5 min
+
     const { data: categories, isLoading, isError, error } = useQuery<Category[]>({
         queryKey: ['categories', userId],
         queryFn: () => fetchCategories(userId),
         enabled: Boolean(userId),
+        staleTime: STALE_MS,
     });
 
     // Sort the categories alphabetically by name
     const sortedCategories = categories ? [...categories].sort((a, b) => a.name.localeCompare(b.name)) : [];
 
+    const invalidateOnSuccess = () => {
+        queryClient.invalidateQueries({ queryKey: ['categories', userId] });
+        queryClient.invalidateQueries({ queryKey: ['insights'] });
+    };
+
     const addMutation = useMutation<Category, Error, { name: string; userId: string }>({
         mutationFn: addCategory,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['categories', userId] });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     const updateMutation = useMutation<Category, Error, { id: string, name: string }>({
         mutationFn: ({ id, name }) => updateCategory(id, name),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['categories', userId] });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     const deleteMutation = useMutation<string, Error, { id: string; userId: string }>({
         mutationFn: deleteCategory,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['categories', userId] });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     return {

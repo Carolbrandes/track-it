@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import React, { useRef, useState } from 'react';
 import { FiCamera, FiCheck } from 'react-icons/fi';
-import { parseReceipt, ParsedReceipt, ReceiptItem } from '@/app/actions/parseReceipt';
+import type { ParsedReceipt, ReceiptItem } from '@/app/actions/parseReceipt';
 import { Category } from '@/app/hooks/useCategories';
 import { useTranslation } from '@/app/i18n/LanguageContext';
 import CategoryAutocomplete from '../CategoryAutocomplete';
@@ -75,7 +75,10 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
     const reset = () => {
         setStep('upload');
-        setPreview(null);
+        setPreview((prev) => {
+            if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
+            return null;
+        });
         setReceipt(null);
         setDetectedCurrency('');
         setTransactionDate(format(new Date(), 'yyyy-MM-dd'));
@@ -107,23 +110,34 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
         setError(null);
         setStep('processing');
 
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const dataUrl = event.target?.result as string;
-            setPreview(dataUrl);
+        setPreview(URL.createObjectURL(file));
 
-            const base64 = dataUrl.split(',')[1];
-            const categoryNames = categories.map(c => c.name);
+        const categoryNames = categories.map(c => c.name);
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('locale', locale);
+        formData.append('existingCategories', JSON.stringify(categoryNames));
 
-            try {
-                const result = await parseReceipt(base64, file.type, locale, categoryNames);
+        try {
+            const res = await fetch('/api/receipt/parse', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+            });
+            const result = await res.json();
 
-                if (!result.success) {
+            if (!result.success) {
+                    const err = result.error ?? '';
+                    const isTimeout = err.includes('timed out') || err.includes('timeout') || err === 'REQUEST_TIMEOUT';
+                    const isTooLarge = err.includes('too large') || err.includes('10MB') || err.includes('Payload');
                     const errorMap: Record<string, string> = {
                         NOT_A_RECEIPT: scan.notAReceipt,
                         RATE_LIMIT: scan.rateLimitError,
                     };
-                    setError(errorMap[result.error ?? ''] || scan.genericError);
+                    let message = errorMap[err] || scan.genericError;
+                    if (isTimeout) message = scan.timeoutError;
+                    else if (isTooLarge) message = scan.imageTooLarge;
+                    setError(message);
                     setStep('upload');
                     return;
                 }
@@ -143,12 +157,10 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
                     setStep('review');
                 }
-            } catch {
-                setError(scan.genericError);
-                setStep('upload');
-            }
-        };
-        reader.readAsDataURL(file);
+        } catch {
+            setError(scan.genericError);
+            setStep('upload');
+        }
 
         if (fileInputRef.current) {
             fileInputRef.current.value = '';

@@ -41,7 +41,7 @@ export const MobileMenuButton = styled.button`
   justify-content: center;
   background: none;
   border: none;
-  color: ${({ theme }) => theme.colors.textPrimary};
+  color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
   padding: 0.25rem;
 

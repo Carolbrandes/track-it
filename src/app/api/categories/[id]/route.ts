@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import Category from '../../../../models/Category';
 import dbConnect from '../../../lib/db';
+import { invalidateInsightsCache } from '../../../lib/invalidateInsightsCache';
 import { formatZodError, updateCategorySchema } from '../../../lib/validations';
 
 async function getAuthToken(): Promise<string | null> {
@@ -51,7 +52,7 @@ export async function PUT(request: NextRequest) {
 
         category.name = name;
         await category.save();
-
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json(category);
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to update category';
@@ -82,7 +83,7 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'Category not found or does not belong to user' }, { status: 404 });
         }
         await Category.findByIdAndDelete(id);
-
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json({ message: 'Category deleted successfully' });
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete category';

@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Category from '../../../models/Category';
 import dbConnect from '../../lib/db';
+import { invalidateInsightsCache } from '../../lib/invalidateInsightsCache';
 import { createCategorySchema, formatZodError } from '../../lib/validations';
 
 async function getAuthToken(): Promise<string | null> {
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
 
         const newCategory = new Category({ name, userId });
         await newCategory.save();
-
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json(newCategory, { status: 201 });
     } catch (error: unknown) {
         let errorMessage = 'Failed on operation';

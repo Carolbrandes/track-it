@@ -3,7 +3,8 @@ import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateInsightsCore } from '@/app/lib/generateInsightsCore';
 
-const INSIGHTS_TIMEOUT_MS = 90_000;
+// Keep below serverless maxDuration (60s) so we can return a proper timeout response
+const INSIGHTS_TIMEOUT_MS = 55_000;
 
 async function getAuthToken(): Promise<string | null> {
     const h = await headers();

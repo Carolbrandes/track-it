@@ -93,14 +93,43 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
         };
 
         const result = await model.generateContent([prompt, imagePart]);
-        const responseText = result.response.text();
+        const response = result.response;
 
-        const cleaned = responseText
+        if (!response) {
+            console.error('[parseReceiptCore] Gemini returned no response (e.g. blocked or empty)');
+            return { success: false, error: 'No response from AI. The image may have been blocked. Try again.' };
+        }
+
+        let responseText: string;
+        try {
+            responseText = response.text();
+        } catch (textErr) {
+            console.error('[parseReceiptCore] response.text() failed:', textErr);
+            return { success: false, error: 'Could not read AI response. Try again with a clearer photo.' };
+        }
+
+        if (!responseText || !responseText.trim()) {
+            console.error('[parseReceiptCore] Empty response text');
+            return { success: false, error: 'Empty response from AI. Try again.' };
+        }
+
+        let cleaned = responseText
             .replaceAll(/```json\n?/g, '')
             .replaceAll(/```\n?/g, '')
             .trim();
 
-        const parsed = JSON.parse(cleaned);
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            cleaned = jsonMatch[0];
+        }
+
+        let parsed: Record<string, unknown>;
+        try {
+            parsed = JSON.parse(cleaned);
+        } catch (parseErr) {
+            console.error('[parseReceiptCore] JSON parse error. Raw (first 400 chars):', cleaned.slice(0, 400));
+            return { success: false, error: 'Invalid AI response. Please try again.' };
+        }
 
         if (parsed.error === 'NOT_A_RECEIPT') {
             return { success: false, error: 'NOT_A_RECEIPT' };
@@ -108,7 +137,7 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
 
         return {
             success: true,
-            data: parsed as ParsedReceipt,
+            data: parsed as unknown as ParsedReceipt,
         };
     } catch (error) {
         // Log detalhado: ver no terminal do backend exatamente o que o Gemini retorna

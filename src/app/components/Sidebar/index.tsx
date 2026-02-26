@@ -6,6 +6,8 @@ import { CiLogout } from "react-icons/ci";
 import { FiPieChart, FiSettings } from "react-icons/fi";
 import { IoMdClose, IoMdList } from "react-icons/io";
 import { LuLayoutList } from "react-icons/lu";
+import { MdPerson } from "react-icons/md";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Avatar } from "./components/Avatar";
@@ -89,6 +91,12 @@ export const Sidebar = () => {
                                 <S.DropdownItem>
                                     <LanguageSelect />
                                 </S.DropdownItem>
+                                <Link href="/my-data" style={{ textDecoration: 'none', color: 'inherit' }} onClick={() => setSettingsOpen(false)}>
+                                    <S.DropdownItem>
+                                        <MdPerson size={16} />
+                                        <span>{t.sidebar.myData}</span>
+                                    </S.DropdownItem>
+                                </Link>
                                 <S.DropdownDivider />
                                 <S.DropdownItem onClick={handleLogout}>
                                     <CiLogout size={16} />

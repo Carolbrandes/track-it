@@ -121,6 +121,8 @@ export const useTransactions = (
 ) => {
     const queryClient = useQueryClient();
 
+    const STALE_MS = 5 * 60 * 1000; // 5 min — dados considerados frescos; refetch após mutação
+
     const {
         data: transactionsData,
         isLoading,
@@ -131,41 +133,35 @@ export const useTransactions = (
         queryFn: () => fetchTransactions(userId, page, limit, filters),
         enabled: Boolean(userId),
         placeholderData: (previousData) => previousData,
+        staleTime: STALE_MS,
     });
-
-
 
     const { data: allTransactionsData } = useQuery({
         queryKey: ['allTransactions', userId, filters],
-        queryFn: () => fetchAllTransactions(userId, 1, filters), // Pass as a function
-        enabled: Boolean(userId), // This ensures the query only runs when userId is defined
+        queryFn: () => fetchAllTransactions(userId, 1, filters),
+        enabled: Boolean(userId),
+        staleTime: STALE_MS,
     });
+
+    const invalidateOnSuccess = () => {
+        queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
+        queryClient.invalidateQueries({ queryKey: ['allTransactions', userId] });
+        queryClient.invalidateQueries({ queryKey: ['insights'] });
+    };
 
     const addMutation = useMutation({
         mutationFn: addTransaction,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['transactions', userId]
-            });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     const updateMutation = useMutation({
         mutationFn: updateTransaction,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['transactions', userId]
-            });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     const deleteMutation = useMutation({
         mutationFn: deleteTransaction,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['transactions', userId]
-            });
-        },
+        onSuccess: invalidateOnSuccess,
     });
 
     return {

@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
 
 
-    const protectedRoutes = ['/', '/add-transaction', '/categories', '/financial-analytics'];
+    const protectedRoutes = ['/', '/add-transaction', '/categories', '/financial-analytics', '/my-data'];
 
     if (protectedRoutes.includes(pathname)) {
         if (!token) {
@@ -51,5 +51,6 @@ export const config = {
         '/add-transaction',
         '/categories',
         '/financial-analytics',
+        '/my-data',
     ],
 };

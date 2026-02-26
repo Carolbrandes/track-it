@@ -1,6 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import mongoose from 'mongoose';
 import db from './db';
 import Transaction from '@/models/Transaction';
+import InsightsCache from '@/models/InsightsCache';
+
+const INSIGHTS_CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 horas
 
 export interface CategoryBreakdown {
     category: string;
@@ -95,6 +99,17 @@ export async function generateInsightsCore(
 ): Promise<InsightsResponse> {
     try {
         await db();
+
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const cached = await InsightsCache.findOne({
+            userId: userObjectId,
+            locale,
+            expiresAt: { $gt: new Date() },
+        }).lean();
+
+        if (cached?.data) {
+            return { success: true, data: cached.data as InsightsData };
+        }
 
         const now = new Date();
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -205,12 +220,31 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks) neste forma
 
         const responseText = await callGeminiWithRetry(prompt);
 
-        const cleanedResponse = responseText
+        let cleanedResponse = responseText
             .replaceAll(/```json\n?/g, '')
             .replaceAll(/```\n?/g, '')
             .trim();
 
-        const parsed: InsightsData = JSON.parse(cleanedResponse);
+        // Try to extract JSON if the model wrapped it in extra text
+        const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            cleanedResponse = jsonMatch[0];
+        }
+
+        let parsed: InsightsData;
+        try {
+            parsed = JSON.parse(cleanedResponse);
+        } catch (parseErr) {
+            console.error('[generateInsightsCore] JSON parse error. Raw (first 500 chars):', cleanedResponse.slice(0, 500));
+            throw new Error('Invalid JSON response from AI. Please try again.');
+        }
+
+        const expiresAt = new Date(Date.now() + INSIGHTS_CACHE_TTL_MS);
+        await InsightsCache.findOneAndUpdate(
+            { userId: userObjectId, locale },
+            { $set: { data: parsed, expiresAt } },
+            { upsert: true }
+        );
 
         return {
             success: true,

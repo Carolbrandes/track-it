@@ -5,6 +5,7 @@ import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '../../lib/db';
+import { invalidateInsightsCache } from '../../lib/invalidateInsightsCache';
 import { createTransactionSchema, formatZodError } from '../../lib/validations';
 
 interface FilterQuery {
@@ -172,6 +173,7 @@ export async function POST(request: Request) {
         });
 
         await newTransaction.save();
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json(newTransaction, { status: 201 });
     } catch (error: unknown) {
         let errorMessage = 'Failed on operation';

@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import Transaction from '../../../../models/Transaction';
 import dbConnect from '../../../lib/db';
+import { invalidateInsightsCache } from '../../../lib/invalidateInsightsCache';
 import { formatZodError, updateTransactionSchema } from '../../../lib/validations';
 
 async function getAuthToken(): Promise<string | null> {
@@ -55,6 +56,7 @@ export async function PUT(request: NextRequest) {
         transaction.is_fixed = is_fixed ?? null;
 
         await transaction.save();
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json(transaction);
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Failed on operation';
@@ -85,6 +87,7 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'Transaction not found or does not belong to user' }, { status: 404 });
         }
         await Transaction.findByIdAndDelete(id);
+        await invalidateInsightsCache(userId as string);
         return NextResponse.json({ message: 'Transaction deleted successfully' });
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Failed on operation';

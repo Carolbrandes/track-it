@@ -39,6 +39,16 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
 
     const [sortKey, setSortKey] = useState<SortKey>('date');
     const [sortDir, setSortDir] = useState<SortDir>('desc');
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    const toggleExpanded = (id: string) => {
+        setExpandedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
 
     const handleSort = (key: SortKey) => {
         if (sortKey === key) {
@@ -73,78 +83,154 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
     }, [transactions, sortKey, sortDir, locale]);
 
     return (
-        <S.TableContainer>
-            <S.ResponsiveTable>
-                <thead>
-                    <tr>
-                        <S.SortableTh onClick={() => handleSort('date')} $active={sortKey === 'date'}>
-                            {t.transactions.date}
-                            <SortIcon columnKey="date" sortKey={sortKey} sortDir={sortDir} />
-                        </S.SortableTh>
-                        <S.SortableTh onClick={() => handleSort('description')} $active={sortKey === 'description'}>
-                            {t.transactions.description}
-                            <SortIcon columnKey="description" sortKey={sortKey} sortDir={sortDir} />
-                        </S.SortableTh>
-                        <S.SortableTh onClick={() => handleSort('category')} $active={sortKey === 'category'}>
-                            {t.transactions.category}
-                            <SortIcon columnKey="category" sortKey={sortKey} sortDir={sortDir} />
-                        </S.SortableTh>
-                        <th>{t.transactions.type}</th>
-                        <th>{t.transactions.fixed}</th>
-                        <S.SortableTh onClick={() => handleSort('amount')} $active={sortKey === 'amount'}>
-                            {t.transactions.amount}
-                            <SortIcon columnKey="amount" sortKey={sortKey} sortDir={sortDir} />
-                        </S.SortableTh>
-                        <th>{t.transactions.actions}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sorted.map(transaction => (
-                        <tr key={transaction._id}>
-                            <td>{formatDate(`${transaction.date}`, locale)}</td>
-                            <td>{transaction.description}</td>
-                            <td>
-                                {typeof transaction.category === 'object'
-                                    ? transaction.category.name
-                                    : t.transactions.uncategorized}
-                            </td>
-                            <td>
-                                <S.TypeBadge $type={transaction.type}>
-                                    {transaction.type}
-                                </S.TypeBadge>
-                            </td>
-                            <td>
-                                {transaction.is_fixed && (
-                                    <S.TypeBadge $type="income">
-                                        {t.transactions.fixed}
-                                    </S.TypeBadge>
-                                )}
-                            </td>
-                            <td>
-                                <S.Amount $type={transaction.type}>
-                                    {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                </S.Amount>
-                            </td>
-                            <td>
-                                <S.ActionButtons>
-                                    <S.EditButton
-                                        onClick={() => handleEdit(transaction)}
-                                        disabled={isUpdating}
-                                    >
-                                        {t.transactions.edit}
-                                    </S.EditButton>
-                                    <S.DeleteButton
-                                        onClick={() => handleDelete(transaction._id)}
-                                        disabled={isDeleting}
-                                    >
-                                        {t.transactions.delete}
-                                    </S.DeleteButton>
-                                </S.ActionButtons>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </S.ResponsiveTable>
-        </S.TableContainer>
+        <>
+            {/* Mobile: cards */}
+            <S.MobileCardsList>
+                {sorted.map((transaction) => {
+                    const expanded = expandedIds.has(transaction._id);
+                    return (
+                        <S.MobileCard key={transaction._id}>
+                            <S.MobileCardHeader>
+                                <S.MobileCardTop>
+                                    <S.MobileCardDescription>{transaction.description}</S.MobileCardDescription>
+                                    <S.MobileCardAmount $type={transaction.type}>
+                                        {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
+                                    </S.MobileCardAmount>
+                                </S.MobileCardTop>
+                                <S.MobileCardDate>
+                                    {formatDate(`${transaction.date}`, locale)}
+                                </S.MobileCardDate>
+                                <S.MobileCardVerMais type="button" onClick={() => toggleExpanded(transaction._id)}>
+                                    {expanded ? t.transactions.seeLess : t.transactions.seeMore}
+                                </S.MobileCardVerMais>
+                            </S.MobileCardHeader>
+                            {expanded && (
+                                <S.MobileCardExpanded>
+                                    <S.MobileCardDetailRow>
+                                        <S.MobileCardDetailLabel>{t.transactions.category}</S.MobileCardDetailLabel>
+                                        <S.MobileCardDetailValue>
+                                            {typeof transaction.category === 'object'
+                                                ? transaction.category.name
+                                                : t.transactions.uncategorized}
+                                        </S.MobileCardDetailValue>
+                                    </S.MobileCardDetailRow>
+                                    <S.MobileCardDetailRow>
+                                        <S.MobileCardDetailLabel>{t.transactions.type}</S.MobileCardDetailLabel>
+                                        <S.MobileCardDetailValue>
+                                            {transaction.type === 'income' ? t.transactions.income : t.transactions.expense}
+                                        </S.MobileCardDetailValue>
+                                    </S.MobileCardDetailRow>
+                                    <S.MobileCardDetailRow>
+                                        <S.MobileCardDetailLabel>{t.transactions.amount}</S.MobileCardDetailLabel>
+                                        <S.MobileCardDetailValue>
+                                            {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
+                                        </S.MobileCardDetailValue>
+                                    </S.MobileCardDetailRow>
+                                    <S.MobileCardDetailRow>
+                                        <S.MobileCardDetailLabel>{t.transactions.fixed}</S.MobileCardDetailLabel>
+                                        <S.MobileCardDetailValue>
+                                            {transaction.is_fixed ? t.transactions.fixed : '—'}
+                                        </S.MobileCardDetailValue>
+                                    </S.MobileCardDetailRow>
+                                    <S.MobileCardActions>
+                                        <S.MobileCardEditBtn
+                                            type="button"
+                                            onClick={() => handleEdit(transaction)}
+                                            disabled={isUpdating}
+                                        >
+                                            {t.transactions.edit}
+                                        </S.MobileCardEditBtn>
+                                        <S.MobileCardDeleteBtn
+                                            type="button"
+                                            onClick={() => handleDelete(transaction._id)}
+                                            disabled={isDeleting}
+                                        >
+                                            {t.transactions.delete}
+                                        </S.MobileCardDeleteBtn>
+                                    </S.MobileCardActions>
+                                </S.MobileCardExpanded>
+                            )}
+                        </S.MobileCard>
+                    );
+                })}
+            </S.MobileCardsList>
+
+            {/* Desktop: tabela */}
+            <S.TableWrapper>
+                <S.TableContainer>
+                    <S.ResponsiveTable>
+                        <thead>
+                            <tr>
+                                <S.SortableTh onClick={() => handleSort('date')} $active={sortKey === 'date'}>
+                                    {t.transactions.date}
+                                    <SortIcon columnKey="date" sortKey={sortKey} sortDir={sortDir} />
+                                </S.SortableTh>
+                                <S.SortableTh onClick={() => handleSort('description')} $active={sortKey === 'description'}>
+                                    {t.transactions.description}
+                                    <SortIcon columnKey="description" sortKey={sortKey} sortDir={sortDir} />
+                                </S.SortableTh>
+                                <S.SortableTh onClick={() => handleSort('category')} $active={sortKey === 'category'}>
+                                    {t.transactions.category}
+                                    <SortIcon columnKey="category" sortKey={sortKey} sortDir={sortDir} />
+                                </S.SortableTh>
+                                <th>{t.transactions.type}</th>
+                                <th>{t.transactions.fixed}</th>
+                                <S.SortableTh onClick={() => handleSort('amount')} $active={sortKey === 'amount'}>
+                                    {t.transactions.amount}
+                                    <SortIcon columnKey="amount" sortKey={sortKey} sortDir={sortDir} />
+                                </S.SortableTh>
+                                <th>{t.transactions.actions}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sorted.map(transaction => (
+                                <tr key={transaction._id}>
+                                    <td>{formatDate(`${transaction.date}`, locale)}</td>
+                                    <td>{transaction.description}</td>
+                                    <td>
+                                        {typeof transaction.category === 'object'
+                                            ? transaction.category.name
+                                            : t.transactions.uncategorized}
+                                    </td>
+                                    <td>
+                                        <S.TypeBadge $type={transaction.type}>
+                                            {transaction.type}
+                                        </S.TypeBadge>
+                                    </td>
+                                    <td>
+                                        {transaction.is_fixed && (
+                                            <S.TypeBadge $type="income">
+                                                {t.transactions.fixed}
+                                            </S.TypeBadge>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <S.Amount $type={transaction.type}>
+                                            {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
+                                        </S.Amount>
+                                    </td>
+                                    <td>
+                                        <S.ActionButtons>
+                                            <S.EditButton
+                                                onClick={() => handleEdit(transaction)}
+                                                disabled={isUpdating}
+                                            >
+                                                {t.transactions.edit}
+                                            </S.EditButton>
+                                            <S.DeleteButton
+                                                onClick={() => handleDelete(transaction._id)}
+                                                disabled={isDeleting}
+                                            >
+                                                {t.transactions.delete}
+                                            </S.DeleteButton>
+                                        </S.ActionButtons>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </S.ResponsiveTable>
+                </S.TableContainer>
+            </S.TableWrapper>
+        </>
     );
 };
