@@ -7,12 +7,14 @@ declare module 'styled-components' {
             surface: string
             textPrimary: string
             textSecondary: string
+            text: string
             primary: string
             secondary: string
             terciary: string
             gray200: string
             gray300: string
             gray700: string
+            border: string
             danger: string
             success: string
             warning: string
