@@ -67,6 +67,7 @@ const es: Translations = {
     fixedTransaction: 'Transacción Fija',
     categorySearchPlaceholder: 'Buscar o crear categoría...',
     createCategory: 'Crear',
+    createError: 'Error al crear categoría',
     addButton: 'Agregar Transacción',
     adding: 'Agregando...',
     success: '¡Transacción registrada con éxito!',
