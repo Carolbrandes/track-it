@@ -47,7 +47,9 @@ const fetchTransactions = async (
         ...(filters.endDate && { endDate: filters.endDate }),
     });
 
-    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`);
+    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
+        credentials: 'include',
+    });
     if (!response.ok) throw new Error('Failed to fetch transactions');
     return response.json();
 };
@@ -61,7 +63,9 @@ const fetchAllTransactions = async (
         Object.entries(filters).map(([key, value]) => [key, String(value)])
     );
 
-    const totalResponse = await fetch(`/api/transactions?userId=${userId}&${new URLSearchParams(stringFilters).toString()}`);
+    const totalResponse = await fetch(`/api/transactions?userId=${userId}&${new URLSearchParams(stringFilters).toString()}`, {
+        credentials: 'include',
+    });
 
     if (!totalResponse.ok) throw new Error('Failed to fetch total transactions');
 
@@ -80,7 +84,9 @@ const fetchAllTransactions = async (
         ...(filters.endDate && { endDate: filters.endDate }),
     });
 
-    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`);
+    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
+        credentials: 'include',
+    });
     if (!response.ok) throw new Error('Failed to fetch transactions');
     return response.json();
 };
@@ -89,6 +95,7 @@ const addTransaction = async (transaction: Omit<Transaction, '_id'>): Promise<Tr
     const response = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(transaction),
     });
     if (!response.ok) throw new Error('Failed to add transaction');
@@ -99,6 +106,7 @@ const updateTransaction = async ({ id, ...transaction }: { id: string } & Partia
     const response = await fetch(`/api/transactions/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(transaction),
     });
     if (!response.ok) throw new Error('Failed to update transaction');
@@ -108,6 +116,7 @@ const updateTransaction = async ({ id, ...transaction }: { id: string } & Partia
 const deleteTransaction = async (id: string): Promise<string> => {
     const response = await fetch(`/api/transactions/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to delete transaction');
     return id;

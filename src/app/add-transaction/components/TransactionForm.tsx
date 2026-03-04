@@ -90,7 +90,7 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             await onAdd({
                 description,
                 amount: Number(amount.replace(/[^0-9.-]+/g, "")),
-                currency: userData.currencyId,
+                currency: selectedCurrencyCode,
                 date: new Date(date),
                 type,
                 is_fixed: isFixed,
