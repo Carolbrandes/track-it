@@ -15,6 +15,7 @@ interface FilterQuery {
     amount?: { $gte?: number; $lte?: number } | string | null;
     date?: { $gte?: Date; $lte?: Date } | Date;
     userId?: string | null;
+    is_fixed?: boolean | null;
 }
 
 // Ensure Category model is registered before using populate('category')
@@ -38,20 +39,19 @@ export async function GET(request: Request) {
             userId: userId || null
         };
 
-        const currentDate = new Date();
-        const month = currentDate.getMonth() + 1; // getMonth() returns 0-11, so we add 1
-        const year = currentDate.getFullYear();
+        // Handle date range filter - only apply when explicitly provided
+        const startDateParam = url.searchParams.get('startDate');
+        const endDateParam = url.searchParams.get('endDate');
 
-        // Set the start date to the first of the month
-        const startDate = new Date(year, month - 1, 1); // April 1, 2025
-        // Set the end date to the last day of the month
-        const endDate = new Date(year, month, 0); // April 30, 2025
+        if (startDateParam && endDateParam) {
+            const startUTC = new Date(startDateParam + 'T00:00:00.000Z');
+            const endUTC = new Date(endDateParam + 'T23:59:59.999Z');
 
-        filterQuery.date = {
-            $gte: startDate, // from April 1, 2025
-            $lte: endDate    // until April 30, 2025
-        };
-
+            filterQuery.date = {
+                $gte: startUTC,
+                $lte: endUTC
+            };
+        }
 
         // Handle description filter
         const descriptionParam = url.searchParams.get('description');
@@ -74,6 +74,12 @@ export async function GET(request: Request) {
             filterQuery.type = typeParam;
         }
 
+        // Handle isFixed filter
+        const isFixedParam = url.searchParams.get('isFixed');
+        if (isFixedParam === 'true') {
+            filterQuery.is_fixed = true;
+        }
+
         // Handle amount filters
         const minAmountParam = url.searchParams.get('minAmount');
         const maxAmountParam = url.searchParams.get('maxAmount');
@@ -88,23 +94,6 @@ export async function GET(request: Request) {
             if (maxAmountParam) {
                 (filterQuery.amount as { $lte: number }).$lte = parseFloat(maxAmountParam);
             }
-        }
-
-        // Handle date range filter
-        const startDateParam = url.searchParams.get('startDate');
-        const endDateParam = url.searchParams.get('endDate');
-
-        if (startDateParam && endDateParam) {
-            const startDate = new Date(startDateParam);
-            const endDate = new Date(endDateParam);
-
-            const startUTC = new Date(startDate.setHours(0, 0, 0, 0));
-            const endUTC = new Date(endDate.setHours(23, 59, 59, 999));
-
-            filterQuery.date = {
-                $gte: startUTC,
-                $lte: endUTC
-            };
         }
 
         const totalCount = await Transaction.countDocuments(filterQuery);

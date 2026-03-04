@@ -71,18 +71,20 @@ const pieOptions: ChartOptions<'pie'> = {
     },
 };
 
-const FixedTransactionsPieChart = ({ month, year }: { month: number; year: number }) => {
+const FixedTransactionsPieChart = ({ month, year, category }: { month: number; year: number; category?: string }) => {
     const { t } = useTranslation();
     const { data: userData } = useUserData();
     const userId = userData?._id;
-    const { transactions = [] } = useTransactions(userId, 1, 100) || {};
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const lastDay = new Date(year, month, 0).getDate();
+    const filters: { startDate: string; endDate: string; category?: string } = {
+        startDate: `${year}-${pad(month)}-01`,
+        endDate: `${year}-${pad(month)}-${pad(lastDay)}`,
+    };
+    if (category) filters.category = category;
+    const { transactions = [] } = useTransactions(userId, 1, 9999, filters) || {};
 
-    const filtered = transactions.filter(txn => {
-        if (!txn.date || !txn.is_fixed) return false;
-        const d = new Date(txn.date);
-        const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-        return utc.getUTCMonth() + 1 === month && utc.getUTCFullYear() === year;
-    });
+    const filtered = transactions.filter(txn => Boolean(txn.is_fixed));
 
     const income = filtered.filter(txn => txn.type === 'income');
     const expense = filtered.filter(txn => txn.type === 'expense');

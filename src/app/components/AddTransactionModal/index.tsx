@@ -7,6 +7,7 @@ import { Category } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useTranslation } from '../../i18n/LanguageContext';
 import CategoryAutocomplete from '../CategoryAutocomplete';
+import { DateInput } from '../DateInput';
 import * as S from '../Modal/styles';
 
 interface AddTransactionModalProps {
@@ -98,10 +99,15 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     };
 
     const handleCreateCategory = async (name: string): Promise<Category | void> => {
-        const newCat = await addCategory(name);
-        if (newCat?._id) {
-            setCategoryId(newCat._id);
-            return newCat;
+        try {
+            const newCat = await addCategory(name);
+            if (newCat?._id) {
+                setCategoryId(newCat._id);
+                return newCat;
+            }
+        } catch (error) {
+            console.error('Failed to create category', error);
+            setError(t.transactionForm.createError || 'Error creating category');
         }
     };
 
@@ -141,10 +147,9 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
                     <S.FormGroup>
                         <S.Label>{t.transactionForm.date}</S.Label>
-                        <S.Input
-                            type="date"
+                        <DateInput
                             value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={(val) => setDate(val)}
                         />
                     </S.FormGroup>
 

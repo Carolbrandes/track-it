@@ -8,6 +8,7 @@ import { NumberFormatValues } from 'react-number-format';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Transaction } from '../../hooks/useTransactions';
 import { TransactionToEdit } from '../../page';
+import { DateInput } from '../DateInput';
 import * as S from './styles';
 
 interface ModalProps {
@@ -117,6 +118,22 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                             decimalScale={2}
                             fixedDecimalScale={true}
                             allowNegative={false}
+                        />
+                    </S.FormGroup>
+
+                    <S.FormGroup>
+                        <S.Label>{t.transactionForm.date}</S.Label>
+                        <DateInput
+                            name="date"
+                            value={(() => {
+                                const d = updatedTransaction.date;
+                                if (!d) return '';
+                                return new Date(d).toISOString().slice(0, 10);
+                            })()}
+                            onChange={(val) => setUpdatedTransaction((prev) => ({
+                                ...prev,
+                                date: new Date(val) as unknown as Date,
+                            }))}
                         />
                     </S.FormGroup>
 

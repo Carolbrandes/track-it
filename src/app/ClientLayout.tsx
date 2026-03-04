@@ -7,6 +7,7 @@ import StyledComponentsRegistry from '../../StyledComponentsRegistry';
 import { CookieConsent } from './components/CookieConsent';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sidebar } from './components/Sidebar';
+import { DateFormatProvider } from './contexts/DateFormatContext';
 import { ThemeProvider } from './hooks/useTheme';
 import { LanguageProvider } from './i18n/LanguageContext';
 import * as S from "./styles";
@@ -27,6 +28,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
         <ThemeProvider>
             <LanguageProvider>
+                <DateFormatProvider>
                 <html lang="en" className={montserrat.className}>
                     <head>
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -46,6 +48,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                         </QueryClientProvider>
                     </body>
                 </html>
+                </DateFormatProvider>
             </LanguageProvider>
         </ThemeProvider>
     );

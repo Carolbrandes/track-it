@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiUser } from 'react-icons/fi';
+import { useDateFormat, type DateFormatPreference } from '../contexts/DateFormatContext';
 import { useTranslation, localeLabels } from '../i18n/LanguageContext';
 import { useUserData } from '../hooks/useUserData';
 import { useCurrency } from '../hooks/useCurrency';
@@ -13,6 +14,7 @@ export default function MyDataPage() {
     const router = useRouter();
     const { data: user, isLoading: userLoading } = useUserData();
     const { currencies } = useCurrency();
+    const { dateFormat, setDateFormat } = useDateFormat();
     const [showConfirm, setShowConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -74,6 +76,31 @@ export default function MyDataPage() {
                 <DataRow label={t.myData.language} value={languageLabel} />
                 <DataRow label={t.myData.currency} value={currencyName} />
                 <DataRow label={t.myData.theme} value={themeLabel} />
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.25rem',
+                    marginBottom: '1rem',
+                    paddingBottom: '1rem',
+                    borderBottom: '1px solid var(--color-gray-300, #e5e7eb)',
+                }}>
+                    <S.Label style={{ margin: 0 }}>{t.myData.dateFormat}</S.Label>
+                    <select
+                        value={dateFormat}
+                        onChange={(e) => setDateFormat(e.target.value as DateFormatPreference)}
+                        style={{
+                            padding: '0.5rem 0.75rem',
+                            borderRadius: '8px',
+                            border: '1px solid var(--color-gray-300, #e5e7eb)',
+                            fontSize: '1rem',
+                            maxWidth: '280px',
+                        }}
+                    >
+                        <option value="mm/dd/yyyy">{t.myData.dateFormatMmDd}</option>
+                        <option value="dd/mm/yyyy">{t.myData.dateFormatDdMm}</option>
+                        <option value="long">{t.myData.dateFormatLong}</option>
+                    </select>
+                </div>
             </S.Section>
 
             <S.Section>

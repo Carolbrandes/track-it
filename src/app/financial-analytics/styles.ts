@@ -14,9 +14,10 @@ export const Title = styled.h1`
 
 export const FilterContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 2rem;
-  max-width: 400px;
+  max-width: 600px;
 `;
 
 export const FilterGroup = styled.div`
@@ -172,6 +173,40 @@ export const BarContainer = styled.div`
   @media (min-width: 600px) {
     height: 300px;
   }
+`;
+
+// ─── Summary expandido ───
+
+export const SummaryGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+export const SummaryRow = styled.div<{ $bold?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
+  font-weight: ${({ $bold }) => ($bold ? 700 : 400)};
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+export const SummaryLabel = styled.span`
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const SummaryValue = styled.span<{ $positive?: boolean }>`
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: ${({ $positive, theme }) =>
+    $positive === undefined ? theme.colors.textPrimary :
+    $positive ? theme.colors.success : theme.colors.danger};
 `;
 
 // ─── Totais ───

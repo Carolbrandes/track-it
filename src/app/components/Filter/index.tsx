@@ -8,6 +8,7 @@ import { Category } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { DateInput } from '../DateInput';
 import * as S from './styles';
 
 interface IFilter {
@@ -21,14 +22,13 @@ interface IFilter {
     maxAmount?: number | string;
     startDate?: string;
     endDate?: string;
-    fixedOnly?: boolean;
+    isFixed?: string;
 }
 
 interface FilterProps {
     filters: IFilter;
     categories: Category[];
     handleFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    onFixedOnlyChange: (checked: boolean) => void;
     resetFilters: () => void;
 }
 
@@ -40,7 +40,7 @@ function getCurrencyConfig(code: string) {
     }
 }
 
-export const Filter = ({ filters, categories = [], handleFilterChange, onFixedOnlyChange, resetFilters }: FilterProps) => {
+export const Filter = ({ filters, categories = [], handleFilterChange, resetFilters }: FilterProps) => {
     const { isMobile } = useDeviceDetect();
     const [showFilters, setShowFilters] = useState(false);
     const { t } = useTranslation();
@@ -92,20 +92,18 @@ export const Filter = ({ filters, categories = [], handleFilterChange, onFixedOn
                 </S.FilterSelect>
                 <S.DateFieldWrapper>
                     <S.DateLabel>{t.filter.startDate}</S.DateLabel>
-                    <S.FilterDateInput
-                        type="date"
+                    <DateInput
                         name="startDate"
                         value={String(filters.startDate || '')}
-                        onChange={handleFilterChange}
+                        onChange={(val) => handleFilterChange({ target: { name: 'startDate', value: val } } as any)}
                     />
                 </S.DateFieldWrapper>
                 <S.DateFieldWrapper>
                     <S.DateLabel>{t.filter.endDate}</S.DateLabel>
-                    <S.FilterDateInput
-                        type="date"
+                    <DateInput
                         name="endDate"
                         value={String(filters.endDate || '')}
-                        onChange={handleFilterChange}
+                        onChange={(val) => handleFilterChange({ target: { name: 'endDate', value: val } } as any)}
                     />
                 </S.DateFieldWrapper>
             </S.FilterColumn>
@@ -137,8 +135,10 @@ export const Filter = ({ filters, categories = [], handleFilterChange, onFixedOn
                 <S.CheckboxLabel>
                     <input
                         type="checkbox"
-                        checked={filters.fixedOnly || false}
-                        onChange={(e) => onFixedOnlyChange(e.target.checked)}
+                        checked={filters.isFixed === 'true'}
+                        onChange={(e) => handleFilterChange({
+                            target: { name: 'isFixed', value: e.target.checked ? 'true' : '' },
+                        } as React.ChangeEvent<HTMLInputElement>)}
                     />
                     {t.filter.fixedOnly}
                 </S.CheckboxLabel>

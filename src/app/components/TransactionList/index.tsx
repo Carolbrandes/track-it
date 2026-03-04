@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { useDateFormat } from '../../contexts/DateFormatContext';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
 import * as S from './styles';
 
@@ -36,6 +37,7 @@ function SortIcon({ columnKey, sortKey, sortDir }: Readonly<{ columnKey: SortKey
 export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEdit, handleDelete }: TransactionListProps) => {
     const { selectedCurrencyCode } = useCurrency();
     const { t, locale } = useTranslation();
+    const { formatDate } = useDateFormat();
 
     const [sortKey, setSortKey] = useState<SortKey>('date');
     const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -98,7 +100,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
                                     </S.MobileCardAmount>
                                 </S.MobileCardTop>
                                 <S.MobileCardDate>
-                                    {formatDate(`${transaction.date}`, locale)}
+                                    {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
                                 </S.MobileCardDate>
                                 <S.MobileCardVerMais type="button" onClick={() => toggleExpanded(transaction._id)}>
                                     {expanded ? t.transactions.seeLess : t.transactions.seeMore}
@@ -185,7 +187,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
                         <tbody>
                             {sorted.map(transaction => (
                                 <tr key={transaction._id}>
-                                    <td>{formatDate(`${transaction.date}`, locale)}</td>
+                                    <td>{formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}</td>
                                     <td>{transaction.description}</td>
                                     <td>
                                         {typeof transaction.category === 'object'

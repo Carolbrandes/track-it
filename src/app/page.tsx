@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { IoAdd } from 'react-icons/io5';
 import { FiCamera } from 'react-icons/fi';
+import styled from 'styled-components';
 import AddTransactionModal from './components/AddTransactionModal';
 import ReceiptScannerModal from './components/ReceiptScannerModal';
 import { Filter } from './components/Filter';
@@ -9,11 +10,44 @@ import Modal from './components/Modal';
 import { Pagination } from './components/Pagination';
 import { Summary } from './components/Summary';
 import { TransactionList } from './components/TransactionList';
+import { useDateFormat } from './contexts/DateFormatContext';
+import type { DateFormatPreference } from './contexts/DateFormatContext';
 import { useCategories } from './hooks/useCategories';
 import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
 import { useTranslation } from './i18n/LanguageContext';
 import * as S from './styles';
+
+const DateFormatBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+`;
+
+const DateFormatLabel = styled.span`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-weight: 500;
+`;
+
+const DateFormatBtn = styled.button<{ $active: boolean }>`
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  font-weight: ${({ $active }) => ($active ? '600' : '400')};
+  cursor: pointer;
+  border: 1px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.border};
+  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.surface};
+  color: ${({ theme, $active }) => $active ? '#fff' : theme.colors.text};
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
 
 export interface TransactionToEdit {
   _id: string
@@ -33,21 +67,18 @@ export interface TransactionToEdit {
 export default function Home() {
   const { t } = useTranslation();
   const { data: userData } = useUserData();
+  const { dateFormat, setDateFormat } = useDateFormat();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const currentDate = new Date();
-  const month = currentDate.getMonth() + 1;
-  const year = currentDate.getFullYear();
-
-  const [fixedOnly, setFixedOnly] = useState(false);
   const [filters, setFilters] = useState({
     description: '',
     category: '',
     type: '',
     minAmount: '',
     maxAmount: '',
-    startDate: new Date(year, month - 1, 1).toISOString().slice(0, 10),
-    endDate: new Date(year, month, 0).toISOString().slice(0, 10)
+    startDate: '',
+    endDate: '',
+    isFixed: '',
   });
   const [transactionToEdit, setTransactionToEdit] = useState<TransactionToEdit | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -81,7 +112,7 @@ export default function Home() {
 
     setFilters(prev => {
       const updatedFilters = { ...prev, [name]: value };
-      if (name === "startDate" && !updatedFilters.endDate) {
+      if (name === 'startDate' && !updatedFilters.endDate) {
         updatedFilters.endDate = value;
       }
       return updatedFilters;
@@ -159,15 +190,15 @@ export default function Home() {
   };
 
   const resetFilters = () => {
-    setFixedOnly(false);
     setFilters({
       description: '',
       category: '',
       type: '',
       minAmount: '',
       maxAmount: '',
-      startDate: new Date(year, month - 1, 1).toISOString().slice(0, 10),
-      endDate: new Date(year, month, 0).toISOString().slice(0, 10)
+      startDate: '',
+      endDate: '',
+      isFixed: '',
     });
     setCurrentPage(1);
   };
@@ -198,16 +229,35 @@ export default function Home() {
 
       <S.Section>
         <Filter
-          filters={{ ...filters, fixedOnly }}
+          filters={filters}
           categories={categories}
           handleFilterChange={(e) => handleFilterChange(e)}
-          onFixedOnlyChange={(checked) => { setFixedOnly(checked); setCurrentPage(1); }}
           resetFilters={resetFilters}
         />
       </S.Section>
 
+      <DateFormatBar>
+        <DateFormatLabel>{t.myData.dateFormat}:</DateFormatLabel>
+        {(['mm/dd/yyyy', 'dd/mm/yyyy', 'long'] as DateFormatPreference[]).map((fmt) => {
+          const labels: Record<DateFormatPreference, string> = {
+            'mm/dd/yyyy': t.myData.dateFormatMmDd,
+            'dd/mm/yyyy': t.myData.dateFormatDdMm,
+            'long': t.myData.dateFormatLong,
+          };
+          return (
+            <DateFormatBtn
+              key={fmt}
+              $active={dateFormat === fmt}
+              onClick={() => setDateFormat(fmt)}
+            >
+              {labels[fmt]}
+            </DateFormatBtn>
+          );
+        })}
+      </DateFormatBar>
+
       <TransactionList
-        transactions={(fixedOnly ? transactions.filter(t => t.is_fixed) : transactions) as TransactionToEdit[]}
+        transactions={transactions as TransactionToEdit[]}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
         handleEdit={handleEdit}

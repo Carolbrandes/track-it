@@ -54,8 +54,11 @@ export default function CategoryAutocomplete({
             if (newCat && newCat._id) {
                 onSelect(newCat._id);
                 setQuery(newCat.name);
+                setIsOpen(false);
             }
-            setIsOpen(false);
+        } catch (error) {
+            console.error('Failed to create category', error);
+            // Optional: alert(t.categories.createError);
         } finally {
             setIsCreating(false);
         }

@@ -21,6 +21,7 @@ interface TransactionFilters {
     maxAmount?: string;
     startDate?: string;
     endDate?: string;
+    isFixed?: string;
 }
 
 interface TransactionResponse {
@@ -45,6 +46,7 @@ const fetchTransactions = async (
         ...(filters.maxAmount && { maxAmount: filters.maxAmount }),
         ...(filters.startDate && { startDate: filters.startDate }),
         ...(filters.endDate && { endDate: filters.endDate }),
+        ...(filters.isFixed === 'true' && { isFixed: 'true' }),
     });
 
     const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
@@ -82,6 +84,7 @@ const fetchAllTransactions = async (
         ...(filters.maxAmount && { maxAmount: filters.maxAmount }),
         ...(filters.startDate && { startDate: filters.startDate }),
         ...(filters.endDate && { endDate: filters.endDate }),
+        ...(filters.isFixed === 'true' && { isFixed: 'true' }),
     });
 
     const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {

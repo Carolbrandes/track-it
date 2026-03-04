@@ -210,10 +210,15 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
     };
 
     const handleCreateCategory = async (name: string): Promise<Category | void> => {
-        const newCat = await addCategory(name);
-        if (newCat?._id) {
-            setCategoryId(newCat._id);
-            return newCat;
+        try {
+            const newCat = await addCategory(name);
+            if (newCat?._id) {
+                setCategoryId(newCat._id);
+                return newCat;
+            }
+        } catch (error) {
+            console.error('Failed to create category', error);
+            setError(t.transactionForm.createError || 'Error creating category');
         }
     };
 

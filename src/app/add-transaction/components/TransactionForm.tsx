@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
 import CategoryAutocomplete from '../../components/CategoryAutocomplete';
+import { DateInput } from '../../components/DateInput';
 import Form, { FormField } from '../../components/Form';
 import { Toast } from '../../components/Toast';
 import { useTranslation } from '../../i18n/LanguageContext';
@@ -147,11 +148,16 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
         },
         {
             label: t.transactionForm.date,
-            type: 'date',
+            type: 'custom',
             name: 'date',
             value: date,
-            onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleFieldChange(event),
-            required: true
+            required: true,
+            component: (
+                <DateInput
+                    value={date}
+                    onChange={(val) => setDate(val)}
+                />
+            )
         },
         {
             label: t.transactionForm.type,
