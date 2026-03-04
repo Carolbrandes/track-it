@@ -16,16 +16,20 @@ services:
       - trackit-network
 
   mongo:
-    image: mongo:latest
+    image: mongo:7
     container_name: trackit-mongo
     restart: unless-stopped
     environment:
       MONGO_INITDB_DATABASE: trackit
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       # Persistência no host (sobrevive a reinicializações e recriação de containers)
-      - ./data/mongodb:/data/db
+      - mongodb_data:/data/db
+    expose:
+      - "27017"
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      test: ["CMD-SHELL", "mongosh \"mongodb://$${MONGO_INITDB_ROOT_USERNAME}:$${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/admin\" --eval \"db.runCommand('ping')\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -59,6 +63,8 @@ services:
       - trackit-network
 
 volumes:
+  mongodb_data:
+    driver: local
   certbot_webroot:
     driver: local
   certbot_certs:
