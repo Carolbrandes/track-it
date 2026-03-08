@@ -100,7 +100,7 @@ export async function GET(request: Request) {
         const totalPages = Math.ceil(totalCount / limit);
         const transactions = await Transaction.find(filterQuery)
             .populate('category')
-            .sort({ date: -1 })
+            .sort({ date: -1, _id: -1 })
             .skip((page - 1) * limit)
             .limit(limit);
 

@@ -272,6 +272,7 @@ const en = {
     dateFormatMmDd: 'MM/DD/YYYY',
     dateFormatDdMm: 'DD/MM/YYYY',
     dateFormatLong: '1 May 2026 (localized)',
+    itemsPerPage: 'Items per page',
     deleteAccount: 'Delete account',
     confirmDelete: 'Are you sure you want to permanently delete your account? All your transactions and data will be removed. This action cannot be undone.',
     cancel: 'Cancel',

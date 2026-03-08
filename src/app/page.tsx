@@ -49,6 +49,23 @@ const DateFormatBtn = styled.button<{ $active: boolean }>`
   }
 `;
 
+const PageSizeSelect = styled.select`
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
+  outline: none;
+  margin-left: 0.2rem;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
 export interface TransactionToEdit {
   _id: string
   description: string
@@ -69,6 +86,7 @@ export default function Home() {
   const { data: userData } = useUserData();
   const { dateFormat, setDateFormat } = useDateFormat();
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [filters, setFilters] = useState({
     description: '',
@@ -101,7 +119,7 @@ export default function Home() {
   } = useTransactions(
     userData?._id,
     currentPage,
-    10,
+    pageSize,
     filters
   );
 
@@ -254,6 +272,22 @@ export default function Home() {
             </DateFormatBtn>
           );
         })}
+        <div style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center' }}>
+          <DateFormatLabel>{t.myData.itemsPerPage}:</DateFormatLabel>
+          <PageSizeSelect
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </PageSizeSelect>
+        </div>
       </DateFormatBar>
 
       <TransactionList
