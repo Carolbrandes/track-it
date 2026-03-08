@@ -274,6 +274,7 @@ const es: Translations = {
     dateFormatMmDd: 'MM/DD/AAAA',
     dateFormatDdMm: 'DD/MM/AAAA',
     dateFormatLong: '1 de mayo de 2026 (localizado)',
+    itemsPerPage: 'Ítems por página',
     deleteAccount: 'Eliminar cuenta',
     confirmDelete: '¿Está seguro de que desea eliminar su cuenta de forma permanente? Todas sus transacciones y datos serán eliminados. Esta acción no se puede deshacer.',
     cancel: 'Cancelar',
