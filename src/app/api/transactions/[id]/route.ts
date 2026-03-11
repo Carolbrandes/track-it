@@ -1,3 +1,4 @@
+import { addMonths } from 'date-fns';
 import { jwtVerify } from 'jose';
 import { Types } from 'mongoose';
 import { headers } from 'next/headers';
@@ -6,6 +7,8 @@ import Transaction from '../../../../models/Transaction';
 import dbConnect from '../../../lib/db';
 import { invalidateInsightsCache } from '../../../lib/invalidateInsightsCache';
 import { formatZodError, updateTransactionSchema } from '../../../lib/validations';
+
+const RECURRING_MONTHS = 12;
 
 async function getAuthToken(): Promise<string | null> {
     const h = await headers();
@@ -48,14 +51,57 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'Transaction not found or does not belong to user' }, { status: 404 });
         }
 
+        const wasNotRecurring = !transaction.recurringGroupId;
+
+        // Derive the final is_fixed value: use whatever the client sent if explicitly
+        // provided, otherwise preserve what was already stored on the document.
+        // This ensures orphaned fixed transactions (is_fixed=true but no recurringGroupId,
+        // created before the recurring feature existed) also get their clones backfilled.
+        const effectiveIsFixed = is_fixed === undefined ? transaction.is_fixed : is_fixed;
+        const becomingFixed = wasNotRecurring && effectiveIsFixed === true;
+
         transaction.description = description;
         transaction.amount = amount;
         transaction.currency = currency;
         transaction.type = type;
         transaction.category = new Types.ObjectId(category);
-        transaction.is_fixed = is_fixed ?? null;
+        transaction.is_fixed = effectiveIsFixed ?? null;
 
-        await transaction.save();
+        if (becomingFixed) {
+            const recurringGroupId = crypto.randomUUID();
+            transaction.recurringGroupId = recurringGroupId;
+
+            // Start from month 1 — month 0 is the transaction being updated right now
+            const futureDocs = Array.from({ length: RECURRING_MONTHS - 1 }, (_, i) => ({
+                description,
+                amount,
+                currency,
+                date: addMonths(transaction.date, i + 1),
+                type,
+                is_fixed: true,
+                recurringGroupId,
+                category,
+                userId,
+            }));
+
+            await transaction.save();
+
+            try {
+                const clones = await Transaction.insertMany(futureDocs);
+                console.info(
+                    `[PUT /transactions] Backfill: created ${clones.length} recurring clones for group ${recurringGroupId}`
+                );
+            } catch (insertErr) {
+                console.error(
+                    `[PUT /transactions] insertMany failed for group ${recurringGroupId}:`,
+                    insertErr
+                );
+                throw insertErr;
+            }
+        } else {
+            await transaction.save();
+        }
+
         await invalidateInsightsCache(userId as string);
         return NextResponse.json(transaction);
     } catch (error: unknown) {

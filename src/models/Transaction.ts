@@ -8,6 +8,7 @@ export interface ITransaction extends Document {
     date: Date;
     type: 'expense' | 'income';
     is_fixed: boolean | null;
+    recurringGroupId?: string;
     category: Types.ObjectId;
     userId: Types.ObjectId;
     createdAt: Date;
@@ -25,6 +26,7 @@ const transactionSchema = new Schema<ITransaction>({
     },
     type: { type: String, required: true, enum: ['expense', 'income'] },
     is_fixed: { type: Boolean, default: null },
+    recurringGroupId: { type: String, index: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     userId: { type: Schema.Types.ObjectId, required: true },
 }, { timestamps: true });

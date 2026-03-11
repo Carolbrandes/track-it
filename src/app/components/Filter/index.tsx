@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
 import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
-import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
+import { addMonths, endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { Category } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
@@ -68,6 +68,35 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
         fireSyntheticChange('endDate', format(end, 'yyyy-MM-dd'));
     }, [fireSyntheticChange]);
 
+    const applyNextMonthFilter = useCallback(() => {
+        const nextMonth = addMonths(new Date(), 1);
+        fireSyntheticChange('startDate', format(startOfMonth(nextMonth), 'yyyy-MM-dd'));
+        fireSyntheticChange('endDate', format(endOfMonth(nextMonth), 'yyyy-MM-dd'));
+    }, [fireSyntheticChange]);
+
+    const applyLastMonthFilter = useCallback(() => {
+        const lastMonth = subMonths(new Date(), 1);
+        fireSyntheticChange('startDate', format(startOfMonth(lastMonth), 'yyyy-MM-dd'));
+        fireSyntheticChange('endDate', format(endOfMonth(lastMonth), 'yyyy-MM-dd'));
+    }, [fireSyntheticChange]);
+
+    // Precompute expected date ranges for each quick filter button (stable per mount day)
+    const quickRanges = useMemo(() => {
+        const today = new Date();
+        const nextMonth = addMonths(today, 1);
+        return {
+            nextMonth:   { start: format(startOfMonth(nextMonth),           'yyyy-MM-dd'), end: format(endOfMonth(nextMonth),           'yyyy-MM-dd') },
+            thisMonth:   { start: format(startOfMonth(today),               'yyyy-MM-dd'), end: format(endOfMonth(today),               'yyyy-MM-dd') },
+            lastMonth:   { start: format(startOfMonth(subMonths(today, 1)), 'yyyy-MM-dd'), end: format(endOfMonth(subMonths(today, 1)),  'yyyy-MM-dd') },
+            last3Months: { start: format(startOfMonth(subMonths(today, 2)), 'yyyy-MM-dd'), end: format(endOfMonth(today),               'yyyy-MM-dd') },
+            last6Months: { start: format(startOfMonth(subMonths(today, 5)), 'yyyy-MM-dd'), end: format(endOfMonth(today),         'yyyy-MM-dd') },
+            lastYear:    { start: format(startOfMonth(subMonths(today, 11)),'yyyy-MM-dd'), end: format(endOfMonth(today),         'yyyy-MM-dd') },
+        };
+    }, []);
+
+    const isActive = (key: keyof typeof quickRanges) =>
+        filters.startDate === quickRanges[key].start && filters.endDate === quickRanges[key].end;
+
     const filterContent = () => (
         <S.FilterForm>
             <S.FilterColumn>
@@ -100,16 +129,22 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     <option value="expense">{t.filter.expense}</option>
                 </S.FilterSelect>
                 <S.QuickFilterRow>
-                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(0)}>
+                    <S.QuickFilterButton type="button" $active={isActive('nextMonth')} onClick={applyNextMonthFilter}>
+                        {t.filter.nextMonth}
+                    </S.QuickFilterButton>
+                    <S.QuickFilterButton type="button" $active={isActive('thisMonth')} onClick={() => applyQuickDateFilter(0)}>
                         {t.filter.thisMonth}
                     </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(2)}>
+                    <S.QuickFilterButton type="button" $active={isActive('lastMonth')} onClick={applyLastMonthFilter}>
+                        {t.filter.lastMonth}
+                    </S.QuickFilterButton>
+                    <S.QuickFilterButton type="button" $active={isActive('last3Months')} onClick={() => applyQuickDateFilter(2)}>
                         {t.filter.last3Months}
                     </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(5)}>
+                    <S.QuickFilterButton type="button" $active={isActive('last6Months')} onClick={() => applyQuickDateFilter(5)}>
                         {t.filter.last6Months}
                     </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(11)}>
+                    <S.QuickFilterButton type="button" $active={isActive('lastYear')} onClick={() => applyQuickDateFilter(11)}>
                         {t.filter.lastYear}
                     </S.QuickFilterButton>
                 </S.QuickFilterRow>

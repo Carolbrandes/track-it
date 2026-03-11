@@ -1,12 +1,15 @@
 
 import Transaction from '@/models/Transaction';
 import Category from '@/models/Category';
+import { addMonths } from 'date-fns';
 import { jwtVerify } from 'jose';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '../../lib/db';
 import { invalidateInsightsCache } from '../../lib/invalidateInsightsCache';
 import { createTransactionSchema, formatZodError } from '../../lib/validations';
+
+const RECURRING_MONTHS = 12;
 
 interface FilterQuery {
     description?: { $regex: string; $options: string } | string;
@@ -44,8 +47,9 @@ export async function GET(request: Request) {
         const endDateParam = url.searchParams.get('endDate');
 
         if (startDateParam && endDateParam) {
-            const startUTC = new Date(startDateParam + 'T00:00:00.000Z');
-            const endUTC = new Date(endDateParam + 'T23:59:59.999Z');
+            // Strip any existing time component so appending always produces a valid ISO string
+            const startUTC = new Date(startDateParam.split('T')[0] + 'T00:00:00.000Z');
+            const endUTC   = new Date(endDateParam.split('T')[0]   + 'T23:59:59.999Z');
 
             filterQuery.date = {
                 $gte: startUTC,
@@ -150,11 +154,46 @@ export async function POST(request: Request) {
 
         const { description, amount, currency, date, type, category, is_fixed } = result.data;
 
+        const baseDate = new Date(date);
+
+        if (is_fixed === true) {
+            const recurringGroupId = crypto.randomUUID();
+
+            const transactionDocs = Array.from({ length: RECURRING_MONTHS }, (_, i) => ({
+                description,
+                amount,
+                currency,
+                date: addMonths(baseDate, i),
+                type,
+                is_fixed: true,
+                recurringGroupId,
+                category,
+                userId,
+            }));
+
+            let inserted;
+            try {
+                inserted = await Transaction.insertMany(transactionDocs);
+                console.info(
+                    `[POST /transactions] Created ${inserted.length} recurring docs for group ${recurringGroupId}`
+                );
+            } catch (insertErr) {
+                console.error(
+                    `[POST /transactions] insertMany failed for group ${recurringGroupId}:`,
+                    insertErr
+                );
+                throw insertErr;
+            }
+
+            await invalidateInsightsCache(userId as string);
+            return NextResponse.json(inserted[0], { status: 201 });
+        }
+
         const newTransaction = new Transaction({
             description,
             amount,
             currency,
-            date: new Date(date),
+            date: baseDate,
             type,
             is_fixed: is_fixed ?? null,
             category,

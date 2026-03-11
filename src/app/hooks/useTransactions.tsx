@@ -1,4 +1,5 @@
 'use client'
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Transaction {
@@ -9,6 +10,7 @@ export interface Transaction {
     date: Date;
     type: 'expense' | 'income';
     is_fixed?: boolean | null;
+    recurringGroupId?: string;
     category: string | { _id: string; name: string, createdAt?: Date | string };
     userId: string;
 }
@@ -160,6 +162,23 @@ export const useTransactions = (
         queryClient.invalidateQueries({ queryKey: ['allTransactions', userId] });
         queryClient.invalidateQueries({ queryKey: ['insights'] });
     };
+
+    // On mount, repair any orphaned fixed transactions (is_fixed=true without recurringGroupId)
+    // that were created before the recurring feature existed. Safe no-op when nothing to repair.
+    useEffect(() => {
+        if (!userId) return;
+        fetch('/api/transactions/backfill', { method: 'POST', credentials: 'include' })
+            .then(async (res) => {
+                if (!res.ok) return;
+                const { backfilled } = await res.json() as { backfilled: number };
+                if (backfilled > 0) {
+                    queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
+                    queryClient.invalidateQueries({ queryKey: ['allTransactions', userId] });
+                    queryClient.invalidateQueries({ queryKey: ['insights'] });
+                }
+            })
+            .catch(() => { /* backfill é best-effort, falha silenciosa */ });
+    }, [userId, queryClient]);
 
     const addMutation = useMutation({
         mutationFn: addTransaction,

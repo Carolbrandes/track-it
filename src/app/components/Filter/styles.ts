@@ -162,14 +162,14 @@ export const QuickFilterRow = styled.div`
   gap: 0.4rem;
 `;
 
-export const QuickFilterButton = styled.button`
-  background: transparent;
+export const QuickFilterButton = styled.button<{ $active?: boolean }>`
+  background: ${({ $active, theme }) => ($active ? theme.colors.primary : 'transparent')};
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.primary)};
   padding: 0.3rem 0.65rem;
   border-radius: 20px;
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: ${({ $active }) => ($active ? '600' : '500')};
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;

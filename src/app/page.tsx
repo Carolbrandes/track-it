@@ -1,4 +1,5 @@
 'use client';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { useState } from 'react';
 import { IoAdd } from 'react-icons/io5';
 import { FiCamera } from 'react-icons/fi';
@@ -81,6 +82,14 @@ export interface TransactionToEdit {
 }
 
 
+function getDefaultDateFilters() {
+  const now = new Date();
+  return {
+    startDate: format(startOfMonth(now), 'yyyy-MM-dd'),
+    endDate: format(endOfMonth(now), 'yyyy-MM-dd'),
+  };
+}
+
 export default function Home() {
   const { t } = useTranslation();
   const { data: userData } = useUserData();
@@ -94,8 +103,7 @@ export default function Home() {
     type: '',
     minAmount: '',
     maxAmount: '',
-    startDate: '',
-    endDate: '',
+    ...getDefaultDateFilters(),
     isFixed: '',
   });
   const [transactionToEdit, setTransactionToEdit] = useState<TransactionToEdit | null>(null);
@@ -214,8 +222,7 @@ export default function Home() {
       type: '',
       minAmount: '',
       maxAmount: '',
-      startDate: '',
-      endDate: '',
+      ...getDefaultDateFilters(),
       isFixed: '',
     });
     setCurrentPage(1);
