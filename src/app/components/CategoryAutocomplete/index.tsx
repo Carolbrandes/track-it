@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { IoAdd } from 'react-icons/io5';
+import { IoAdd, IoChevronDown } from 'react-icons/io5';
 import { Category } from '../../hooks/useCategories';
 import { useTranslation } from '../../i18n/LanguageContext';
 import * as S from './styles';
@@ -22,6 +22,7 @@ export default function CategoryAutocomplete({
     const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
+    const [isUserTyping, setIsUserTyping] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,17 +34,19 @@ export default function CategoryAutocomplete({
         }
     }, [selectedCategory, isOpen]);
 
-    const filtered = query.trim()
+    // Only filter when the user is actively typing; on open/focus show everything
+    const filtered = isUserTyping && query.trim()
         ? categories.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
         : categories;
 
     const exactMatch = categories.some(c => c.name.toLowerCase() === query.trim().toLowerCase());
-    const showCreateOption = query.trim().length > 0 && !exactMatch;
+    const showCreateOption = isUserTyping && query.trim().length > 0 && !exactMatch;
 
     const handleSelect = useCallback((cat: Category) => {
         onSelect(cat._id);
         setQuery(cat.name);
         setIsOpen(false);
+        setIsUserTyping(false);
     }, [onSelect]);
 
     const handleCreate = async () => {
@@ -55,12 +58,25 @@ export default function CategoryAutocomplete({
                 onSelect(newCat._id);
                 setQuery(newCat.name);
                 setIsOpen(false);
+                setIsUserTyping(false);
             }
         } catch (error) {
             console.error('Failed to create category', error);
-            // Optional: alert(t.categories.createError);
         } finally {
             setIsCreating(false);
+        }
+    };
+
+    const handleChevronClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isOpen) {
+            setIsOpen(false);
+            setIsUserTyping(false);
+            if (selectedCategory) setQuery(selectedCategory.name);
+        } else {
+            setIsUserTyping(false);
+            setIsOpen(true);
         }
     };
 
@@ -68,6 +84,7 @@ export default function CategoryAutocomplete({
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setIsOpen(false);
+                setIsUserTyping(false);
                 if (selectedCategory) {
                     setQuery(selectedCategory.name);
                 }
@@ -79,16 +96,30 @@ export default function CategoryAutocomplete({
 
     return (
         <S.Container ref={containerRef}>
-            <S.SearchInput
-                type="text"
-                value={query}
-                onChange={(e) => {
-                    setQuery(e.target.value);
-                    setIsOpen(true);
-                }}
-                onFocus={() => setIsOpen(true)}
-                placeholder={t.transactionForm.categorySearchPlaceholder}
-            />
+            <S.InputWrapper>
+                <S.SearchInput
+                    type="text"
+                    value={query}
+                    onChange={(e) => {
+                        setQuery(e.target.value);
+                        setIsUserTyping(true);
+                        setIsOpen(true);
+                    }}
+                    onFocus={() => {
+                        setIsUserTyping(false);
+                        setIsOpen(true);
+                    }}
+                    placeholder={t.transactionForm.categorySearchPlaceholder}
+                />
+                <S.ChevronButton
+                    type="button"
+                    onClick={handleChevronClick}
+                    $isOpen={isOpen}
+                    aria-label="Toggle category list"
+                >
+                    <IoChevronDown size={16} />
+                </S.ChevronButton>
+            </S.InputWrapper>
 
             {isOpen && (
                 <S.Dropdown>

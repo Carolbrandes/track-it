@@ -255,34 +255,42 @@ export const LoadingWrapper = styled.div`
 
 export const InsightsPanel = styled.div`
   width: 100%;
-
-  @media (min-width: 1024px) {
-    width: 380px;
-    min-width: 380px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-    position: sticky;
-    top: 5rem;
-
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: ${({ theme }) => theme.colors.gray300};
-      border-radius: 4px;
-    }
-  }
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.5rem;
 `;
 
 export const InsightsPanelHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.85;
+  }
+`;
+
+export const InsightsPanelActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+export const InsightsChevron = styled.span<{ $isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  transition: transform 0.25s ease;
+  transform: ${({ $isOpen }) => ($isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+  line-height: 0;
 `;
 
 export const InsightsSectionTitle = styled.h2`
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.textPrimary};
   display: flex;
@@ -326,9 +334,18 @@ export const RefreshButton = styled.button`
 `;
 
 export const InsightsGrid = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 0.75rem;
+  margin-top: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 `;
 
 export const InsightCard = styled.div`
@@ -535,4 +552,231 @@ export const ErrorCard = styled(InsightCard)`
 export const ErrorText = styled.p`
   color: ${({ theme }) => theme.colors.danger};
   font-size: 0.85rem;
+`;
+
+// ─── Tabs ───
+
+export const TabBar = styled.div`
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.gray300};
+  margin-bottom: 2rem;
+`;
+
+export const TabButton = styled.button<{ $active: boolean }>`
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: ${({ $active }) => ($active ? 700 : 500)};
+  font-family: inherit;
+  background: none;
+  border: none;
+  border-bottom: 2px solid ${({ $active, theme }) => ($active ? theme.colors.primary : 'transparent')};
+  margin-bottom: -2px;
+  color: ${({ $active, theme }) => ($active ? theme.colors.primary : theme.colors.textSecondary)};
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+// ─── Summary Tab ───
+
+export const SummaryMetricRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const MetricCard = styled.div<{ $type: 'income' | 'expense' | 'balance-pos' | 'balance-neg' }>`
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-top: 3px solid ${({ $type, theme }) =>
+    $type === 'income' ? theme.colors.success :
+    $type === 'expense' ? theme.colors.danger :
+    $type === 'balance-pos' ? theme.colors.primary :
+    theme.colors.danger};
+`;
+
+export const MetricLabel = styled.span`
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const MetricValue = styled.span<{ $type?: 'income' | 'expense' | 'balance-pos' | 'balance-neg' }>`
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: ${({ $type, theme }) =>
+    $type === 'income' ? theme.colors.success :
+    $type === 'expense' ? theme.colors.danger :
+    $type === 'balance-pos' ? theme.colors.primary :
+    $type === 'balance-neg' ? theme.colors.danger :
+    theme.colors.textPrimary};
+`;
+
+export const BudgetCard = styled(ChartCard)``;
+
+export const BudgetTrack = styled.div`
+  width: 100%;
+  height: 12px;
+  background: ${({ theme }) => theme.colors.gray300};
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.75rem 0 0.5rem;
+`;
+
+export const BudgetBarFill = styled.div<{ $percent: number; $status: 'ok' | 'warning' | 'danger' }>`
+  height: 100%;
+  width: ${({ $percent }) => Math.min($percent, 100)}%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  background: ${({ $status, theme }) =>
+    $status === 'danger' ? theme.colors.danger :
+    $status === 'warning' ? theme.colors.warning :
+    theme.colors.success};
+`;
+
+export const BudgetMeta = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const BudgetPercent = styled.span<{ $status: 'ok' | 'warning' | 'danger' }>`
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: ${({ $status, theme }) =>
+    $status === 'danger' ? theme.colors.danger :
+    $status === 'warning' ? theme.colors.warning :
+    theme.colors.success};
+`;
+
+// ─── Month Analysis Tab ───
+
+export const ToggleGroup = styled.div`
+  display: flex;
+  gap: 0;
+  border: 1px solid ${({ theme }) => theme.colors.gray300};
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+`;
+
+export const ToggleButton = styled.button<{ $active: boolean }>`
+  padding: 0.5rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  font-family: inherit;
+  background: ${({ $active, theme }) => ($active ? theme.colors.primary : theme.colors.surface)};
+  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.textPrimary)};
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:not(:last-child) {
+    border-right: 1px solid ${({ theme }) => theme.colors.gray300};
+  }
+
+  &:hover:not([disabled]) {
+    background: ${({ $active, theme }) => ($active ? theme.colors.primary : theme.colors.gray200)};
+  }
+`;
+
+// ─── Comparison Tab ───
+
+export const ComparisonFilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  align-items: flex-end;
+`;
+
+export const ComparisonFilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+`;
+
+export const ComparisonFilterLabel = styled.label`
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const ComparisonSelectGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+export const ComparisonTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+`;
+
+export const ComparisonThead = styled.thead`
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: ${({ theme }) => theme.colors.textSecondary};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.gray300};
+    white-space: nowrap;
+  }
+`;
+
+export const ComparisonTbody = styled.tbody`
+  tr:nth-child(even) {
+    background: ${({ theme }) => theme.colors.gray200};
+  }
+
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
+    color: ${({ theme }) => theme.colors.textPrimary};
+  }
+`;
+
+export const VariationBadge = styled.span<{ $direction: 'up' | 'down' | 'neutral' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: ${({ $direction, theme }) =>
+    $direction === 'up' ? `${theme.colors.danger}1A` :
+    $direction === 'down' ? `${theme.colors.success}1A` :
+    `${theme.colors.gray300}`};
+  color: ${({ $direction, theme }) =>
+    $direction === 'up' ? theme.colors.danger :
+    $direction === 'down' ? theme.colors.success :
+    theme.colors.textSecondary};
 `;

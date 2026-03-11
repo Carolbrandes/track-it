@@ -5,9 +5,15 @@ export const Container = styled.div`
   width: 100%;
 `;
 
+export const InputWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
 export const SearchInput = styled.input`
   width: 100%;
-  padding: 0.6rem 0.75rem;
+  padding: 0.6rem 2.25rem 0.6rem 0.75rem;
   font-size: 0.95rem;
   border: 1px solid ${({ theme }) => theme.colors.gray300};
   border-radius: 8px;
@@ -23,6 +29,26 @@ export const SearchInput = styled.input`
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.textSecondary};
+  }
+`;
+
+export const ChevronButton = styled.button<{ $isOpen: boolean }>`
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  transition: transform 0.2s, color 0.15s;
+  transform: ${({ $isOpen }) => ($isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+  line-height: 0;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 

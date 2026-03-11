@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { NumberFormatValues } from 'react-number-format';
 import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
+import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { Category } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
@@ -59,6 +60,14 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
         fireSyntheticChange(name, values.value);
     }, [fireSyntheticChange]);
 
+    const applyQuickDateFilter = useCallback((monthsBack: number) => {
+        const today = new Date();
+        const start = startOfMonth(monthsBack === 0 ? today : subMonths(today, monthsBack));
+        const end = endOfMonth(today);
+        fireSyntheticChange('startDate', format(start, 'yyyy-MM-dd'));
+        fireSyntheticChange('endDate', format(end, 'yyyy-MM-dd'));
+    }, [fireSyntheticChange]);
+
     const filterContent = () => (
         <S.FilterForm>
             <S.FilterColumn>
@@ -90,6 +99,20 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     <option value="income">{t.filter.income}</option>
                     <option value="expense">{t.filter.expense}</option>
                 </S.FilterSelect>
+                <S.QuickFilterRow>
+                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(0)}>
+                        {t.filter.thisMonth}
+                    </S.QuickFilterButton>
+                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(2)}>
+                        {t.filter.last3Months}
+                    </S.QuickFilterButton>
+                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(5)}>
+                        {t.filter.last6Months}
+                    </S.QuickFilterButton>
+                    <S.QuickFilterButton type="button" onClick={() => applyQuickDateFilter(11)}>
+                        {t.filter.lastYear}
+                    </S.QuickFilterButton>
+                </S.QuickFilterRow>
                 <S.DateFieldWrapper>
                     <S.DateLabel>{t.filter.startDate}</S.DateLabel>
                     <DateInput

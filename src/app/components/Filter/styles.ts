@@ -156,6 +156,31 @@ export const FilterNumericFormat = styled(NumericFormat)`
   }
 `;
 
+export const QuickFilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+`;
+
+export const QuickFilterButton = styled.button`
+  background: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary};
+    color: #fff;
+  }
+`;
+
 export const DateFieldWrapper = styled.div`
   display: flex;
   flex-direction: column;
