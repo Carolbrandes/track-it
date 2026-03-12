@@ -48,7 +48,7 @@ export default function AiInsightsSection() {
         },
         staleTime: INSIGHTS_STALE_MS,
         gcTime: INSIGHTS_STALE_MS,
-        enabled: false,
+        enabled: true,
     });
 
     const loading = isLoading || isRefetching;
@@ -68,9 +68,6 @@ export default function AiInsightsSection() {
     };
 
     const handleToggle = () => {
-        if (!isExpanded && !data && !isLoading) {
-            refetch();
-        }
         setIsExpanded(prev => !prev);
     };
 

@@ -28,8 +28,10 @@ const transactionSchema = new Schema<ITransaction>({
     is_fixed: { type: Boolean, default: null },
     recurringGroupId: { type: String, index: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-    userId: { type: Schema.Types.ObjectId, required: true },
+    userId: { type: Schema.Types.ObjectId, required: true, index: true },
 }, { timestamps: true });
+
+transactionSchema.index({ userId: 1, date: -1 });
 
 const Transaction: Model<ITransaction> =
     mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', transactionSchema);

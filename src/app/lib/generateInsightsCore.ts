@@ -54,16 +54,13 @@ interface PopulatedTransaction {
 
 function formatTransactionsForPrompt(transactions: PopulatedTransaction[]): string {
     return transactions
-        .map((t) => ({
-            description: t.description,
-            amount: t.amount,
-            currency: t.currency,
-            date: new Date(t.date).toISOString().split('T')[0],
-            type: t.type,
-            is_fixed: t.is_fixed,
-            category: t.category?.name ?? 'Sem categoria',
-        }))
-        .map((t) => JSON.stringify(t))
+        .map((t) => {
+            const date = new Date(t.date).toISOString().split('T')[0];
+            const desc = t.description.replace(/[|\n]/g, ' ').substring(0, 30); // Remove pipe/newline & limit length
+            const cat = (t.category?.name ?? 'S/C').substring(0, 20);
+            const fixed = t.is_fixed ? 'FIXO' : 'VAR';
+            return `${date}|${desc}|${t.amount}|${cat}|${fixed}`;
+        })
         .join('\n');
 }
 
@@ -163,10 +160,10 @@ REGRAS ESTRITAS:
 - Todos os valores monetários devem usar a moeda que aparece nos dados.
 - Seja direto, humanizado e motivador no tom.
 
-TRANSAÇÕES DO MÊS ATUAL (${currentMonthStart.toLocaleDateString('pt-BR')} a ${currentMonthEnd.toLocaleDateString('pt-BR')}):
+TRANSAÇÕES DO MÊS ATUAL (Formato: Data|Descrição|Valor|Categoria|Fixo/Var):
 ${currentFormatted || 'Nenhuma transação este mês.'}
 
-TRANSAÇÕES DOS 6 MESES ANTERIORES (${sixMonthsAgo.toLocaleDateString('pt-BR')} a ${new Date(currentMonthStart.getTime() - 1).toLocaleDateString('pt-BR')}):
+TRANSAÇÕES DOS 6 MESES ANTERIORES (Mesmo formato):
 ${previousFormatted || 'Nenhuma transação nos meses anteriores.'}
 
 INSTRUÇÕES DE ANÁLISE:
