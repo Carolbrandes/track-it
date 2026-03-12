@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from './styles';
 
 const STORAGE_KEY = 'trackit-cookie-consent';
 
@@ -25,20 +24,30 @@ export function CookieConsent() {
     if (!visible) return null;
 
     return (
-        <S.Banner role="dialog" aria-label={t.cookieConsent.title}>
-            <S.Content>
-                <S.Text>
+        <div
+            role="dialog"
+            aria-label={t.cookieConsent.title}
+            className="fixed bottom-0 left-0 right-0 z-[9999] bg-surface border-t border-gray-300 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] px-6 py-5 animate-[slideUp_0.4s_ease-out] md:px-8"
+        >
+            <div className="max-w-[1000px] mx-auto flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+                <p className="text-sm leading-relaxed text-text-secondary m-0 flex-1">
                     {t.cookieConsent.message}{' '}
-                    <S.PrivacyLink href="/terms">
+                    <a
+                        href="/terms"
+                        className="text-primary no-underline font-medium hover:underline"
+                    >
                         {t.cookieConsent.learnMore}
-                    </S.PrivacyLink>
-                </S.Text>
-                <S.Actions>
-                    <S.AcceptButton onClick={handleAccept}>
+                    </a>
+                </p>
+                <div className="flex gap-3 shrink-0">
+                    <button
+                        onClick={handleAccept}
+                        className="py-[0.55rem] px-6 bg-primary text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-opacity duration-200 whitespace-nowrap hover:opacity-90"
+                    >
                         {t.cookieConsent.accept}
-                    </S.AcceptButton>
-                </S.Actions>
-            </S.Content>
-        </S.Banner>
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }

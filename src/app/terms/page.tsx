@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { IoArrowBack } from 'react-icons/io5';
 import { useTranslation } from '../i18n/LanguageContext';
-import * as S from './styles';
 
 export default function TermsAndPrivacy() {
     const { t } = useTranslation();
@@ -11,87 +10,93 @@ export default function TermsAndPrivacy() {
     const router = useRouter();
 
     return (
-        <S.Container>
-            <S.Header>
-                <S.BackButton onClick={() => router.back()}>
+        <div className="max-w-[800px] mx-auto px-6 pt-8 pb-16 text-text-primary md:px-8 md:pt-12 md:pb-20">
+            <header className="mb-10">
+                <button
+                    className="inline-flex items-center gap-1.5 text-[0.9rem] text-primary bg-transparent border-none p-0 mb-6 font-medium font-[inherit] cursor-pointer hover:underline"
+                    onClick={() => router.back()}
+                >
                     <IoArrowBack size={16} />
                     {terms.backToLogin}
-                </S.BackButton>
-                <S.PageTitle>{terms.pageTitle}</S.PageTitle>
-                <S.LastUpdated>{terms.lastUpdated}</S.LastUpdated>
-            </S.Header>
+                </button>
+                <h1 className="text-[1.75rem] font-bold mb-2 text-text-primary md:text-[2rem]">{terms.pageTitle}</h1>
+                <p className="text-[0.85rem] text-text-secondary m-0">{terms.lastUpdated}</p>
+            </header>
 
-            <S.SectionGroup>
-                <S.SectionTitle>{terms.termsTitle}</S.SectionTitle>
-                <S.SectionIntro>{terms.termsIntro}</S.SectionIntro>
+            <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-3 text-primary">{terms.termsTitle}</h2>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mb-6">{terms.termsIntro}</p>
 
-                <S.ArticleTitle>{terms.sections.serviceTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.serviceText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.serviceTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.serviceText}</p>
 
-                <S.ArticleTitle>{terms.sections.accountTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.accountText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.accountTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.accountText}</p>
 
-                <S.ArticleTitle>{terms.sections.responsibilitiesTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.responsibilitiesText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.responsibilitiesTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.responsibilitiesText}</p>
 
-                <S.ArticleTitle>{terms.sections.ipTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.ipText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.ipTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.ipText}</p>
 
-                <S.ArticleTitle>{terms.sections.liabilityTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.liabilityText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.liabilityTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.liabilityText}</p>
 
-                <S.ArticleTitle>{terms.sections.changesTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.sections.changesText}</S.Paragraph>
-            </S.SectionGroup>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.sections.changesTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.sections.changesText}</p>
+            </section>
 
-            <S.Divider />
+            <hr className="border-none border-t border-gray-300 my-10" />
 
-            <S.SectionGroup>
-                <S.SectionTitle>{terms.privacyTitle}</S.SectionTitle>
-                <S.SectionIntro>{terms.privacyIntro}</S.SectionIntro>
+            <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-3 text-primary">{terms.privacyTitle}</h2>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mb-6">{terms.privacyIntro}</p>
 
-                <S.ArticleTitle>{terms.privacy.collectTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.collectText}</S.Paragraph>
-                <S.List>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.collectTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.collectText}</p>
+                <ul className="mt-2 mb-4 pl-5">
                     {terms.privacy.collectItems.map((item) => (
-                        <S.ListItem key={item}>{item}</S.ListItem>
+                        <li key={item} className="text-[0.95rem] leading-[1.7] text-text-secondary mb-1.5">{item}</li>
                     ))}
-                </S.List>
+                </ul>
 
-                <S.ArticleTitle>{terms.privacy.useTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.useText}</S.Paragraph>
-                <S.List>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.useTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.useText}</p>
+                <ul className="mt-2 mb-4 pl-5">
                     {terms.privacy.useItems.map((item) => (
-                        <S.ListItem key={item}>{item}</S.ListItem>
+                        <li key={item} className="text-[0.95rem] leading-[1.7] text-text-secondary mb-1.5">{item}</li>
                     ))}
-                </S.List>
+                </ul>
 
-                <S.ArticleTitle>{terms.privacy.storageTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.storageText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.storageTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.storageText}</p>
 
-                <S.ArticleTitle>{terms.privacy.cookiesTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.cookiesText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.cookiesTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.cookiesText}</p>
 
-                <S.ArticleTitle>{terms.privacy.rightsTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.rightsText}</S.Paragraph>
-                <S.List>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.rightsTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.rightsText}</p>
+                <ul className="mt-2 mb-4 pl-5">
                     {terms.privacy.rightsItems.map((item) => (
-                        <S.ListItem key={item}>{item}</S.ListItem>
+                        <li key={item} className="text-[0.95rem] leading-[1.7] text-text-secondary mb-1.5">{item}</li>
                     ))}
-                </S.List>
-                <S.Paragraph>{terms.privacy.rightsFooter}</S.Paragraph>
+                </ul>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.rightsFooter}</p>
 
-                <S.ArticleTitle>{terms.privacy.sharingTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.sharingText}</S.Paragraph>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.sharingTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.sharingText}</p>
 
-                <S.ArticleTitle>{terms.privacy.contactTitle}</S.ArticleTitle>
-                <S.Paragraph>{terms.privacy.contactText}</S.Paragraph>
-                <S.Paragraph>
-                    <S.EmailLink href={`mailto:${terms.privacy.contactEmail}`}>
+                <h3 className="text-[1.1rem] font-semibold mt-8 mb-2 text-text-primary">{terms.privacy.contactTitle}</h3>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">{terms.privacy.contactText}</p>
+                <p className="text-[0.95rem] leading-[1.7] text-text-secondary mt-0 mb-3">
+                    <a
+                        className="text-primary font-medium no-underline hover:underline"
+                        href={`mailto:${terms.privacy.contactEmail}`}
+                    >
                         {terms.privacy.contactEmail}
-                    </S.EmailLink>
-                </S.Paragraph>
-            </S.SectionGroup>
-        </S.Container>
+                    </a>
+                </p>
+            </section>
+        </div>
     );
 }

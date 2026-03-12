@@ -3,7 +3,7 @@ import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { useState } from 'react';
 import { IoAdd } from 'react-icons/io5';
 import { FiCamera } from 'react-icons/fi';
-import styled from 'styled-components';
+import { cn } from '@/app/lib/cn';
 import AddTransactionModal from './components/AddTransactionModal';
 import ReceiptScannerModal from './components/ReceiptScannerModal';
 import { Filter } from './components/Filter';
@@ -17,55 +17,6 @@ import { useCategories } from './hooks/useCategories';
 import { useTransactions } from './hooks/useTransactions';
 import { useUserData } from './hooks/useUserData';
 import { useTranslation } from './i18n/LanguageContext';
-import * as S from './styles';
-
-const DateFormatBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.75rem;
-`;
-
-const DateFormatLabel = styled.span`
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-weight: 500;
-`;
-
-const DateFormatBtn = styled.button<{ $active: boolean }>`
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-family: inherit;
-  font-weight: ${({ $active }) => ($active ? '600' : '400')};
-  cursor: pointer;
-  border: 1px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.border};
-  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.surface};
-  color: ${({ theme, $active }) => $active ? '#fff' : theme.colors.text};
-  transition: all 0.15s;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
-  }
-`;
-
-const PageSizeSelect = styled.select`
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-family: inherit;
-  cursor: pointer;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  outline: none;
-  margin-left: 0.2rem;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
-  }
-`;
 
 export interface TransactionToEdit {
   _id: string
@@ -229,40 +180,46 @@ export default function Home() {
   };
 
   if (!userData) return null;
-  if (isLoading) return <S.LoadingIndicator>{t.common.loading}</S.LoadingIndicator>;
-  if (isError) return <S.ErrorMessage>{error?.message}</S.ErrorMessage>;
+  if (isLoading) return <div className="text-center p-8 text-lg text-text-secondary">{t.common.loading}</div>;
+  if (isError) return <div className="text-danger bg-surface p-4 rounded-lg mb-4 border border-danger">{error?.message}</div>;
 
   return (
-    <S.PageContainer>
-      <S.TitleRow>
-        <S.Title>{t.transactions.title}</S.Title>
-        <S.ButtonRow>
-          <S.ScanButton onClick={() => setIsScanModalOpen(true)}>
+    <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <h1 className="text-[1.75rem] text-text-primary">{t.transactions.title}</h1>
+        <div className="flex gap-2">
+          <button
+            className="flex items-center gap-1.5 px-4 py-2 bg-surface text-primary border border-primary rounded-[10px] text-sm font-semibold font-[inherit] cursor-pointer transition-all duration-200 whitespace-nowrap hover:bg-primary hover:text-white"
+            onClick={() => setIsScanModalOpen(true)}
+          >
             <FiCamera size={18} />
             {t.receiptScanner.scanButton}
-          </S.ScanButton>
-          <S.AddButton onClick={() => setIsAddModalOpen(true)}>
+          </button>
+          <button
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white border-none rounded-[10px] text-sm font-semibold font-[inherit] cursor-pointer transition-opacity duration-200 whitespace-nowrap hover:opacity-[0.88]"
+            onClick={() => setIsAddModalOpen(true)}
+          >
             <IoAdd size={20} />
             {t.transactionForm.addButton}
-          </S.AddButton>
-        </S.ButtonRow>
-      </S.TitleRow>
+          </button>
+        </div>
+      </div>
 
-      <S.Section>
+      <div className="mb-8">
         <Summary transactions={allTransactions} totalCount={totalCount} />
-      </S.Section>
+      </div>
 
-      <S.Section>
+      <div className="mb-8">
         <Filter
           filters={filters}
           categories={categories}
           handleFilterChange={(e) => handleFilterChange(e)}
           resetFilters={resetFilters}
         />
-      </S.Section>
+      </div>
 
-      <DateFormatBar>
-        <DateFormatLabel>{t.myData.dateFormat}:</DateFormatLabel>
+      <div className="flex items-center gap-2 flex-wrap mb-3">
+        <span className="text-xs text-text-secondary font-medium">{t.myData.dateFormat}:</span>
         {(['mm/dd/yyyy', 'dd/mm/yyyy', 'long'] as DateFormatPreference[]).map((fmt) => {
           const labels: Record<DateFormatPreference, string> = {
             'mm/dd/yyyy': t.myData.dateFormatMmDd,
@@ -270,18 +227,24 @@ export default function Home() {
             'long': t.myData.dateFormatLong,
           };
           return (
-            <DateFormatBtn
+            <button
               key={fmt}
-              $active={dateFormat === fmt}
+              className={cn(
+                "px-2.5 py-1 rounded-md text-xs font-[inherit] cursor-pointer border transition-all duration-150 hover:border-primary",
+                dateFormat === fmt
+                  ? "font-semibold border-primary bg-primary text-white"
+                  : "font-normal border-border bg-surface text-text"
+              )}
               onClick={() => setDateFormat(fmt)}
             >
               {labels[fmt]}
-            </DateFormatBtn>
+            </button>
           );
         })}
-        <div style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center' }}>
-          <DateFormatLabel>{t.myData.itemsPerPage}:</DateFormatLabel>
-          <PageSizeSelect
+        <div className="ml-4 flex items-center">
+          <span className="text-xs text-text-secondary font-medium">{t.myData.itemsPerPage}:</span>
+          <select
+            className="px-2.5 py-1 rounded-md text-xs font-[inherit] cursor-pointer border border-border bg-surface text-text outline-none ml-0.5 hover:border-primary"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -293,9 +256,9 @@ export default function Home() {
             <option value={15}>15</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
-          </PageSizeSelect>
+          </select>
         </div>
-      </DateFormatBar>
+      </div>
 
       <TransactionList
         transactions={transactions as TransactionToEdit[]}
@@ -305,11 +268,11 @@ export default function Home() {
         handleDelete={handleDelete}
       />
 
-      <S.Section>
+      <div className="mb-8">
         {totalPages > 1 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} handlePageChange={handlePageChange} />
         )}
-      </S.Section>
+      </div>
 
       {transactionToEdit && (
         <Modal
@@ -342,6 +305,6 @@ export default function Home() {
           return result ?? undefined;
         }}
       />
-    </S.PageContainer>
+    </div>
   );
 }

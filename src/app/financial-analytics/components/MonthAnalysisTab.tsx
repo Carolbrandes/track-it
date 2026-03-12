@@ -16,7 +16,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Transaction, useTransactions } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from '../styles';
+import { cn } from '@/app/lib/cn';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
 
@@ -140,50 +140,72 @@ export default function MonthAnalysisTab({ month, year, category }: MonthAnalysi
 
     return (
         <div>
-            <S.ToggleGroup>
-                <S.ToggleButton $active={!showFixedOnly} onClick={() => setShowFixedOnly(false)}>
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden w-fit mb-6">
+                <button
+                    onClick={() => setShowFixedOnly(false)}
+                    className={cn(
+                        'px-4 py-2 text-sm border-none cursor-pointer transition-colors duration-150 not-last:border-r not-last:border-gray-300',
+                        !showFixedOnly
+                            ? 'font-semibold bg-primary text-white'
+                            : 'font-normal bg-surface text-text-primary hover:bg-gray-200'
+                    )}
+                >
                     {t.analytics.toggleGeneral}
-                </S.ToggleButton>
-                <S.ToggleButton $active={showFixedOnly} onClick={() => setShowFixedOnly(true)}>
+                </button>
+                <button
+                    onClick={() => setShowFixedOnly(true)}
+                    className={cn(
+                        'px-4 py-2 text-sm border-none cursor-pointer transition-colors duration-150',
+                        showFixedOnly
+                            ? 'font-semibold bg-primary text-white'
+                            : 'font-normal bg-surface text-text-primary hover:bg-gray-200'
+                    )}
+                >
                     {t.analytics.toggleFixed}
-                </S.ToggleButton>
-            </S.ToggleGroup>
+                </button>
+            </div>
 
             {isEmpty ? (
-                <S.EmptyState>
+                <div className="text-center py-10 px-4 text-text-secondary text-[0.9rem]">
                     {showFixedOnly ? t.analytics.noFixedTransactions : t.analytics.noTransactions} {monthLabel}
-                </S.EmptyState>
+                </div>
             ) : (
                 <>
                     {incomeByCategory.length > 0 && (
-                        <S.ChartCard style={{ marginBottom: '1.5rem' }}>
-                            <S.ChartCardTitle>{t.analytics.income}</S.ChartCardTitle>
-                            <S.PieBlock>
-                                <S.PieContainer>
+                        <div className="bg-surface border border-gray-300 rounded-xl p-5 mb-6">
+                            <h3 className="text-[0.95rem] font-semibold text-text-primary m-0 mb-4">{t.analytics.income}</h3>
+                            <div className="flex flex-col items-center gap-3 flex-1">
+                                <div className="w-[180px] h-[180px] relative">
                                     <Pie data={buildPieData(incomeByCategory, incomeTotal)} options={pieOptions} />
-                                </S.PieContainer>
-                                <S.LegendContainer>
+                                </div>
+                                <div className="flex flex-col gap-1 w-full">
                                     {incomeByCategory.map(([name, amount], i) => (
-                                        <S.LegendItem key={name}>
-                                            <S.ColorBox style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                        <div key={name} className="flex items-center gap-1.5 text-[0.8rem] text-text-primary">
+                                            <div
+                                                className="w-2.5 h-2.5 min-w-[10px] rounded-sm"
+                                                style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                                            />
                                             {name}
-                                            <S.LegendValue>
+                                            <span className="ml-auto font-medium text-text-secondary text-[0.78rem]">
                                                 {incomeTotal > 0 ? Math.round((amount / incomeTotal) * 100) : 0}%
-                                            </S.LegendValue>
-                                        </S.LegendItem>
+                                            </span>
+                                        </div>
                                     ))}
-                                </S.LegendContainer>
-                            </S.PieBlock>
-                        </S.ChartCard>
+                                </div>
+                            </div>
+                        </div>
                     )}
 
                     {expenseByCategory.length > 0 && (
-                        <S.ChartCard>
-                            <S.ChartCardTitle>{t.analytics.expensesByCategory}</S.ChartCardTitle>
-                            <S.BarContainer style={{ height: `${Math.max(200, expenseByCategory.length * 40)}px` }}>
+                        <div className="bg-surface border border-gray-300 rounded-xl p-5">
+                            <h3 className="text-[0.95rem] font-semibold text-text-primary m-0 mb-4">{t.analytics.expensesByCategory}</h3>
+                            <div
+                                className="w-full relative sm:h-[300px]"
+                                style={{ height: `${Math.max(200, expenseByCategory.length * 40)}px` }}
+                            >
                                 <Bar data={barData} options={barOptions} />
-                            </S.BarContainer>
-                        </S.ChartCard>
+                            </div>
+                        </div>
                     )}
                 </>
             )}

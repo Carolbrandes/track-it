@@ -5,12 +5,12 @@ import { useUserData } from '../../hooks/useUserData';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { formatCurrency } from '../../utils/formatters';
-import * as S from '../styles';
+import { cn } from '@/app/lib/cn';
 
 interface AnalyticsSummaryProps {
-    month: number;
-    year: number;
-    category?: string;
+    readonly month: number;
+    readonly year: number;
+    readonly category?: string;
 }
 
 function computeSummary(transactions: Transaction[]) {
@@ -42,6 +42,11 @@ function computeSummary(transactions: Transaction[]) {
     };
 }
 
+function SummaryValueColor(positive?: boolean): string {
+    if (positive === undefined) return 'text-text-primary';
+    return positive ? 'text-success' : 'text-danger';
+}
+
 export default function AnalyticsSummary({ month, year, category }: AnalyticsSummaryProps) {
     const { t, locale } = useTranslation();
     const { data: userData } = useUserData();
@@ -60,52 +65,74 @@ export default function AnalyticsSummary({ month, year, category }: AnalyticsSum
     const summary = computeSummary(transactions);
 
     if (isLoading) {
-        return <S.LoadingWrapper>{t.common.loading}</S.LoadingWrapper>;
+        return (
+            <div className="flex justify-center items-center w-full h-[200px] text-text-secondary">
+                {t.common.loading}
+            </div>
+        );
     }
 
     return (
-        <S.ChartCard>
-            <S.ChartCardTitle>{t.analytics.summaryTitle}</S.ChartCardTitle>
-            <S.SummaryGrid>
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.income}</S.SummaryLabel>
-                    <S.SummaryValue $positive>{formatCurrency(summary.incomeNonFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.incomeFixed}</S.SummaryLabel>
-                    <S.SummaryValue $positive>{formatCurrency(summary.incomeFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow $bold>
-                    <S.SummaryLabel>{t.analytics.totalIncome}</S.SummaryLabel>
-                    <S.SummaryValue $positive>{formatCurrency(summary.incomeTotal, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
+        <div className="bg-surface border border-gray-300 rounded-xl p-5">
+            <h3 className="text-[0.95rem] font-semibold text-text-primary m-0 mb-4">{t.analytics.summaryTitle}</h3>
+            <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.income}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(true))}>
+                        {formatCurrency(summary.incomeNonFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.incomeFixed}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(true))}>
+                        {formatCurrency(summary.incomeFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300 font-bold">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.totalIncome}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(true))}>
+                        {formatCurrency(summary.incomeTotal, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
 
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.expenses}</S.SummaryLabel>
-                    <S.SummaryValue $positive={false}>{formatCurrency(summary.expenseNonFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.expensesFixed}</S.SummaryLabel>
-                    <S.SummaryValue $positive={false}>{formatCurrency(summary.expenseFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow $bold>
-                    <S.SummaryLabel>{t.analytics.totalExpenses}</S.SummaryLabel>
-                    <S.SummaryValue $positive={false}>{formatCurrency(summary.expenseTotal, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.expenses}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(false))}>
+                        {formatCurrency(summary.expenseNonFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.expensesFixed}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(false))}>
+                        {formatCurrency(summary.expenseFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300 font-bold">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.totalExpenses}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(false))}>
+                        {formatCurrency(summary.expenseTotal, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
 
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.balance}</S.SummaryLabel>
-                    <S.SummaryValue $positive={summary.balanceNonFixed >= 0}>{formatCurrency(summary.balanceNonFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow>
-                    <S.SummaryLabel>{t.analytics.balanceFixed}</S.SummaryLabel>
-                    <S.SummaryValue $positive={summary.balanceFixed >= 0}>{formatCurrency(summary.balanceFixed, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-                <S.SummaryRow $bold>
-                    <S.SummaryLabel>{t.analytics.balanceTotal}</S.SummaryLabel>
-                    <S.SummaryValue $positive={summary.balanceTotal >= 0}>{formatCurrency(summary.balanceTotal, selectedCurrencyCode, locale)}</S.SummaryValue>
-                </S.SummaryRow>
-            </S.SummaryGrid>
-        </S.ChartCard>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.balance}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(summary.balanceNonFixed >= 0))}>
+                        {formatCurrency(summary.balanceNonFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.balanceFixed}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(summary.balanceFixed >= 0))}>
+                        {formatCurrency(summary.balanceFixed, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b-0 font-bold">
+                    <span className="text-[0.9rem] text-text-secondary">{t.analytics.balanceTotal}</span>
+                    <span className={cn('text-[0.95rem] font-semibold', SummaryValueColor(summary.balanceTotal >= 0))}>
+                        {formatCurrency(summary.balanceTotal, selectedCurrencyCode, locale)}
+                    </span>
+                </div>
+            </div>
+        </div>
     );
 }

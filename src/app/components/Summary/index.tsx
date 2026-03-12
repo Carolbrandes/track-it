@@ -1,10 +1,10 @@
 'use client'
 
+import { cn } from '@/app/lib/cn';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from './styles';
 
 interface SummaryProps {
     transactions: Transaction[]
@@ -27,31 +27,28 @@ export const Summary = ({ transactions, totalCount }: SummaryProps) => {
         }, { income: 0, expense: 0, balance: 0 });
     };
 
-    // Get totals from all transactions
     const totals = calculateTotals();
 
-
     return (
-        <S.SummaryCard>
-            <S.SummaryItem>
+        <div className="flex flex-col gap-3 bg-surface text-text-primary p-4 rounded-xl border border-gray-300 min-[1200px]:grid min-[1200px]:grid-cols-4">
+            <div className="flex gap-2 p-2">
                 <span>{t.summary.income}</span>
-                <S.AmountPositive>{formatCurrency(totals.income, selectedCurrencyCode, locale)}</S.AmountPositive>
-            </S.SummaryItem>
-            <S.SummaryItem>
+                <span className="text-success font-bold">{formatCurrency(totals.income, selectedCurrencyCode, locale)}</span>
+            </div>
+            <div className="flex gap-2 p-2">
                 <span>{t.summary.expense}</span>
-                <S.AmountNegative>{formatCurrency(totals.expense, selectedCurrencyCode, locale)}</S.AmountNegative>
-            </S.SummaryItem>
-            <S.SummaryItem>
+                <span className="text-danger font-bold">{formatCurrency(totals.expense, selectedCurrencyCode, locale)}</span>
+            </div>
+            <div className="flex gap-2 p-2">
                 <span>{t.summary.balance}</span>
-                <S.AmountBalance $positive={totals.balance > 0}>
+                <span className={cn("font-bold", totals.balance > 0 ? "text-success" : "text-danger")}>
                     {formatCurrency(totals.balance, selectedCurrencyCode, locale)}
-                </S.AmountBalance>
-            </S.SummaryItem>
-            <S.SummaryItem>
+                </span>
+            </div>
+            <div className="flex gap-2 p-2">
                 <span>{t.summary.transactionCount}</span>
                 <span>{totalCount}</span>
-            </S.SummaryItem>
-        </S.SummaryCard>
+            </div>
+        </div>
     );
 };
-

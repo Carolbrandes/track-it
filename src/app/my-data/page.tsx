@@ -7,7 +7,7 @@ import { useDateFormat, type DateFormatPreference } from '../contexts/DateFormat
 import { useTranslation, localeLabels } from '../i18n/LanguageContext';
 import { useUserData } from '../hooks/useUserData';
 import { useCurrency } from '../hooks/useCurrency';
-import * as S from '../styles/shared';
+import { cn } from '@/app/lib/cn';
 
 export default function MyDataPage() {
     const { t, locale } = useTranslation();
@@ -49,109 +49,105 @@ export default function MyDataPage() {
 
     if (userLoading) {
         return (
-            <S.PageContainer>
-                <S.Title>{t.myData.title}</S.Title>
-                <S.LoadingIndicator>Carregando...</S.LoadingIndicator>
-            </S.PageContainer>
+            <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
+                <h1 className="text-[1.75rem] mb-8 text-text-primary">{t.myData.title}</h1>
+                <div className="text-center p-8 text-lg text-text-secondary">Carregando...</div>
+            </div>
         );
     }
     if (!user) {
         return (
-            <S.PageContainer>
-                <S.Title>{t.myData.title}</S.Title>
-                <S.LoadingIndicator>—</S.LoadingIndicator>
-            </S.PageContainer>
+            <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
+                <h1 className="text-[1.75rem] mb-8 text-text-primary">{t.myData.title}</h1>
+                <div className="text-center p-8 text-lg text-text-secondary">—</div>
+            </div>
         );
     }
 
     return (
-        <S.PageContainer>
-            <S.Title style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
+            <h1 className="text-[1.75rem] mb-8 text-text-primary flex items-center gap-2">
                 <FiUser size={24} />
                 {t.myData.title}
-            </S.Title>
+            </h1>
 
-            <S.Section>
+            <div className="mb-8">
                 <DataRow label={t.myData.email} value={user.email ?? '—'} />
                 <DataRow label={t.myData.language} value={languageLabel} />
                 <DataRow label={t.myData.currency} value={currencyName} />
                 <DataRow label={t.myData.theme} value={themeLabel} />
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem',
-                    marginBottom: '1rem',
-                    paddingBottom: '1rem',
-                    borderBottom: '1px solid var(--color-gray-300, #e5e7eb)',
-                }}>
-                    <S.Label style={{ margin: 0 }}>{t.myData.dateFormat}</S.Label>
+                <div className="flex flex-col gap-1 mb-4 pb-4 border-b border-gray-300">
+                    <span className="font-semibold text-sm text-text-secondary">{t.myData.dateFormat}</span>
                     <select
                         value={dateFormat}
                         onChange={(e) => setDateFormat(e.target.value as DateFormatPreference)}
-                        style={{
-                            padding: '0.5rem 0.75rem',
-                            borderRadius: '8px',
-                            border: '1px solid var(--color-gray-300, #e5e7eb)',
-                            fontSize: '1rem',
-                            maxWidth: '280px',
-                        }}
+                        className="px-3 py-2 rounded-lg border border-gray-300 text-base max-w-[280px]"
                     >
                         <option value="mm/dd/yyyy">{t.myData.dateFormatMmDd}</option>
                         <option value="dd/mm/yyyy">{t.myData.dateFormatDdMm}</option>
                         <option value="long">{t.myData.dateFormatLong}</option>
                     </select>
                 </div>
-            </S.Section>
+            </div>
 
-            <S.Section>
-                <S.SectionTitle>{t.myData.deleteAccount}</S.SectionTitle>
-                <p style={{ color: 'var(--color-text-secondary, #666)', marginBottom: '1rem', fontSize: '0.95rem' }}>
+            <div className="mb-8">
+                <h2 className="text-2xl mb-6 text-text-primary">{t.myData.deleteAccount}</h2>
+                <p className="text-text-secondary mb-4 text-[0.95rem]">
                     {t.myData.confirmDelete.split('.')[0]}.
                 </p>
                 {showConfirm ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: '320px' }}>
-                        <p style={{ color: 'var(--color-text-primary)', fontSize: '0.9rem' }}>
+                    <div className="flex flex-col gap-3 max-w-[320px]">
+                        <p className="text-text-primary text-[0.9rem]">
                             {t.myData.confirmDelete}
                         </p>
-                        {deleteError && <S.ErrorMessage>{deleteError}</S.ErrorMessage>}
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <S.Button
-                                $danger
-                                $disabled={isDeleting}
+                        {deleteError && (
+                            <div className="text-danger bg-surface p-4 rounded-lg mb-4 border border-danger">
+                                {deleteError}
+                            </div>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                className={cn(
+                                    "px-5 py-2.5 border-none rounded-lg cursor-pointer transition-all duration-200 w-fit font-medium hover:opacity-85",
+                                    "bg-danger text-white",
+                                    isDeleting && "cursor-not-allowed opacity-70"
+                                )}
                                 onClick={handleDeleteAccount}
+                                disabled={isDeleting}
                             >
                                 {isDeleting ? t.myData.deleting : t.myData.deleteAccount}
-                            </S.Button>
-                            <S.Button
-                                $disabled={isDeleting}
+                            </button>
+                            <button
+                                className={cn(
+                                    "px-5 py-2.5 border-none rounded-lg cursor-pointer transition-all duration-200 w-fit font-medium hover:opacity-85",
+                                    "bg-gray-300 text-inherit",
+                                    isDeleting && "cursor-not-allowed opacity-70"
+                                )}
                                 onClick={() => { setShowConfirm(false); setDeleteError(null); }}
+                                disabled={isDeleting}
                             >
                                 {t.myData.cancel}
-                            </S.Button>
+                            </button>
                         </div>
                     </div>
                 ) : (
-                    <S.Button $danger onClick={() => setShowConfirm(true)}>
+                    <button
+                        className="px-5 py-2.5 border-none rounded-lg cursor-pointer transition-all duration-200 w-fit font-medium hover:opacity-85 bg-danger text-white"
+                        onClick={() => setShowConfirm(true)}
+                    >
                         {t.myData.deleteAccount}
-                    </S.Button>
+                    </button>
                 )}
-            </S.Section>
-        </S.PageContainer>
+            </div>
+        </div>
     );
 }
 
 function DataRow({ label, value }: Readonly<{ label: string; value: string }>) {
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.25rem',
-            marginBottom: '1rem',
-            paddingBottom: '1rem',
-            borderBottom: '1px solid var(--color-gray-300, #e5e7eb)',
-        }}>
-            <S.Label style={{ margin: 0 }}>{label}</S.Label>
-            <span style={{ fontSize: '1rem', color: 'var(--color-text-primary)' }}>{value}</span>
+        <div className="flex flex-col gap-1 mb-4 pb-4 border-b border-gray-300">
+            <span className="font-semibold text-sm text-text-secondary">{label}</span>
+            <span className="text-base text-text-primary">{value}</span>
         </div>
     );
 }

@@ -1,15 +1,12 @@
 'use client';
 
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { DefaultTheme, ThemeProvider as StyledThemeProvider } from 'styled-components';
-import { darkTheme, lightTheme } from '../styles/theme';
 
 interface ThemeProviderProps {
     children: ReactNode;
 }
 
 interface ThemeContextProps {
-    theme: DefaultTheme;
     toggleTheme: () => void;
     isLightTheme: boolean;
 }
@@ -17,27 +14,31 @@ interface ThemeContextProps {
 const ThemeContext = createContext<ThemeContextProps>({} as ThemeContextProps);
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-    const [theme, setTheme] = useState<DefaultTheme>(lightTheme);
-    const isLightTheme = theme === lightTheme;
+    const [isLight, setIsLight] = useState(true);
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            setTheme(savedTheme === 'light' ? lightTheme : darkTheme);
+        if (savedTheme === 'dark') {
+            setIsLight(false);
+            document.documentElement.setAttribute('data-theme', 'dark');
         }
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = isLightTheme ? darkTheme : lightTheme;
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme === lightTheme ? 'light' : 'dark');
+        const next = !isLight;
+        setIsLight(next);
+        if (next) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        }
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme, isLightTheme }}>
-            <StyledThemeProvider theme={theme}>
-                {children}
-            </StyledThemeProvider>
+        <ThemeContext.Provider value={{ toggleTheme, isLightTheme: isLight }}>
+            {children}
         </ThemeContext.Provider>
     );
 }

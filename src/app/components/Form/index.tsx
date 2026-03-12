@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { NumberFormatValues } from 'react-number-format';
-import * as S from '../../styles/shared';
+import { cn } from '@/app/lib/cn';
 
 
 export type FieldType = 'text' | 'number' | 'date' | 'select' | 'radio-group' | 'custom';
@@ -36,7 +36,6 @@ export default function Form({
 }: FormProps) {
   const handleRadioChange = (field: FormField, value: string) => {
     if (field.onChange) {
-      // Create a synthetic event
       const syntheticEvent = {
         target: { name: field.name, value },
       } as React.ChangeEvent<HTMLInputElement>;
@@ -53,19 +52,26 @@ export default function Form({
 
 
   return (
-    <S.Form onSubmit={handleSubmit}>
-      {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+    <form className="flex flex-col gap-4 mb-8" onSubmit={handleSubmit}>
+      {error && (
+        <div className="text-danger bg-surface p-4 rounded-lg mb-4 border border-danger">
+          {error}
+        </div>
+      )}
 
       {fields.map((field) => (
-        <S.FormGroup key={field.name}>
-          <S.Label htmlFor={field.name}>{field.label}</S.Label>
+        <div className="flex flex-col gap-2" key={field.name}>
+          <label className="font-semibold text-sm text-text-secondary" htmlFor={field.name}>
+            {field.label}
+          </label>
 
           {field.type === 'custom' ? (
             <React.Fragment>
               {field.component}
             </React.Fragment>
           ) : field.type === 'text' || field.type === 'number' || field.type === 'date' ? (
-            <S.Input
+            <input
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-[0.95rem] bg-surface text-text-primary transition-[border-color] duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13] placeholder:text-text-secondary"
               type={field.type}
               name={field.name}
               value={field.value}
@@ -75,8 +81,8 @@ export default function Form({
             />
           )
             : field.type === 'select' ? (
-              <S.Input
-                as="select"
+              <select
+                className="px-3 py-2.5 border border-gray-300 rounded-lg text-[0.95rem] bg-surface text-text-primary transition-[border-color] duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13] placeholder:text-text-secondary"
                 id={field.name}
                 name={field.name}
                 value={field.value}
@@ -88,28 +94,40 @@ export default function Form({
                     {option.label}
                   </option>
                 ))}
-              </S.Input>
+              </select>
             ) : field.type === 'radio-group' ? (
-              <S.RadioGroup>
+              <div className="flex gap-2 my-2">
                 {field.options?.map((option) => (
-                  <S.RadioButton
+                  <button
                     key={option.value}
-                    $active={field.value === option.value}
+                    className={cn(
+                      "px-4 py-2 rounded-full cursor-pointer transition-all duration-200 font-[inherit] border",
+                      field.value === option.value
+                        ? "bg-primary text-white border-primary font-semibold"
+                        : "bg-gray-200 text-text-secondary border-gray-300 hover:bg-gray-300"
+                    )}
                     type="button"
                     name={field.name}
                     onClick={() => handleRadioChange(field, option.value)}
                   >
                     {option.label}
-                  </S.RadioButton>
+                  </button>
                 ))}
-              </S.RadioGroup>
+              </div>
             ) : null}
-        </S.FormGroup>
+        </div>
       ))}
 
-      <S.Button $primary type="submit" disabled={isSubmitting}>
+      <button
+        className={cn(
+          "px-5 py-2.5 border-none rounded-lg cursor-pointer transition-all duration-200 w-fit font-medium hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-70",
+          "bg-primary text-white"
+        )}
+        type="submit"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? 'Processing...' : submitText}
-      </S.Button>
-    </S.Form>
+      </button>
+    </form>
   );
 }

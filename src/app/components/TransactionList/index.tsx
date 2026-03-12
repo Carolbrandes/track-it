@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { cn } from '@/app/lib/cn';
 import { useDateFormat } from '../../contexts/DateFormatContext';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from './styles';
 
 interface TransactionListProps {
     transactions: Transaction[];
@@ -20,6 +20,12 @@ interface TransactionListProps {
 type SortKey = 'date' | 'description' | 'category' | 'amount';
 type SortDir = 'asc' | 'desc';
 
+const thBaseClasses =
+    'p-3 text-left border-b border-gray-300 bg-surface font-semibold text-text-secondary text-[0.85rem] uppercase tracking-[0.5px]';
+
+const tdBaseClasses =
+    'p-3 text-left border-b border-gray-300 text-text-primary min-[1200px]:whitespace-nowrap';
+
 function getCategoryName(txn: Transaction): string {
     if (typeof txn.category === 'object' && txn.category !== null) {
         return txn.category.name;
@@ -28,7 +34,7 @@ function getCategoryName(txn: Transaction): string {
 }
 
 function SortIcon({ columnKey, sortKey, sortDir }: Readonly<{ columnKey: SortKey; sortKey: SortKey; sortDir: SortDir }>) {
-    if (sortKey !== columnKey) return <S.SortIconInactive />;
+    if (sortKey !== columnKey) return <span className="inline-block w-[14px] ml-1" />;
     return sortDir === 'asc'
         ? <FiChevronUp size={14} />
         : <FiChevronDown size={14} />;
@@ -87,152 +93,222 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
     return (
         <>
             {/* Mobile: cards */}
-            <S.MobileCardsList>
+            <div className="hidden flex-col gap-3 my-4 max-[859px]:flex">
                 {sorted.map((transaction) => {
                     const expanded = expandedIds.has(transaction._id);
                     return (
-                        <S.MobileCard key={transaction._id}>
-                            <S.MobileCardHeader>
-                                <S.MobileCardTop>
-                                    <S.MobileCardDescription>{transaction.description}</S.MobileCardDescription>
-                                    <S.MobileCardAmount $type={transaction.type}>
+                        <div
+                            key={transaction._id}
+                            className="bg-surface border border-gray-300 rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                        >
+                            <div className="p-4">
+                                <div className="flex justify-between items-start gap-2 mb-1">
+                                    <div className="font-semibold text-base text-text-primary flex-1 min-w-0 break-words">
+                                        {transaction.description}
+                                    </div>
+                                    <span
+                                        className={cn(
+                                            'font-bold text-base shrink-0',
+                                            transaction.type === 'income' ? 'text-success' : 'text-danger'
+                                        )}
+                                    >
                                         {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                    </S.MobileCardAmount>
-                                </S.MobileCardTop>
-                                <S.MobileCardDate>
+                                    </span>
+                                </div>
+                                <div className="text-[0.8rem] text-text-secondary mb-2">
                                     {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
-                                </S.MobileCardDate>
-                                <S.MobileCardVerMais type="button" onClick={() => toggleExpanded(transaction._id)}>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="bg-none border-none p-0 text-[0.9rem] font-semibold text-primary cursor-pointer mt-1 hover:underline"
+                                    onClick={() => toggleExpanded(transaction._id)}
+                                >
                                     {expanded ? t.transactions.seeLess : t.transactions.seeMore}
-                                </S.MobileCardVerMais>
-                            </S.MobileCardHeader>
+                                </button>
+                            </div>
                             {expanded && (
-                                <S.MobileCardExpanded>
-                                    <S.MobileCardDetailRow>
-                                        <S.MobileCardDetailLabel>{t.transactions.category}</S.MobileCardDetailLabel>
-                                        <S.MobileCardDetailValue>
+                                <div className="p-4 pt-3 border-t border-gray-300">
+                                    <div className="[&:not(:first-child)]:mt-3">
+                                        <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.category}</div>
+                                        <div className="text-[0.95rem] font-medium text-text-primary">
                                             {typeof transaction.category === 'object'
                                                 ? transaction.category.name
                                                 : t.transactions.uncategorized}
-                                        </S.MobileCardDetailValue>
-                                    </S.MobileCardDetailRow>
-                                    <S.MobileCardDetailRow>
-                                        <S.MobileCardDetailLabel>{t.transactions.type}</S.MobileCardDetailLabel>
-                                        <S.MobileCardDetailValue>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3">
+                                        <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.type}</div>
+                                        <div className="text-[0.95rem] font-medium text-text-primary">
                                             {transaction.type === 'income' ? t.transactions.income : t.transactions.expense}
-                                        </S.MobileCardDetailValue>
-                                    </S.MobileCardDetailRow>
-                                    <S.MobileCardDetailRow>
-                                        <S.MobileCardDetailLabel>{t.transactions.amount}</S.MobileCardDetailLabel>
-                                        <S.MobileCardDetailValue>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3">
+                                        <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.amount}</div>
+                                        <div className="text-[0.95rem] font-medium text-text-primary">
                                             {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                        </S.MobileCardDetailValue>
-                                    </S.MobileCardDetailRow>
-                                    <S.MobileCardDetailRow>
-                                        <S.MobileCardDetailLabel>{t.transactions.fixed}</S.MobileCardDetailLabel>
-                                        <S.MobileCardDetailValue>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3">
+                                        <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.fixed}</div>
+                                        <div className="text-[0.95rem] font-medium text-text-primary">
                                             {transaction.is_fixed ? t.transactions.fixed : '—'}
-                                        </S.MobileCardDetailValue>
-                                    </S.MobileCardDetailRow>
-                                    <S.MobileCardActions>
-                                        <S.MobileCardEditBtn
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 mt-4">
+                                        <button
                                             type="button"
+                                            className="flex-1 py-2 px-3 rounded-lg border border-primary bg-transparent text-primary font-semibold text-[0.9rem] cursor-pointer hover:bg-primary hover:text-white"
                                             onClick={() => handleEdit(transaction)}
                                             disabled={isUpdating}
                                         >
                                             {t.transactions.edit}
-                                        </S.MobileCardEditBtn>
-                                        <S.MobileCardDeleteBtn
+                                        </button>
+                                        <button
                                             type="button"
+                                            className="flex-1 py-2 px-3 rounded-lg border-none bg-danger text-white font-semibold text-[0.9rem] cursor-pointer hover:opacity-90"
                                             onClick={() => handleDelete(transaction._id)}
                                             disabled={isDeleting}
                                         >
                                             {t.transactions.delete}
-                                        </S.MobileCardDeleteBtn>
-                                    </S.MobileCardActions>
-                                </S.MobileCardExpanded>
+                                        </button>
+                                    </div>
+                                </div>
                             )}
-                        </S.MobileCard>
+                        </div>
                     );
                 })}
-            </S.MobileCardsList>
+            </div>
 
-            {/* Desktop: tabela */}
-            <S.TableWrapper>
-                <S.TableContainer>
-                    <S.ResponsiveTable>
+            {/* Desktop: table */}
+            <div className="block max-[859px]:hidden">
+                <div className="w-full overflow-x-auto my-4">
+                    <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <S.SortableTh onClick={() => handleSort('date')} $active={sortKey === 'date'}>
+                                <th
+                                    className={cn(
+                                        thBaseClasses,
+                                        'cursor-pointer select-none transition-colors duration-150 [&>svg]:align-middle [&>svg]:ml-1 hover:!text-primary',
+                                        sortKey === 'date' ? '!text-primary' : '',
+                                        'min-[1200px]:whitespace-nowrap min-[1200px]:w-[15%]'
+                                    )}
+                                    onClick={() => handleSort('date')}
+                                >
                                     {t.transactions.date}
                                     <SortIcon columnKey="date" sortKey={sortKey} sortDir={sortDir} />
-                                </S.SortableTh>
-                                <S.SortableTh onClick={() => handleSort('description')} $active={sortKey === 'description'}>
+                                </th>
+                                <th
+                                    className={cn(
+                                        thBaseClasses,
+                                        'cursor-pointer select-none transition-colors duration-150 [&>svg]:align-middle [&>svg]:ml-1 hover:!text-primary',
+                                        sortKey === 'description' ? '!text-primary' : '',
+                                        'min-[1200px]:whitespace-nowrap min-[1200px]:w-[25%]'
+                                    )}
+                                    onClick={() => handleSort('description')}
+                                >
                                     {t.transactions.description}
                                     <SortIcon columnKey="description" sortKey={sortKey} sortDir={sortDir} />
-                                </S.SortableTh>
-                                <S.SortableTh onClick={() => handleSort('category')} $active={sortKey === 'category'}>
+                                </th>
+                                <th
+                                    className={cn(
+                                        thBaseClasses,
+                                        'cursor-pointer select-none transition-colors duration-150 [&>svg]:align-middle [&>svg]:ml-1 hover:!text-primary',
+                                        sortKey === 'category' ? '!text-primary' : '',
+                                        'min-[1200px]:whitespace-nowrap min-[1200px]:w-[20%]'
+                                    )}
+                                    onClick={() => handleSort('category')}
+                                >
                                     {t.transactions.category}
                                     <SortIcon columnKey="category" sortKey={sortKey} sortDir={sortDir} />
-                                </S.SortableTh>
-                                <th>{t.transactions.type}</th>
-                                <th>{t.transactions.fixed}</th>
-                                <S.SortableTh onClick={() => handleSort('amount')} $active={sortKey === 'amount'}>
+                                </th>
+                                <th className={cn(thBaseClasses, 'min-[1200px]:whitespace-nowrap min-[1200px]:w-[10%]')}>
+                                    {t.transactions.type}
+                                </th>
+                                <th className={cn(thBaseClasses, 'min-[1200px]:whitespace-nowrap min-[1200px]:w-[8%]')}>
+                                    {t.transactions.fixed}
+                                </th>
+                                <th
+                                    className={cn(
+                                        thBaseClasses,
+                                        'cursor-pointer select-none transition-colors duration-150 [&>svg]:align-middle [&>svg]:ml-1 hover:!text-primary',
+                                        sortKey === 'amount' ? '!text-primary' : '',
+                                        'min-[1200px]:whitespace-nowrap min-[1200px]:w-[15%]'
+                                    )}
+                                    onClick={() => handleSort('amount')}
+                                >
                                     {t.transactions.amount}
                                     <SortIcon columnKey="amount" sortKey={sortKey} sortDir={sortDir} />
-                                </S.SortableTh>
-                                <th>{t.transactions.actions}</th>
+                                </th>
+                                <th className={cn(thBaseClasses, 'min-[1200px]:whitespace-nowrap min-[1200px]:w-[15%]')}>
+                                    {t.transactions.actions}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {sorted.map(transaction => (
-                                <tr key={transaction._id}>
-                                    <td>{formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}</td>
-                                    <td>{transaction.description}</td>
-                                    <td>
+                                <tr key={transaction._id} className="hover:bg-gray-200">
+                                    <td className={tdBaseClasses}>
+                                        {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
+                                    </td>
+                                    <td className={tdBaseClasses}>{transaction.description}</td>
+                                    <td className={tdBaseClasses}>
                                         {typeof transaction.category === 'object'
                                             ? transaction.category.name
                                             : t.transactions.uncategorized}
                                     </td>
-                                    <td>
-                                        <S.TypeBadge $type={transaction.type}>
+                                    <td className={tdBaseClasses}>
+                                        <span
+                                            className={cn(
+                                                'inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold',
+                                                transaction.type === 'income'
+                                                    ? 'bg-success/[0.13] text-success'
+                                                    : 'bg-danger/[0.13] text-danger'
+                                            )}
+                                        >
                                             {transaction.type}
-                                        </S.TypeBadge>
+                                        </span>
                                     </td>
-                                    <td>
+                                    <td className={tdBaseClasses}>
                                         {transaction.is_fixed && (
-                                            <S.TypeBadge $type="income">
+                                            <span className="inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold bg-success/[0.13] text-success">
                                                 {t.transactions.fixed}
-                                            </S.TypeBadge>
+                                            </span>
                                         )}
                                     </td>
-                                    <td>
-                                        <S.Amount $type={transaction.type}>
+                                    <td className={tdBaseClasses}>
+                                        <span
+                                            className={cn(
+                                                'font-bold',
+                                                transaction.type === 'income' ? 'text-success' : 'text-danger'
+                                            )}
+                                        >
                                             {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                        </S.Amount>
+                                        </span>
                                     </td>
-                                    <td>
-                                        <S.ActionButtons>
-                                            <S.EditButton
+                                    <td className={tdBaseClasses}>
+                                        <div className="flex gap-2">
+                                            <button
+                                                className="py-[0.3rem] px-[0.65rem] bg-primary text-white border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-opacity duration-200 hover:opacity-85"
                                                 onClick={() => handleEdit(transaction)}
                                                 disabled={isUpdating}
                                             >
                                                 {t.transactions.edit}
-                                            </S.EditButton>
-                                            <S.DeleteButton
+                                            </button>
+                                            <button
+                                                className="py-[0.3rem] px-[0.65rem] bg-gray-300 text-text-primary border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-all duration-200 hover:bg-danger hover:text-white"
                                                 onClick={() => handleDelete(transaction._id)}
                                                 disabled={isDeleting}
                                             >
                                                 {t.transactions.delete}
-                                            </S.DeleteButton>
-                                        </S.ActionButtons>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
-                    </S.ResponsiveTable>
-                </S.TableContainer>
-            </S.TableWrapper>
+                    </table>
+                </div>
+            </div>
         </>
     );
 };

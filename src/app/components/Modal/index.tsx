@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client';
 
 import { Category } from '@/app/hooks/useCategories';
 import { useCurrency } from '@/app/hooks/useCurrency';
 import React, { useEffect, useState } from 'react';
-import { NumberFormatValues } from 'react-number-format';
+import { NumericFormat, NumberFormatValues } from 'react-number-format';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { Transaction } from '../../hooks/useTransactions';
 import { TransactionToEdit } from '../../page';
 import { DateInput } from '../DateInput';
-import * as S from './styles';
+
+const inputClasses =
+    'py-[0.6rem] px-3 text-[0.95rem] border border-gray-300 rounded-lg bg-background text-text-primary transition-colors duration-200 font-[inherit] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]';
 
 interface ModalProps {
     isOpen: boolean;
@@ -63,26 +64,33 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
         : updatedTransaction.category || '';
 
     return (
-        <S.ModalOverlay>
-            <S.ModalContainer>
-                <S.ModalHeader>
-                    <h3>{t.editModal.title}</h3>
-                    <S.CloseButton onClick={onClose}>X</S.CloseButton>
-                </S.ModalHeader>
-                <S.ModalBody>
-                    <S.FormGroup>
-                        <S.Label>{t.editModal.description}</S.Label>
-                        <S.Input
+        <div className="fixed inset-0 w-screen h-screen bg-black/50 flex justify-center items-center z-[200]">
+            <div className="bg-surface p-6 rounded-[14px] w-[420px] max-w-[95%] shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-gray-300">
+                <div className="flex justify-between items-center mb-5">
+                    <h3 className="m-0 text-[1.2rem] text-text-primary">{t.editModal.title}</h3>
+                    <button
+                        className="bg-transparent border-none text-lg cursor-pointer text-text-secondary p-1 hover:text-text-primary"
+                        onClick={onClose}
+                    >
+                        X
+                    </button>
+                </div>
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-[0.3rem]">
+                        <label className="text-[0.85rem] font-semibold text-text-secondary">{t.editModal.description}</label>
+                        <input
+                            className={inputClasses}
                             type="text"
                             name="description"
                             value={updatedTransaction.description}
                             onChange={handleInputChange}
                         />
-                    </S.FormGroup>
+                    </div>
 
-                    <S.FormGroup>
-                        <S.Label>{t.editModal.selectCategory}</S.Label>
-                        <S.Select
+                    <div className="flex flex-col gap-[0.3rem]">
+                        <label className="text-[0.85rem] font-semibold text-text-secondary">{t.editModal.selectCategory}</label>
+                        <select
+                            className={inputClasses}
                             name="category"
                             value={categoryValue}
                             onChange={handleInputChange}
@@ -93,24 +101,26 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                                     {category.name}
                                 </option>
                             ))}
-                        </S.Select>
-                    </S.FormGroup>
+                        </select>
+                    </div>
 
-                    <S.FormGroup>
-                        <S.Label>{t.transactionForm.type}</S.Label>
-                        <S.Select
+                    <div className="flex flex-col gap-[0.3rem]">
+                        <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.type}</label>
+                        <select
+                            className={inputClasses}
                             name="type"
                             value={updatedTransaction.type}
                             onChange={handleInputChange}
                         >
                             <option value="income">{t.editModal.income}</option>
                             <option value="expense">{t.editModal.expense}</option>
-                        </S.Select>
-                    </S.FormGroup>
+                        </select>
+                    </div>
 
-                    <S.FormGroup>
-                        <S.Label>{t.editModal.amount}</S.Label>
-                        <S.StyledNumericFormat
+                    <div className="flex flex-col gap-[0.3rem]">
+                        <label className="text-[0.85rem] font-semibold text-text-secondary">{t.editModal.amount}</label>
+                        <NumericFormat
+                            className={`${inputClasses} w-full`}
                             value={updatedTransaction.amount}
                             onValueChange={handleAmountChange}
                             thousandSeparator={true}
@@ -119,10 +129,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                             fixedDecimalScale={true}
                             allowNegative={false}
                         />
-                    </S.FormGroup>
+                    </div>
 
-                    <S.FormGroup>
-                        <S.Label>{t.transactionForm.date}</S.Label>
+                    <div className="flex flex-col gap-[0.3rem]">
+                        <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.date}</label>
                         <DateInput
                             name="date"
                             value={(() => {
@@ -135,25 +145,35 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
                                 date: new Date(val) as unknown as Date,
                             }))}
                         />
-                    </S.FormGroup>
+                    </div>
 
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: '4px' }}>
+                    <label className="flex items-center gap-2 cursor-pointer mt-1">
                         <input
                             type="checkbox"
                             checked={updatedTransaction.is_fixed || false}
                             onChange={(e) => setUpdatedTransaction(prev => ({ ...prev, is_fixed: e.target.checked }))}
-                            style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                            className="w-[1.2rem] h-[1.2rem] cursor-pointer"
                         />
                         {t.transactionForm.fixedTransaction}
                     </label>
 
-                    <S.ButtonGroup>
-                        <S.SaveButton onClick={handleSave}>{t.editModal.save}</S.SaveButton>
-                        <S.CancelButton onClick={onClose}>{t.editModal.cancel}</S.CancelButton>
-                    </S.ButtonGroup>
-                </S.ModalBody>
-            </S.ModalContainer>
-        </S.ModalOverlay>
+                    <div className="flex gap-3 mt-2">
+                        <button
+                            className="flex-1 py-[0.65rem] text-[0.95rem] font-semibold border-none rounded-lg cursor-pointer transition-opacity duration-200 font-[inherit] bg-primary text-white hover:opacity-85"
+                            onClick={handleSave}
+                        >
+                            {t.editModal.save}
+                        </button>
+                        <button
+                            className="flex-1 py-[0.65rem] text-[0.95rem] font-semibold border-none rounded-lg cursor-pointer transition-opacity duration-200 font-[inherit] bg-gray-300 text-text-primary hover:opacity-85"
+                            onClick={onClose}
+                        >
+                            {t.editModal.cancel}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 

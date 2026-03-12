@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { IoAdd, IoChevronDown } from 'react-icons/io5';
 import { Category } from '../../hooks/useCategories';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from './styles';
+import { cn } from '@/app/lib/cn';
 
 interface CategoryAutocompleteProps {
     readonly categories: Category[];
@@ -95,9 +95,9 @@ export default function CategoryAutocomplete({
     }, [selectedCategory]);
 
     return (
-        <S.Container ref={containerRef}>
-            <S.InputWrapper>
-                <S.SearchInput
+        <div ref={containerRef} className="relative w-full">
+            <div className="relative flex items-center">
+                <input
                     type="text"
                     value={query}
                     onChange={(e) => {
@@ -110,41 +110,53 @@ export default function CategoryAutocomplete({
                         setIsOpen(true);
                     }}
                     placeholder={t.transactionForm.categorySearchPlaceholder}
+                    className="w-full py-[0.6rem] pr-9 pl-3 text-[0.95rem] border border-gray-300 rounded-lg bg-surface text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13] placeholder:text-text-secondary"
                 />
-                <S.ChevronButton
+                <button
                     type="button"
                     onClick={handleChevronClick}
-                    $isOpen={isOpen}
                     aria-label="Toggle category list"
+                    className={cn(
+                        'absolute right-2 flex items-center justify-center bg-transparent border-none cursor-pointer p-[0.2rem] text-text-secondary transition-[transform,color] duration-200 leading-none hover:text-primary',
+                        isOpen && 'rotate-180'
+                    )}
                 >
                     <IoChevronDown size={16} />
-                </S.ChevronButton>
-            </S.InputWrapper>
+                </button>
+            </div>
 
             {isOpen && (
-                <S.Dropdown>
+                <ul className="absolute top-full left-0 right-0 z-50 mt-1 p-0 list-none bg-surface border border-gray-300 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] max-h-[200px] overflow-y-auto">
                     {filtered.map(cat => (
-                        <S.DropdownItem
+                        <li
                             key={cat._id}
-                            $isSelected={cat._id === selectedId}
                             onClick={() => handleSelect(cat)}
+                            className={cn(
+                                'py-[0.55rem] px-3 text-[0.9rem] cursor-pointer text-text-primary hover:bg-gray-200',
+                                cat._id === selectedId ? 'bg-gray-200 font-semibold' : 'bg-transparent font-normal'
+                            )}
                         >
                             {cat.name}
-                        </S.DropdownItem>
+                        </li>
                     ))}
 
                     {showCreateOption && (
-                        <S.CreateItem onClick={handleCreate}>
+                        <li
+                            onClick={handleCreate}
+                            className="py-[0.55rem] px-3 text-[0.9rem] cursor-pointer text-primary font-semibold flex items-center gap-[0.4rem] border-t border-gray-300 hover:bg-gray-200"
+                        >
                             <IoAdd size={16} />
                             {t.transactionForm.createCategory} &quot;{query.trim()}&quot;
-                        </S.CreateItem>
+                        </li>
                     )}
 
                     {filtered.length === 0 && !showCreateOption && (
-                        <S.EmptyItem>{t.categories.noCategoriesFound}</S.EmptyItem>
+                        <li className="py-[0.55rem] px-3 text-[0.85rem] text-text-secondary italic">
+                            {t.categories.noCategoriesFound}
+                        </li>
                     )}
-                </S.Dropdown>
+                </ul>
             )}
-        </S.Container>
+        </div>
     );
 }

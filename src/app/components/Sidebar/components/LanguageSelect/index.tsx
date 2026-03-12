@@ -2,7 +2,6 @@
 
 import { MdLanguage } from 'react-icons/md';
 import { Locale, localeLabels, useTranslation } from '../../../../i18n/LanguageContext';
-import * as S from './styles';
 
 const locales: Locale[] = ['en', 'pt', 'es'];
 
@@ -10,9 +9,10 @@ export const LanguageSelect = () => {
     const { locale, setLocale } = useTranslation();
 
     return (
-        <S.LanguageSelectContainer>
+        <div className="flex items-center gap-1.5 w-full text-text-primary">
             <MdLanguage />
-            <S.Select
+            <select
+                className="flex-1 min-w-0 p-1 border-none text-text-primary text-[0.85rem] bg-transparent cursor-pointer font-[inherit]"
                 value={locale}
                 onChange={(e) => setLocale(e.target.value as Locale)}
             >
@@ -21,7 +21,7 @@ export const LanguageSelect = () => {
                         {localeLabels[loc]}
                     </option>
                 ))}
-            </S.Select>
-        </S.LanguageSelectContainer>
+            </select>
+        </div>
     );
 };

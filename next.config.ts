@@ -2,9 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     output: "standalone",
-    compiler: {
-        styledComponents: true,
-    },
+    compiler: {},
     // Mongoose/MongoDB fora do bundle (evita panic no servidor)
     serverExternalPackages: ["mongoose", "mongodb"],
     experimental: {

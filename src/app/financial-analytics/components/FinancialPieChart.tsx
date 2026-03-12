@@ -12,10 +12,10 @@ import {
     Tooltip,
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
+import { cn } from '@/app/lib/cn';
 import { Transaction, useTransactions } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
 import { useTranslation } from '../../i18n/LanguageContext';
-import * as S from '../styles';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
 
@@ -141,71 +141,71 @@ const FinancialPieChart = ({ month, year, category }: { month: number; year: num
     const monthLabel = new Date(year, month - 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
     if (filtered.length === 0) {
-        return <S.EmptyState>{t.analytics.noTransactions} {monthLabel}</S.EmptyState>;
+        return <div className="text-center py-10 px-4 text-text-secondary text-sm">{t.analytics.noTransactions} {monthLabel}</div>;
     }
 
     return (
         <>
-            <S.ChartCard>
-                <S.PieRow>
+            <div className="bg-surface border border-gray-300 rounded-xl p-5">
+                <div className="flex flex-col gap-6 min-[600px]:flex-row">
                     {incomeByCategory.length > 0 && (
-                        <S.PieBlock>
-                            <S.PieLabel>{t.analytics.income}</S.PieLabel>
-                            <S.PieContainer>
+                        <div className="flex flex-col items-center gap-3 flex-1">
+                            <div className="text-sm font-semibold text-text-secondary uppercase tracking-wide">{t.analytics.income}</div>
+                            <div className="w-[180px] h-[180px] relative">
                                 <Pie data={buildPieData(incomeByCategory, incomeTotal)} options={pieOptions} />
-                            </S.PieContainer>
-                            <S.LegendContainer>
+                            </div>
+                            <div className="flex flex-col gap-1 w-full">
                                 {incomeByCategory.map(([name, amount], i) => (
-                                    <S.LegendItem key={name}>
-                                        <S.ColorBox style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                    <div key={name} className="flex items-center gap-1.5 text-xs text-text-primary">
+                                        <div className="w-2.5 h-2.5 min-w-[10px] rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                                         {name}
-                                        <S.LegendValue>
+                                        <span className="ml-auto font-medium text-text-secondary text-[0.78rem]">
                                             {incomeTotal > 0 ? Math.round((amount / incomeTotal) * 100) : 0}%
-                                        </S.LegendValue>
-                                    </S.LegendItem>
+                                        </span>
+                                    </div>
                                 ))}
-                            </S.LegendContainer>
-                        </S.PieBlock>
+                            </div>
+                        </div>
                     )}
 
                     {expenseByCategory.length > 0 && (
-                        <S.PieBlock>
-                            <S.PieLabel>{t.analytics.expenses}</S.PieLabel>
-                            <S.PieContainer>
+                        <div className="flex flex-col items-center gap-3 flex-1">
+                            <div className="text-sm font-semibold text-text-secondary uppercase tracking-wide">{t.analytics.expenses}</div>
+                            <div className="w-[180px] h-[180px] relative">
                                 <Pie data={buildPieData(expenseByCategory, expenseTotal)} options={pieOptions} />
-                            </S.PieContainer>
-                            <S.LegendContainer>
+                            </div>
+                            <div className="flex flex-col gap-1 w-full">
                                 {expenseByCategory.map(([name, amount], i) => (
-                                    <S.LegendItem key={name}>
-                                        <S.ColorBox style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                                    <div key={name} className="flex items-center gap-1.5 text-xs text-text-primary">
+                                        <div className="w-2.5 h-2.5 min-w-[10px] rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                                         {name}
-                                        <S.LegendValue>
+                                        <span className="ml-auto font-medium text-text-secondary text-[0.78rem]">
                                             {expenseTotal > 0 ? Math.round((amount / expenseTotal) * 100) : 0}%
-                                        </S.LegendValue>
-                                    </S.LegendItem>
+                                        </span>
+                                    </div>
                                 ))}
-                            </S.LegendContainer>
-                        </S.PieBlock>
+                            </div>
+                        </div>
                     )}
-                </S.PieRow>
+                </div>
 
-                <S.TotalsRow>
-                    <S.TotalChip $type="income">
+                <div className="flex gap-4 mt-2">
+                    <div className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-success/[0.09] text-success")}>
                         {t.analytics.income}: ${incomeTotal.toFixed(2)}
-                    </S.TotalChip>
-                    <S.TotalChip $type="expense">
+                    </div>
+                    <div className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-danger/[0.09] text-danger")}>
                         {t.analytics.expenses}: ${expenseTotal.toFixed(2)}
-                    </S.TotalChip>
-                </S.TotalsRow>
-            </S.ChartCard>
+                    </div>
+                </div>
+            </div>
 
             {allExpenseCategories.length > 0 && (
-                <S.ChartCard>
-                    <S.ChartCardTitle>{t.analytics.expensesByCategory}</S.ChartCardTitle>
-                    <S.BarContainer>
+                <div className="bg-surface border border-gray-300 rounded-xl p-5">
+                    <h3 className="text-[0.95rem] font-semibold text-text-primary mt-0 mb-4">{t.analytics.expensesByCategory}</h3>
+                    <div className="w-full h-[260px] relative min-[600px]:h-[300px]">
                         <Bar data={barData} options={barOptions} />
-                    </S.BarContainer>
-                </S.ChartCard>
+                    </div>
+                </div>
             )}
         </>
     );

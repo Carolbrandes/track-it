@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { cn } from '@/app/lib/cn';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useCategories } from '../hooks/useCategories';
 import { useUserData } from '../hooks/useUserData';
 import ComparisonTab from './components/ComparisonTab';
 import MonthAnalysisTab from './components/MonthAnalysisTab';
 import SummaryTab from './components/SummaryTab';
-import * as S from './styles';
 
 type ActiveTab = 'summary' | 'analysis' | 'comparison';
 
@@ -30,56 +30,72 @@ export default function FinancialAnalyticsPage() {
     const categoryFilter = selectedCategory || undefined;
 
     return (
-        <S.PageContainer>
-            <S.Title>{t.analytics.title}</S.Title>
+        <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
+            <h1 className="text-[1.75rem] font-bold text-text-primary mb-5">{t.analytics.title}</h1>
 
-            <S.TabBar>
-                <S.TabButton $active={activeTab === 'summary'} onClick={() => setActiveTab('summary')}>
-                    {t.analytics.tabSummary}
-                </S.TabButton>
-                <S.TabButton $active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')}>
-                    {t.analytics.tabAnalysis}
-                </S.TabButton>
-                <S.TabButton $active={activeTab === 'comparison'} onClick={() => setActiveTab('comparison')}>
-                    {t.analytics.tabComparison}
-                </S.TabButton>
-            </S.TabBar>
+            <div className="flex gap-1 border-b-2 border-gray-300 mb-8">
+                {(['summary', 'analysis', 'comparison'] as const).map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                            'px-5 py-2.5 text-[0.9rem] font-medium bg-transparent border-none border-b-2 -mb-[2px] cursor-pointer transition-colors duration-150 whitespace-nowrap',
+                            activeTab === tab
+                                ? 'font-bold border-primary text-primary'
+                                : 'border-transparent text-text-secondary hover:text-primary'
+                        )}
+                    >
+                        {tab === 'summary' && t.analytics.tabSummary}
+                        {tab === 'analysis' && t.analytics.tabAnalysis}
+                        {tab === 'comparison' && t.analytics.tabComparison}
+                    </button>
+                ))}
+            </div>
 
             {activeTab !== 'comparison' && (
-                <S.FilterContainer>
-                    <S.FilterGroup>
-                        <S.FilterLabel>{t.analytics.month}</S.FilterLabel>
-                        <S.FilterSelect
+                <div className="flex flex-wrap gap-4 mb-8 max-w-[600px]">
+                    <div className="flex flex-col gap-1.5 flex-1">
+                        <label className="text-[0.8rem] font-semibold text-text-secondary uppercase tracking-wide">
+                            {t.analytics.month}
+                        </label>
+                        <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(Number.parseInt(e.target.value))}
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-[0.9rem] bg-surface text-text-primary font-[inherit] transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                         >
                             {months.map((month) => (
                                 <option key={month.value} value={month.value}>
                                     {month.name}
                                 </option>
                             ))}
-                        </S.FilterSelect>
-                    </S.FilterGroup>
+                        </select>
+                    </div>
 
-                    <S.FilterGroup>
-                        <S.FilterLabel>{t.analytics.year}</S.FilterLabel>
-                        <S.FilterSelect
+                    <div className="flex flex-col gap-1.5 flex-1">
+                        <label className="text-[0.8rem] font-semibold text-text-secondary uppercase tracking-wide">
+                            {t.analytics.year}
+                        </label>
+                        <select
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(Number.parseInt(e.target.value))}
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-[0.9rem] bg-surface text-text-primary font-[inherit] transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                         >
                             {years.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>
                             ))}
-                        </S.FilterSelect>
-                    </S.FilterGroup>
+                        </select>
+                    </div>
 
-                    <S.FilterGroup>
-                        <S.FilterLabel>{t.filter.allCategories}</S.FilterLabel>
-                        <S.FilterSelect
+                    <div className="flex flex-col gap-1.5 flex-1">
+                        <label className="text-[0.8rem] font-semibold text-text-secondary uppercase tracking-wide">
+                            {t.filter.allCategories}
+                        </label>
+                        <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-[0.9rem] bg-surface text-text-primary font-[inherit] transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                         >
                             <option value="">{t.filter.allCategories}</option>
                             {categories.map((cat) => (
@@ -87,9 +103,9 @@ export default function FinancialAnalyticsPage() {
                                     {cat.name}
                                 </option>
                             ))}
-                        </S.FilterSelect>
-                    </S.FilterGroup>
-                </S.FilterContainer>
+                        </select>
+                    </div>
+                </div>
             )}
 
             {activeTab === 'summary' && (
@@ -116,6 +132,6 @@ export default function FinancialAnalyticsPage() {
                     years={years}
                 />
             )}
-        </S.PageContainer>
+        </div>
     );
 }

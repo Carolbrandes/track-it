@@ -1,30 +1,6 @@
 'use client';
 
-import styled from 'styled-components';
-
-const StyledDateInput = styled.input`
-  padding: 0.6rem 0.75rem;
-  font-size: 0.95rem;
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.textPrimary};
-  transition: border-color 0.2s;
-  font-family: inherit;
-  width: 100%;
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}22;
-  }
-
-  &::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    opacity: 0.7;
-    filter: ${({ theme }) => theme.colors.text === '#ffffff' || theme.colors.text === '#f1f5f9' ? 'invert(1)' : 'none'};
-  }
-`;
+import { cn } from '@/app/lib/cn';
 
 interface DateInputProps {
     readonly value: string;
@@ -37,14 +13,17 @@ interface DateInputProps {
 
 export function DateInput({ value, onChange, name, placeholder, required, className }: DateInputProps) {
     return (
-        <StyledDateInput
+        <input
             type="date"
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
             name={name}
             placeholder={placeholder}
             required={required}
-            className={className}
+            className={cn(
+                "px-3 py-2.5 text-[0.95rem] border border-gray-300 rounded-lg bg-background text-text-primary transition-[border-color] duration-200 font-[inherit] w-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]",
+                className
+            )}
         />
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 import { format } from 'date-fns';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { NumberFormatValues } from 'react-number-format';
+import { NumericFormat, NumberFormatValues } from 'react-number-format';
 import CategoryAutocomplete from '../../components/CategoryAutocomplete';
 import { DateInput } from '../../components/DateInput';
 import Form, { FormField } from '../../components/Form';
@@ -11,7 +11,6 @@ import { Category, useCategories } from '../../hooks/useCategories';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { useUserData } from '../../hooks/useUserData';
-import * as S from '../styles';
 
 export type TransactionType = Omit<Transaction, '_id' | 'userId'>
 
@@ -134,7 +133,8 @@ export default function TransactionForm({ onAdd }: { onAdd: (transaction: Transa
             required: true,
             placeholder: '0.00',
             component: (
-                <S.StyledNumericFormat
+                <NumericFormat
+                    className="w-full py-2.5 px-3 text-[0.95rem] border border-gray-300 rounded-lg bg-surface text-text-primary font-[inherit] transition-colors duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                     value={amount}
                     onValueChange={handleAmountChange}
                     thousandSeparator={true}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { NumberFormatValues } from 'react-number-format';
+import { NumericFormat, NumberFormatValues } from 'react-number-format';
 import { RiChatDeleteLine } from "react-icons/ri";
 import { TfiFilter } from "react-icons/tfi";
 import { addMonths, endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
@@ -10,7 +10,7 @@ import { useCurrency } from '../../hooks/useCurrency';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { DateInput } from '../DateInput';
-import * as S from './styles';
+import { cn } from '@/app/lib/cn';
 
 interface IFilter {
     description?: { $regex: string; $options: string } | string;
@@ -40,6 +40,9 @@ function getCurrencyConfig(code: string) {
         default:    return { prefix: '$ ', thousandSeparator: ',', decimalSeparator: '.' };
     }
 }
+
+const filterFieldClass =
+    "py-[0.55rem] px-3 rounded-lg text-[0.9rem] w-full bg-surface border border-gray-300 text-text-primary font-[inherit] transition-[border-color] duration-200 placeholder:text-text-secondary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10";
 
 export const Filter = ({ filters, categories = [], handleFilterChange, resetFilters }: FilterProps) => {
     const { isMobile } = useDeviceDetect();
@@ -80,7 +83,6 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
         fireSyntheticChange('endDate', format(endOfMonth(lastMonth), 'yyyy-MM-dd'));
     }, [fireSyntheticChange]);
 
-    // Precompute expected date ranges for each quick filter button (stable per mount day)
     const quickRanges = useMemo(() => {
         const today = new Date();
         const nextMonth = addMonths(today, 1);
@@ -98,19 +100,21 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
         filters.startDate === quickRanges[key].start && filters.endDate === quickRanges[key].end;
 
     const filterContent = () => (
-        <S.FilterForm>
-            <S.FilterColumn>
-                <S.FilterInput
+        <div className="flex flex-col gap-4 mb-6 min-[900px]:grid min-[900px]:grid-cols-2 min-[900px]:items-start">
+            <div className="flex flex-col gap-2.5">
+                <input
                     type="text"
                     name="description"
                     placeholder={t.filter.description}
                     value={String(filters.description) || ''}
                     onChange={handleFilterChange}
+                    className={filterFieldClass}
                 />
-                <S.FilterSelect
+                <select
                     name="category"
                     value={filters.category || ''}
                     onChange={handleFilterChange}
+                    className={filterFieldClass}
                 >
                     <option value="">{t.filter.allCategories}</option>
                     {categories.map(category => (
@@ -118,56 +122,100 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                             {category.name}
                         </option>
                     ))}
-                </S.FilterSelect>
-                <S.FilterSelect
+                </select>
+                <select
                     name="type"
                     value={filters.type || ''}
                     onChange={handleFilterChange}
+                    className={filterFieldClass}
                 >
                     <option value="">{t.filter.allTypes}</option>
                     <option value="income">{t.filter.income}</option>
                     <option value="expense">{t.filter.expense}</option>
-                </S.FilterSelect>
-                <S.QuickFilterRow>
-                    <S.QuickFilterButton type="button" $active={isActive('nextMonth')} onClick={applyNextMonthFilter}>
+                </select>
+                <div className="flex flex-wrap gap-[0.4rem]">
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('nextMonth') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={applyNextMonthFilter}
+                    >
                         {t.filter.nextMonth}
-                    </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" $active={isActive('thisMonth')} onClick={() => applyQuickDateFilter(0)}>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('thisMonth') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={() => applyQuickDateFilter(0)}
+                    >
                         {t.filter.thisMonth}
-                    </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" $active={isActive('lastMonth')} onClick={applyLastMonthFilter}>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('lastMonth') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={applyLastMonthFilter}
+                    >
                         {t.filter.lastMonth}
-                    </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" $active={isActive('last3Months')} onClick={() => applyQuickDateFilter(2)}>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('last3Months') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={() => applyQuickDateFilter(2)}
+                    >
                         {t.filter.last3Months}
-                    </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" $active={isActive('last6Months')} onClick={() => applyQuickDateFilter(5)}>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('last6Months') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={() => applyQuickDateFilter(5)}
+                    >
                         {t.filter.last6Months}
-                    </S.QuickFilterButton>
-                    <S.QuickFilterButton type="button" $active={isActive('lastYear')} onClick={() => applyQuickDateFilter(11)}>
+                    </button>
+                    <button
+                        type="button"
+                        className={cn(
+                            "border border-primary py-[0.3rem] px-[0.65rem] rounded-full text-[0.78rem] font-[inherit] cursor-pointer whitespace-nowrap transition-all duration-150 hover:bg-primary hover:text-white",
+                            isActive('lastYear') ? "bg-primary text-white font-semibold" : "bg-transparent text-primary font-medium"
+                        )}
+                        onClick={() => applyQuickDateFilter(11)}
+                    >
                         {t.filter.lastYear}
-                    </S.QuickFilterButton>
-                </S.QuickFilterRow>
-                <S.DateFieldWrapper>
-                    <S.DateLabel>{t.filter.startDate}</S.DateLabel>
+                    </button>
+                </div>
+                <div className="flex flex-col gap-[0.2rem]">
+                    <span className="text-xs font-medium text-text-secondary">{t.filter.startDate}</span>
                     <DateInput
                         name="startDate"
                         value={String(filters.startDate || '')}
                         onChange={(val) => handleFilterChange({ target: { name: 'startDate', value: val } } as any)}
                     />
-                </S.DateFieldWrapper>
-                <S.DateFieldWrapper>
-                    <S.DateLabel>{t.filter.endDate}</S.DateLabel>
+                </div>
+                <div className="flex flex-col gap-[0.2rem]">
+                    <span className="text-xs font-medium text-text-secondary">{t.filter.endDate}</span>
                     <DateInput
                         name="endDate"
                         value={String(filters.endDate || '')}
                         onChange={(val) => handleFilterChange({ target: { name: 'endDate', value: val } } as any)}
                     />
-                </S.DateFieldWrapper>
-            </S.FilterColumn>
+                </div>
+            </div>
 
-            <S.FilterColumn>
-                <S.FilterNumericFormat
+            <div className="flex flex-col gap-2.5">
+                <NumericFormat
+                    className={filterFieldClass}
                     placeholder={t.filter.minAmount}
                     value={filters.minAmount || ''}
                     onValueChange={handleAmountChange('minAmount')}
@@ -177,7 +225,8 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     decimalScale={2}
                     allowNegative={false}
                 />
-                <S.FilterNumericFormat
+                <NumericFormat
+                    className={filterFieldClass}
                     placeholder={t.filter.maxAmount}
                     value={filters.maxAmount || ''}
                     onValueChange={handleAmountChange('maxAmount')}
@@ -187,39 +236,51 @@ export const Filter = ({ filters, categories = [], handleFilterChange, resetFilt
                     decimalScale={2}
                     allowNegative={false}
                 />
-            </S.FilterColumn>
+            </div>
 
-            <S.FilterBottomRow>
-                <S.CheckboxLabel>
+            <div className="flex items-center gap-4 flex-wrap min-[900px]:col-span-full">
+                <label className="flex items-center gap-2 text-[0.9rem] cursor-pointer whitespace-nowrap text-text-primary">
                     <input
                         type="checkbox"
+                        className="w-[1.1rem] h-[1.1rem] cursor-pointer accent-primary"
                         checked={filters.isFixed === 'true'}
                         onChange={(e) => handleFilterChange({
                             target: { name: 'isFixed', value: e.target.checked ? 'true' : '' },
                         } as React.ChangeEvent<HTMLInputElement>)}
                     />
                     {t.filter.fixedOnly}
-                </S.CheckboxLabel>
-                <S.ResetButton onClick={resetFilters}>{t.filter.resetFilters}</S.ResetButton>
-            </S.FilterBottomRow>
-        </S.FilterForm>
+                </label>
+                <button
+                    className="bg-transparent text-primary border border-primary py-2 px-4 text-[0.85rem] cursor-pointer rounded-lg transition-all duration-200 whitespace-nowrap font-[inherit] hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={resetFilters}
+                >
+                    {t.filter.resetFilters}
+                </button>
+            </div>
+        </div>
     );
 
     return isMobile ? (
-        <S.FilterContainer>
-            <div className="filterButtonContainer">
-                <button onClick={() => setShowFilters(true)}>
+        <div>
+            <div className="flex justify-end gap-4 mb-8">
+                <button
+                    className="bg-transparent border border-primary h-8 w-8 rounded-lg text-primary"
+                    onClick={() => setShowFilters(true)}
+                >
                     <TfiFilter />
                 </button>
 
                 {showFilters && (
-                    <button onClick={() => setShowFilters(false)}>
+                    <button
+                        className="bg-transparent border border-primary h-8 w-8 rounded-lg text-primary"
+                        onClick={() => setShowFilters(false)}
+                    >
                         <RiChatDeleteLine />
                     </button>
                 )}
             </div>
             {showFilters && filterContent()}
-        </S.FilterContainer>
+        </div>
     ) : (
         filterContent()
     );

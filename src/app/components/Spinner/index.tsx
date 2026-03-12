@@ -1,7 +1,5 @@
 'use client'
 
-import * as S from './styles';
-
 interface SpinnerProps {
     fullPage?: boolean;
 }
@@ -9,11 +7,11 @@ interface SpinnerProps {
 export const Spinner = ({ fullPage = false }: SpinnerProps) => {
     if (fullPage) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <S.Spinner />
+            <div className="flex justify-center items-center h-screen">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             </div>
         );
     }
 
-    return <S.Spinner />;
+    return <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />;
 };

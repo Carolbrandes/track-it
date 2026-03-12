@@ -5,7 +5,6 @@ import { TfiMoney } from "react-icons/tfi";
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useUserData } from '../../../../hooks/useUserData';
 import { useTranslation } from '../../../../i18n/LanguageContext';
-import * as S from './styles';
 
 export const CurrencySelect = () => {
     const { currencies, selectedCurrencyCode, userLoading } = useCurrency();
@@ -65,9 +64,10 @@ export const CurrencySelect = () => {
     }
 
     return (
-        <S.CurrencySelect>
+        <div className="flex items-center gap-1.5 w-full text-text-primary">
             <TfiMoney />
             <select
+                className="flex-1 min-w-0 p-1 border-none text-text-primary text-[0.85rem] bg-transparent cursor-pointer font-[inherit]"
                 value={selectedCurrency}
                 onChange={handleCurrencyChange}
                 disabled={isUpdating}
@@ -79,7 +79,7 @@ export const CurrencySelect = () => {
                     </option>
                 ))}
             </select>
-            {isUpdating && <span>{t.currency.updating}</span>}
-        </S.CurrencySelect>
+            {isUpdating && <span className="text-[0.8rem] text-text-secondary">{t.currency.updating}</span>}
+        </div>
     );
 };

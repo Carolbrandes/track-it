@@ -6,8 +6,8 @@ import { FiCamera, FiCheck } from 'react-icons/fi';
 import type { ParsedReceipt, ReceiptItem } from '@/app/actions/parseReceipt';
 import { Category } from '@/app/hooks/useCategories';
 import { useTranslation } from '@/app/i18n/LanguageContext';
+import { cn } from '@/app/lib/cn';
 import CategoryAutocomplete from '../CategoryAutocomplete';
-import * as S from './styles';
 
 type SaveMode = 'items' | 'total';
 
@@ -162,7 +162,7 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     setTotalDescription(result.data.storeName || '');
                     setEditedItems([...result.data.items]);
 
-                    const allIndexes = new Set<number>(result.data.items.map((_, i) => i));
+                    const allIndexes = new Set<number>(result.data.items.map((_: ReceiptItem, i: number) => i));
                     setSelectedItems(allIndexes);
 
                     const matchedId = findBestCategoryMatch(result.data.suggestedCategory, categories);
@@ -275,23 +275,45 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
     if (!isOpen) return null;
 
+    const typeButtonClasses = (active: boolean, variant: 'expense' | 'income') => {
+        const color = variant === 'expense' ? 'danger' : 'success';
+        return cn(
+            'flex-1 py-2 px-3 rounded-lg text-[0.85rem] font-medium cursor-pointer transition-all duration-200',
+            active
+                ? variant === 'expense'
+                    ? 'border border-danger bg-danger/[0.08] text-danger'
+                    : 'border border-success bg-success/[0.08] text-success'
+                : 'border border-gray-300 bg-transparent text-text-secondary',
+            !active && (color === 'danger' ? 'hover:border-danger' : 'hover:border-success')
+        );
+    };
+
     return (
-        <S.Overlay>
-            <S.Container>
-                <S.Header>
-                    <h3>
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black/50 flex justify-center items-center z-[200]">
+            <div className="bg-surface rounded-[14px] w-[520px] max-w-[95%] max-h-[90vh] overflow-y-auto shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-gray-300">
+                <div className="flex justify-between items-center px-6 py-5 border-b border-gray-300">
+                    <h3 className="m-0 text-[1.15rem] text-text-primary flex items-center gap-2">
                         <FiCamera size={20} />
                         {scan.title}
                     </h3>
-                    <S.CloseButton onClick={handleClose}>✕</S.CloseButton>
-                </S.Header>
+                    <button
+                        onClick={handleClose}
+                        className="bg-transparent border-none text-lg cursor-pointer text-text-secondary p-1 hover:text-text-primary"
+                    >
+                        ✕
+                    </button>
+                </div>
 
-                <S.Body>
-                    {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+                <div className="p-6 flex flex-col gap-4">
+                    {error && (
+                        <div className="text-danger text-[0.85rem] py-2 px-3 bg-danger/[0.07] rounded-lg border border-danger/20">
+                            {error}
+                        </div>
+                    )}
 
                     {step === 'upload' && (
                         <>
-                            <S.UploadArea>
+                            <label className="flex flex-col items-center justify-center gap-3 py-10 px-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer transition-all duration-200 text-text-secondary bg-background hover:border-primary hover:text-primary hover:bg-primary/[0.03] [&>input]:hidden">
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -299,110 +321,137 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                                     capture="environment"
                                     onChange={handleFileChange}
                                 />
-                                <S.UploadIcon>
+                                <div className="flex items-center justify-center w-14 h-14 rounded-full bg-primary/[0.08] text-primary">
                                     <FiCamera size={24} />
-                                </S.UploadIcon>
-                                <S.UploadText>{scan.uploadText}</S.UploadText>
-                                <S.UploadHint>{scan.uploadHint}</S.UploadHint>
-                            </S.UploadArea>
+                                </div>
+                                <span className="text-[0.9rem] font-medium text-center">{scan.uploadText}</span>
+                                <span className="text-[0.78rem] text-text-secondary">{scan.uploadHint}</span>
+                            </label>
 
-                            <S.ButtonGroup>
-                                <S.SecondaryButton onClick={handleClose}>
+                            <div className="flex gap-3 mt-1">
+                                <button
+                                    onClick={handleClose}
+                                    className="flex-1 py-[0.65rem] text-[0.95rem] font-semibold border-none rounded-lg cursor-pointer transition-opacity duration-200 bg-gray-300 text-text-primary hover:opacity-85"
+                                >
                                     {t.editModal.cancel}
-                                </S.SecondaryButton>
-                            </S.ButtonGroup>
+                                </button>
+                            </div>
                         </>
                     )}
 
                     {step === 'processing' && (
-                        <S.ProcessingWrapper>
-                            <S.Spinner />
+                        <div className="flex flex-col items-center gap-4 p-8 text-text-secondary">
+                            <div className="w-10 h-10 border-[3px] border-gray-300 border-t-primary rounded-full animate-spin" />
                             <span>{scan.processing}</span>
-                            {preview && <S.PreviewImage src={preview} alt="Receipt" />}
-                        </S.ProcessingWrapper>
+                            {preview && (
+                                <img
+                                    src={preview}
+                                    alt="Receipt"
+                                    className="max-w-full max-h-[200px] object-contain rounded-lg border border-gray-300"
+                                />
+                            )}
+                        </div>
                     )}
 
                     {step === 'review' && receipt && (
                         <>
-                            {preview && <S.PreviewImage src={preview} alt="Receipt" />}
+                            {preview && (
+                                <img
+                                    src={preview}
+                                    alt="Receipt"
+                                    className="max-w-full max-h-[200px] object-contain rounded-lg border border-gray-300"
+                                />
+                            )}
 
-                            <S.ReceiptInfo>
-                                <S.ReceiptStoreName>{receipt.storeName}</S.ReceiptStoreName>
-                                <S.ReceiptDate>{receipt.date}</S.ReceiptDate>
-                                <S.ReceiptTotal>
+                            <div className="flex flex-col gap-1 p-3 bg-background rounded-lg border border-gray-300">
+                                <div className="font-semibold text-[0.95rem] text-text-primary">{receipt.storeName}</div>
+                                <div className="text-[0.82rem] text-text-secondary">{receipt.date}</div>
+                                <div className="text-[0.9rem] font-semibold text-primary mt-1">
                                     Total: {currencyToUse} {receipt.total.toFixed(2)}
-                                </S.ReceiptTotal>
+                                </div>
                                 {receipt.suggestedCategory && (
-                                    <S.SuggestedCategory>
+                                    <div className="text-[0.8rem] text-text-secondary mt-[0.15rem] italic">
                                         {scan.suggestedCategory}: {receipt.suggestedCategory}
-                                    </S.SuggestedCategory>
+                                    </div>
                                 )}
-                            </S.ReceiptInfo>
+                            </div>
 
-                            <S.FormRow>
-                                <S.FormLabel>{t.transactionForm.date}</S.FormLabel>
-                                <S.EditableInput
+                            <div className="flex flex-col gap-[0.3rem]">
+                                <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.date}</label>
+                                <input
                                     type="date"
                                     value={transactionDate}
                                     onChange={(e) => setTransactionDate(e.target.value)}
+                                    className="py-[0.55rem] px-3 text-[0.9rem] border border-gray-300 rounded-lg bg-background text-text-primary transition-[border-color] duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                                 />
-                            </S.FormRow>
+                            </div>
 
-                            <S.FormRow>
-                                <S.FormLabel>{t.transactionForm.type}</S.FormLabel>
-                                <S.TypeToggle>
-                                    <S.TypeButton
-                                        $active={transactionType === 'expense'}
-                                        $variant="expense"
+                            <div className="flex flex-col gap-[0.3rem]">
+                                <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.type}</label>
+                                <div className="flex gap-2">
+                                    <button
+                                        className={typeButtonClasses(transactionType === 'expense', 'expense')}
                                         onClick={() => setTransactionType('expense')}
                                     >
                                         {t.transactions.expense}
-                                    </S.TypeButton>
-                                    <S.TypeButton
-                                        $active={transactionType === 'income'}
-                                        $variant="income"
+                                    </button>
+                                    <button
+                                        className={typeButtonClasses(transactionType === 'income', 'income')}
                                         onClick={() => setTransactionType('income')}
                                     >
                                         {t.transactions.income}
-                                    </S.TypeButton>
-                                </S.TypeToggle>
-                            </S.FormRow>
+                                    </button>
+                                </div>
+                            </div>
 
                             {receipt.items.length > 1 && (
-                                <S.ModeSelector>
-                                    <S.ModeLabel>{scan.saveAs}</S.ModeLabel>
-                                    <S.ModeOptions>
-                                        <S.ModeButton
-                                            $active={mode === 'total'}
+                                <div className="flex flex-col gap-2">
+                                    <div className="text-[0.85rem] font-semibold text-text-secondary uppercase tracking-[0.3px]">
+                                        {scan.saveAs}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            className={cn(
+                                                'flex-1 py-[0.6rem] px-3 rounded-lg text-[0.85rem] font-medium cursor-pointer transition-all duration-200 hover:border-primary',
+                                                mode === 'total'
+                                                    ? 'border border-primary bg-primary/[0.08] text-primary'
+                                                    : 'border border-gray-300 bg-transparent text-text-secondary'
+                                            )}
                                             onClick={() => setMode('total')}
                                         >
                                             {scan.modeTotal}
-                                        </S.ModeButton>
-                                        <S.ModeButton
-                                            $active={mode === 'items'}
+                                        </button>
+                                        <button
+                                            className={cn(
+                                                'flex-1 py-[0.6rem] px-3 rounded-lg text-[0.85rem] font-medium cursor-pointer transition-all duration-200 hover:border-primary',
+                                                mode === 'items'
+                                                    ? 'border border-primary bg-primary/[0.08] text-primary'
+                                                    : 'border border-gray-300 bg-transparent text-text-secondary'
+                                            )}
                                             onClick={() => setMode('items')}
                                         >
                                             {scan.modeItems}
-                                        </S.ModeButton>
-                                    </S.ModeOptions>
-                                </S.ModeSelector>
+                                        </button>
+                                    </div>
+                                </div>
                             )}
 
                             {mode === 'total' && (
-                                <S.FormRow>
-                                    <S.FormLabel>{t.transactionForm.description}</S.FormLabel>
-                                    <S.EditableInput
+                                <div className="flex flex-col gap-[0.3rem]">
+                                    <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.description}</label>
+                                    <input
                                         type="text"
                                         value={totalDescription}
                                         onChange={(e) => setTotalDescription(e.target.value)}
                                         placeholder={scan.receiptPurchase}
+                                        className="py-[0.55rem] px-3 text-[0.9rem] border border-gray-300 rounded-lg bg-background text-text-primary transition-[border-color] duration-200 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/[0.13]"
                                     />
-                                </S.FormRow>
+                                </div>
                             )}
 
                             {mode === 'items' && (
                                 <>
-                                    <S.SelectedCount>
+                                    <div className="text-[0.82rem] text-text-secondary text-center">
                                         {scan.selectedCount
                                             .replace('{selected}', String(selectedItems.size))
                                             .replace('{total}', String(receipt.items.length))}
@@ -410,79 +459,97 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                                         <button
                                             type="button"
                                             onClick={toggleAllItems}
-                                            style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer', padding: 0, font: 'inherit', fontSize: 'inherit' }}
+                                            className="bg-transparent border-none text-inherit underline cursor-pointer p-0 font-[inherit] text-[inherit]"
                                         >
                                             {selectedItems.size === receipt.items.length
                                                 ? scan.deselectAll
                                                 : scan.selectAll}
                                         </button>
-                                    </S.SelectedCount>
+                                    </div>
 
-                                    <S.ItemsList>
+                                    <div className="flex flex-col gap-2">
                                         {editedItems.map((item, i) => (
-                                            <S.ItemCard
+                                            <div
                                                 key={`${i}-${item.amount}`}
-                                                $selected={selectedItems.has(i)}
+                                                className={cn(
+                                                    'flex items-center gap-3 py-[0.6rem] px-3 rounded-lg cursor-pointer transition-all duration-150 hover:border-primary',
+                                                    selectedItems.has(i)
+                                                        ? 'border border-primary bg-primary/[0.04]'
+                                                        : 'border border-gray-300 bg-transparent'
+                                                )}
                                             >
-                                                <S.ItemCheckbox
-                                                    $checked={selectedItems.has(i)}
+                                                <div
                                                     onClick={() => toggleItem(i)}
+                                                    className={cn(
+                                                        'w-5 h-5 min-w-[20px] rounded border-2 flex items-center justify-center text-white text-xs transition-all duration-150',
+                                                        selectedItems.has(i)
+                                                            ? 'border-primary bg-primary'
+                                                            : 'border-gray-300 bg-transparent'
+                                                    )}
                                                 >
                                                     {selectedItems.has(i) ? <FiCheck size={14} /> : null}
-                                                </S.ItemCheckbox>
-                                                <S.ItemDetails>
-                                                    <S.ItemEditableInput
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <input
                                                         type="text"
                                                         value={item.description}
                                                         onChange={(e) => updateItemDescription(i, e.target.value)}
                                                         onClick={(e) => e.stopPropagation()}
+                                                        className="w-full py-1 px-[0.4rem] text-[0.85rem] border border-transparent rounded bg-transparent text-text-primary transition-all duration-150 hover:border-gray-300 hover:bg-background focus:outline-none focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/[0.13]"
                                                     />
                                                     {item.quantity != null && item.quantity > 1 && (
-                                                        <S.ItemQuantity>x{item.quantity}</S.ItemQuantity>
+                                                        <span className="text-[0.75rem] text-text-secondary">x{item.quantity}</span>
                                                     )}
-                                                </S.ItemDetails>
-                                                <S.ItemAmount>
+                                                </div>
+                                                <div className="text-[0.88rem] font-semibold text-text-primary whitespace-nowrap">
                                                     {currencyToUse} {(item.amount * (item.quantity || 1)).toFixed(2)}
-                                                </S.ItemAmount>
-                                            </S.ItemCard>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </S.ItemsList>
+                                    </div>
                                 </>
                             )}
 
-                            <S.FormRow>
-                                <S.FormLabel>{t.transactionForm.category}</S.FormLabel>
+                            <div className="flex flex-col gap-[0.3rem]">
+                                <label className="text-[0.85rem] font-semibold text-text-secondary">{t.transactionForm.category}</label>
                                 <CategoryAutocomplete
                                     categories={categories}
                                     selectedId={categoryId}
                                     onSelect={(id) => setCategoryId(id)}
                                     onCreateNew={handleCreateCategory}
                                 />
-                            </S.FormRow>
+                            </div>
 
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                            <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={isFixed}
                                     onChange={(e) => setIsFixed(e.target.checked)}
-                                    style={{ width: '1.1rem', height: '1.1rem', cursor: 'pointer' }}
+                                    className="w-[1.1rem] h-[1.1rem] cursor-pointer"
                                 />
                                 {t.transactionForm.fixedTransaction}
                             </label>
 
-                            <S.ButtonGroup>
-                                <S.PrimaryButton onClick={handleSave} disabled={isSaving}>
+                            <div className="flex gap-3 mt-1">
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="flex-1 py-[0.65rem] text-[0.95rem] font-semibold border-none rounded-lg cursor-pointer transition-opacity duration-200 bg-primary text-white hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
                                     {isSaving ? t.common.processing : scan.saveButton}
-                                </S.PrimaryButton>
-                                <S.SecondaryButton onClick={() => { reset(); }}>
+                                </button>
+                                <button
+                                    onClick={() => { reset(); }}
+                                    className="flex-1 py-[0.65rem] text-[0.95rem] font-semibold border-none rounded-lg cursor-pointer transition-opacity duration-200 bg-gray-300 text-text-primary hover:opacity-85"
+                                >
                                     {scan.scanAnother}
-                                </S.SecondaryButton>
-                            </S.ButtonGroup>
+                                </button>
+                            </div>
                         </>
                     )}
-                </S.Body>
-            </S.Container>
-        </S.Overlay>
+                </div>
+            </div>
+        </div>
     );
 };
 
