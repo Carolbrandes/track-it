@@ -30,8 +30,8 @@ const transactionSchema = new mongoose.Schema({
   category: mongoose.Schema.Types.Mixed,
 }, { strict: false });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
-const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
+const User = (mongoose.models.User || mongoose.model('User', userSchema)) as mongoose.Model<any>;
+const Transaction = (mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema)) as mongoose.Model<any>;
 
 async function listData() {
   try {
