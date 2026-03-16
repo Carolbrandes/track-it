@@ -214,3 +214,42 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        await db();
+        const authToken = await getAuthToken();
+        if (!authToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { payload } = await jwtVerify(authToken, new TextEncoder().encode(process.env.JWT_SECRET!));
+        const userId = payload.userId;
+
+        const body = await request.json();
+        const { ids } = body;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return NextResponse.json({ error: 'Invalid or empty IDs array' }, { status: 400 });
+        }
+
+        const result = await Transaction.deleteMany({
+            _id: { $in: ids },
+            userId // Ensure user owns the transactions
+        });
+
+        await invalidateInsightsCache(userId as string);
+
+        return NextResponse.json({
+            message: 'Transactions deleted successfully',
+            count: result.deletedCount
+        });
+    } catch (error: unknown) {
+        let errorMessage = 'Failed on operation';
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+}

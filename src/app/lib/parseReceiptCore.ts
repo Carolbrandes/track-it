@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { sanitizeReceiptItems, RawReceiptItem } from './receiptSanitizer';
 
 export interface ReceiptItem {
     description: string;
@@ -53,18 +54,26 @@ RESPONDA EXCLUSIVAMENTE em ${language}.
 Extraia as seguintes informações:
 1. Nome do estabelecimento (storeName)
 2. Data da compra no formato YYYY-MM-DD (date)
-3. Lista de itens individuais (items) — CADA item deve ter o nome ESPECÍFICO do produto/serviço (ex: "Arroz 5kg", "Coca-Cola 2L", "Pão Francês"), NUNCA use o nome da loja como descrição do item
+3. Lista de itens individuais (items) — Para CADA item, extraia:
+   - "description": nome ESPECÍFICO do produto/serviço (ex: "Arroz 5kg", "Coca-Cola 2L"). NUNCA use o nome da loja.
+   - "quantity": quantidade do item (número). Se não especificado, assuma 1.
+   - "unitPrice": preço unitário do item.
+   - "totalLinePrice": preço total da linha (quantidade * preço unitário).
+
+   REGRA CRÍTICA PARA ITENS:
+   - Se a nota mostrar apenas o valor acumulado para múltiplos itens (ex: 5 leites por 31.250 total), coloque esse valor em 'totalLinePrice' e calcule o 'unitPrice' (total / quantidade).
+
 4. Valor total (total)
 5. Tipo: "expense" se é um gasto/compra, "income" se é um recebimento/depósito/transferência recebida/salário
 6. Categoria sugerida (suggestedCategory) — baseada no CONTEÚDO real do comprovante. Exemplos: compra de supermercado = "Mercado", depósito bancário = "Depósito", transferência recebida = "Transferência", restaurante = "Alimentação", farmácia = "Saúde"
-7. Moeda (currency) — código ISO: R$ = "BRL", $ (contexto americano) = "USD", € = "EUR"
+7. Moeda (currency) — código ISO: R$ = "BRL", $ (contexto americano) = "USD", € = "EUR", Gs = "PYG"
 ${categoriesHint}
 
 REGRAS IMPORTANTES:
 - A "description" de cada item deve ser o NOME DO PRODUTO, NUNCA o nome da loja/estabelecimento
 - Se o comprovante for um depósito, transferência recebida ou pagamento recebido, o type deve ser "income"
 - Se o comprovante for uma compra, pagamento ou saque, o type deve ser "expense"
-- Se não houver itens individuais (ex: depósito), crie um único item com a descrição do que é (ex: "Depósito bancário")
+- Se não houver itens individuais (ex: depósito), crie um único item com a descrição do que é (ex: "Depósito bancário") e unitPrice = valor total.
 - A data deve estar no formato YYYY-MM-DD. Se não encontrar, use a data de hoje
 - Valores devem ser numéricos (sem símbolo de moeda)
 - Se a imagem não for um comprovante/recibo válido, retorne: {"error": "NOT_A_RECEIPT"}
@@ -74,7 +83,12 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
   "storeName": "Nome do Estabelecimento",
   "date": "2025-01-15",
   "items": [
-    { "description": "Nome específico do produto ou serviço", "amount": 10.50, "quantity": 1 }
+    { 
+      "description": "Nome específico do produto ou serviço", 
+      "quantity": 1,
+      "unitPrice": 10.50,
+      "totalLinePrice": 10.50
+    }
   ],
   "total": 150.00,
   "type": "expense",
@@ -136,16 +150,27 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
         }
 
         // Build a plain object to avoid any circular refs or non-JSON-serializable data (e.g. "Maximum array nesting" / serialization errors)
-        const items = Array.isArray(parsed.items)
+        const currency = typeof parsed.currency === 'string' ? parsed.currency : String(parsed.currency ?? 'BRL');
+        
+        const rawItems: RawReceiptItem[] = Array.isArray(parsed.items)
             ? (parsed.items as unknown[]).map((it: unknown) => {
                 const o = it && typeof it === 'object' ? it as Record<string, unknown> : {};
+                // If the AI returns 'amount' (old prompt style), map it to unitPrice or totalLinePrice depending on logic,
+                // but since we updated the prompt, we expect unitPrice/totalLinePrice.
+                // Fallback: if unitPrice missing but amount present, use amount.
+                const unitPrice = typeof o.unitPrice === 'number' ? o.unitPrice : (Number(o.amount) || 0);
+                
                 return {
                     description: typeof o.description === 'string' ? o.description : String(o.description ?? ''),
-                    amount: Number(o.amount) || 0,
-                    quantity: typeof o.quantity === 'number' ? o.quantity : undefined,
+                    quantity: typeof o.quantity === 'number' ? o.quantity : 1,
+                    unitPrice: unitPrice,
+                    totalLinePrice: typeof o.totalLinePrice === 'number' ? o.totalLinePrice : 0,
                 };
             })
             : [];
+
+        const items = sanitizeReceiptItems(rawItems, currency);
+
         const data: ParsedReceipt = {
             storeName: typeof parsed.storeName === 'string' ? parsed.storeName : String(parsed.storeName ?? ''),
             date: typeof parsed.date === 'string' ? parsed.date : String(parsed.date ?? ''),
@@ -153,7 +178,7 @@ RETORNE EXCLUSIVAMENTE um JSON válido (sem markdown, sem backticks):
             total: Number(parsed.total) || 0,
             type: parsed.type === 'income' ? 'income' : 'expense',
             suggestedCategory: typeof parsed.suggestedCategory === 'string' ? parsed.suggestedCategory : String(parsed.suggestedCategory ?? ''),
-            currency: typeof parsed.currency === 'string' ? parsed.currency : String(parsed.currency ?? 'BRL'),
+            currency,
         };
         return { success: true, data };
     } catch (error) {

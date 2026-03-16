@@ -5,6 +5,7 @@ import User from '../../../../models/User';
 import dbConnect from '../../../lib/db';
 import { isPlayStoreReviewLogin } from '../../../lib/playstore-review-account';
 import { formatZodError, verifyCodeSchema } from '../../../lib/validations';
+import { seedCategories } from '../../../lib/seed';
 
 const DEFAULT_CURRENCY_ID = new mongoose.Types.ObjectId('67e12322a2f7b8353bceb3f6');
 
@@ -33,6 +34,10 @@ export async function POST(req: Request) {
                 currencyId: DEFAULT_CURRENCY_ID,
             });
         }
+        
+        // Seed categories for play store account if needed
+        await seedCategories(user._id);
+
         const token = await new SignJWT({ userId: user._id.toString() })
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime('7d')
@@ -74,6 +79,9 @@ export async function POST(req: Request) {
 
     // Limpar o código de verificação após a validação
     await User.findByIdAndUpdate(user._id, { $unset: { verificationCode: 1 } });
+
+    // Seed default categories if needed
+    await seedCategories(user._id);
 
     // Gerar o token JWT
     const token = await new SignJWT({ userId: user._id.toString() })

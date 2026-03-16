@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dbConnect from './db';
-import InsightsCache from '@/models/InsightsCache';
+import InsightsCache from '../../models/InsightsCache';
 
 /**
  * Remove o cache de insights do usuário. Chamar após criar/editar/remover

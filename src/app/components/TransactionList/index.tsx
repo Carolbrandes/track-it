@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiSettings } from 'react-icons/fi';
 import { cn } from '@/app/lib/cn';
 import { useDateFormat } from '../../contexts/DateFormatContext';
 import { useCurrency } from '../../hooks/useCurrency';
@@ -13,8 +13,10 @@ interface TransactionListProps {
     transactions: Transaction[];
     handleEdit: (transaction: Transaction) => void;
     handleDelete: (id: string) => void;
+    handleBulkDelete: (ids: string[]) => Promise<void>;
     isUpdating: boolean;
     isDeleting: boolean;
+    isBulkDeleting: boolean;
 }
 
 type SortKey = 'date' | 'description' | 'category' | 'amount';
@@ -40,7 +42,7 @@ function SortIcon({ columnKey, sortKey, sortDir }: Readonly<{ columnKey: SortKey
         : <FiChevronDown size={14} />;
 }
 
-export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEdit, handleDelete }: TransactionListProps) => {
+export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDeleting, handleEdit, handleDelete, handleBulkDelete }: TransactionListProps) => {
     const { selectedCurrencyCode } = useCurrency();
     const { t, locale } = useTranslation();
     const { formatDate } = useDateFormat();
@@ -48,6 +50,8 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
     const [sortKey, setSortKey] = useState<SortKey>('date');
     const [sortDir, setSortDir] = useState<SortDir>('desc');
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
     const toggleExpanded = (id: string) => {
         setExpandedIds((prev) => {
@@ -90,43 +94,168 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
         return copy;
     }, [transactions, sortKey, sortDir, locale]);
 
+    const toggleSelection = (id: string) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === sorted.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(sorted.map(t => t._id)));
+        }
+    };
+
+    const executeBulkDelete = async () => {
+        if (selectedIds.size === 0) return;
+        
+        const confirmMessage = t.transactions.confirmDeleteSelected 
+            ? t.transactions.confirmDeleteSelected.replace('{count}', String(selectedIds.size))
+            : `Are you sure you want to delete ${selectedIds.size} transactions?`;
+
+        if (window.confirm(confirmMessage)) {
+            await handleBulkDelete(Array.from(selectedIds));
+            setSelectedIds(new Set());
+            setIsSelectionMode(false);
+        }
+    };
+
+    const executeDeleteAll = async () => {
+        if (sorted.length === 0) return;
+
+        const confirmMessage = t.transactions.confirmDeleteAll 
+            ? t.transactions.confirmDeleteAll
+            : `Are you sure you want to delete ALL ${sorted.length} visible transactions?`;
+
+        if (window.confirm(confirmMessage)) {
+            await handleBulkDelete(sorted.map(t => t._id));
+            setSelectedIds(new Set());
+            setIsSelectionMode(false);
+        }
+    };
+
     return (
         <>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-text-primary m-0">
+                    {t.transactions.listTitle || 'Transactions'}
+                </h2>
+                <div className="flex gap-2">
+                    <button
+                        onClick={executeDeleteAll}
+                        disabled={isBulkDeleting || sorted.length === 0}
+                        className="px-3 py-1.5 text-sm font-medium text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-colors disabled:opacity-50"
+                    >
+                        {t.transactions.deleteAll || 'Delete All'}
+                    </button>
+                    {isSelectionMode ? (
+                        <>
+                            <button
+                                onClick={executeBulkDelete}
+                                disabled={isBulkDeleting || selectedIds.size === 0}
+                                className="px-3 py-1.5 text-sm font-medium text-white bg-danger border border-danger rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                            >
+                                {t.transactions.deleteSelected || 'Delete Selected'} ({selectedIds.size})
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsSelectionMode(false);
+                                    setSelectedIds(new Set());
+                                }}
+                                className="px-3 py-1.5 text-sm font-medium text-text-secondary border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                                {t.editModal.cancel}
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => setIsSelectionMode(true)}
+                            className="px-3 py-1.5 text-sm font-medium text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-colors"
+                        >
+                            {t.transactions.deleteSelected || 'Delete Selected'}
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {/* Mobile: cards */}
             <div className="hidden flex-col gap-3 my-4 max-[859px]:flex">
+                {isSelectionMode && (
+                    <div className="flex items-center gap-2 px-1 mb-2">
+                        <input
+                            type="checkbox"
+                            checked={sorted.length > 0 && selectedIds.size === sorted.length}
+                            onChange={toggleSelectAll}
+                            className="w-5 h-5 accent-primary"
+                        />
+                        <span className="text-sm text-text-secondary">{t.transactions.selectAll || 'Select All'}</span>
+                    </div>
+                )}
+                
                 {sorted.map((transaction) => {
                     const expanded = expandedIds.has(transaction._id);
+                    const isSelected = selectedIds.has(transaction._id);
+                    
                     return (
                         <div
                             key={transaction._id}
-                            className="bg-surface border border-gray-300 rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                            className={cn(
+                                "bg-surface border rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-colors",
+                                isSelectionMode && isSelected ? "border-primary bg-primary/[0.02]" : "border-gray-300"
+                            )}
+                            onClick={() => {
+                                if (isSelectionMode) toggleSelection(transaction._id);
+                            }}
                         >
-                            <div className="p-4">
-                                <div className="flex justify-between items-start gap-2 mb-1">
-                                    <div className="font-semibold text-base text-text-primary flex-1 min-w-0 break-words">
-                                        {transaction.description}
+                            <div className="p-4 flex gap-3">
+                                {isSelectionMode && (
+                                    <div className="flex items-start pt-1">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelection(transaction._id)}
+                                            className="w-5 h-5 accent-primary"
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
                                     </div>
-                                    <span
-                                        className={cn(
-                                            'font-bold text-base shrink-0',
-                                            transaction.type === 'income' ? 'text-success' : 'text-danger'
-                                        )}
-                                    >
-                                        {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                    </span>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-start gap-2 mb-1">
+                                        <div className="font-semibold text-base text-text-primary flex-1 min-w-0 break-words">
+                                            {transaction.description}
+                                        </div>
+                                        <span
+                                            className={cn(
+                                                'font-bold text-base shrink-0',
+                                                transaction.type === 'income' ? 'text-success' : 'text-danger'
+                                            )}
+                                        >
+                                            {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
+                                        </span>
+                                    </div>
+                                    <div className="text-[0.8rem] text-text-secondary mb-2">
+                                        {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
+                                    </div>
+                                    {!isSelectionMode && (
+                                        <button
+                                            type="button"
+                                            className="bg-none border-none p-0 text-[0.9rem] font-semibold text-primary cursor-pointer mt-1 hover:underline"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleExpanded(transaction._id);
+                                            }}
+                                        >
+                                            {expanded ? t.transactions.seeLess : t.transactions.seeMore}
+                                        </button>
+                                    )}
                                 </div>
-                                <div className="text-[0.8rem] text-text-secondary mb-2">
-                                    {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
-                                </div>
-                                <button
-                                    type="button"
-                                    className="bg-none border-none p-0 text-[0.9rem] font-semibold text-primary cursor-pointer mt-1 hover:underline"
-                                    onClick={() => toggleExpanded(transaction._id)}
-                                >
-                                    {expanded ? t.transactions.seeLess : t.transactions.seeMore}
-                                </button>
                             </div>
-                            {expanded && (
+                            {expanded && !isSelectionMode && (
                                 <div className="p-4 pt-3 border-t border-gray-300">
                                     <div className="[&:not(:first-child)]:mt-3">
                                         <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.category}</div>
@@ -185,6 +314,16 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
                     <table className="w-full border-collapse">
                         <thead>
                             <tr>
+                                {isSelectionMode && (
+                                    <th className={cn(thBaseClasses, 'w-[40px] text-center')}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sorted.length > 0 && selectedIds.size === sorted.length}
+                                            onChange={toggleSelectAll}
+                                            className="w-4 h-4 accent-primary cursor-pointer"
+                                        />
+                                    </th>
+                                )}
                                 <th
                                     className={cn(
                                         thBaseClasses,
@@ -245,66 +384,95 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, handleEd
                             </tr>
                         </thead>
                         <tbody>
-                            {sorted.map(transaction => (
-                                <tr key={transaction._id} className="hover:bg-gray-200">
-                                    <td className={tdBaseClasses}>
-                                        {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
-                                    </td>
-                                    <td className={tdBaseClasses}>{transaction.description}</td>
-                                    <td className={tdBaseClasses}>
-                                        {typeof transaction.category === 'object'
-                                            ? transaction.category.name
-                                            : t.transactions.uncategorized}
-                                    </td>
-                                    <td className={tdBaseClasses}>
-                                        <span
-                                            className={cn(
-                                                'inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold',
-                                                transaction.type === 'income'
-                                                    ? 'bg-success/[0.13] text-success'
-                                                    : 'bg-danger/[0.13] text-danger'
-                                            )}
-                                        >
-                                            {transaction.type}
-                                        </span>
-                                    </td>
-                                    <td className={tdBaseClasses}>
-                                        {transaction.is_fixed && (
-                                            <span className="inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold bg-success/[0.13] text-success">
-                                                {t.transactions.fixed}
-                                            </span>
+                            {sorted.map(transaction => {
+                                const isSelected = selectedIds.has(transaction._id);
+                                return (
+                                    <tr 
+                                        key={transaction._id} 
+                                        className={cn(
+                                            "hover:bg-gray-200 transition-colors",
+                                            isSelectionMode && isSelected && "bg-primary/[0.04]"
                                         )}
-                                    </td>
-                                    <td className={tdBaseClasses}>
-                                        <span
-                                            className={cn(
-                                                'font-bold',
-                                                transaction.type === 'income' ? 'text-success' : 'text-danger'
+                                        onClick={() => {
+                                            if (isSelectionMode) toggleSelection(transaction._id);
+                                        }}
+                                    >
+                                        {isSelectionMode && (
+                                            <td className={cn(tdBaseClasses, "text-center")}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => toggleSelection(transaction._id)}
+                                                    className="w-4 h-4 accent-primary cursor-pointer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            </td>
+                                        )}
+                                        <td className={tdBaseClasses}>
+                                            {formatDate(`${transaction.date}`, locale as 'en' | 'pt' | 'es')}
+                                        </td>
+                                        <td className={tdBaseClasses}>{transaction.description}</td>
+                                        <td className={tdBaseClasses}>
+                                            {typeof transaction.category === 'object'
+                                                ? transaction.category.name
+                                                : t.transactions.uncategorized}
+                                        </td>
+                                        <td className={tdBaseClasses}>
+                                            <span
+                                                className={cn(
+                                                    'inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold',
+                                                    transaction.type === 'income'
+                                                        ? 'bg-success/[0.13] text-success'
+                                                        : 'bg-danger/[0.13] text-danger'
+                                                )}
+                                            >
+                                                {transaction.type}
+                                            </span>
+                                        </td>
+                                        <td className={tdBaseClasses}>
+                                            {transaction.is_fixed && (
+                                                <span className="inline-block px-[0.6rem] py-1 rounded-full text-xs font-semibold bg-success/[0.13] text-success">
+                                                    {t.transactions.fixed}
+                                                </span>
                                             )}
-                                        >
-                                            {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
-                                        </span>
-                                    </td>
-                                    <td className={tdBaseClasses}>
-                                        <div className="flex gap-2">
-                                            <button
-                                                className="py-[0.3rem] px-[0.65rem] bg-primary text-white border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-opacity duration-200 hover:opacity-85"
-                                                onClick={() => handleEdit(transaction)}
-                                                disabled={isUpdating}
+                                        </td>
+                                        <td className={tdBaseClasses}>
+                                            <span
+                                                className={cn(
+                                                    'font-bold',
+                                                    transaction.type === 'income' ? 'text-success' : 'text-danger'
+                                                )}
                                             >
-                                                {t.transactions.edit}
-                                            </button>
-                                            <button
-                                                className="py-[0.3rem] px-[0.65rem] bg-gray-300 text-text-primary border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-all duration-200 hover:bg-danger hover:text-white"
-                                                onClick={() => handleDelete(transaction._id)}
-                                                disabled={isDeleting}
-                                            >
-                                                {t.transactions.delete}
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                                {formatCurrency(transaction.amount, selectedCurrencyCode, locale)}
+                                            </span>
+                                        </td>
+                                        <td className={tdBaseClasses}>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    className="py-[0.3rem] px-[0.65rem] bg-primary text-white border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-opacity duration-200 hover:opacity-85 disabled:opacity-50"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEdit(transaction);
+                                                    }}
+                                                    disabled={isUpdating || isSelectionMode}
+                                                >
+                                                    {t.transactions.edit}
+                                                </button>
+                                                <button
+                                                    className="py-[0.3rem] px-[0.65rem] bg-gray-300 text-text-primary border-none rounded-md cursor-pointer text-[0.8rem] font-medium transition-all duration-200 hover:bg-danger hover:text-white disabled:opacity-50"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(transaction._id);
+                                                    }}
+                                                    disabled={isDeleting || isSelectionMode}
+                                                >
+                                                    {t.transactions.delete}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

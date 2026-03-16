@@ -1,4 +1,5 @@
 'use client';
+import { exportToCSV, exportToPDF, exportToXML } from '@/app/utils/exportData';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { useState } from 'react';
 import { IoAdd } from 'react-icons/io5';
@@ -74,7 +75,9 @@ export default function Home() {
     isUpdating,
     addTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    deleteTransactions,
+    isDeletingMany
   } = useTransactions(
     userData?._id,
     currentPage,
@@ -116,6 +119,15 @@ export default function Home() {
       } catch (err) {
         console.error('Error deleting transaction:', err);
       }
+    }
+  };
+
+  const handleBulkDelete = async (ids: string[]) => {
+    try {
+      await deleteTransactions(ids);
+    } catch (err) {
+      console.error('Error deleting transactions:', err);
+      alert(t.transactions.deleteError || 'Error deleting transactions');
     }
   };
 
@@ -166,6 +178,22 @@ export default function Home() {
     }
   };
 
+  const handleExport = (exportFormat: 'csv' | 'xml' | 'pdf') => {
+    const filename = `transactions_${format(new Date(), 'yyyy-MM-dd')}`;
+    const dataForExport = allTransactions.map((t: any) => ({
+      date: t.date,
+      description: t.description,
+      amount: t.amount,
+      type: t.type,
+      category: t.category,
+      currency: t.currency,
+    }));
+
+    if (exportFormat === 'csv') exportToCSV(dataForExport, filename);
+    if (exportFormat === 'xml') exportToXML(dataForExport, filename);
+    if (exportFormat === 'pdf') exportToPDF(dataForExport, filename);
+  };
+
   const resetFilters = () => {
     setFilters({
       description: '',
@@ -188,6 +216,22 @@ export default function Home() {
       <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
         <h1 className="text-[1.75rem] text-text-primary">{t.transactions.title}</h1>
         <div className="flex gap-2">
+          <div className="flex items-center bg-surface border border-primary rounded-[10px] overflow-hidden mr-2">
+            <button
+              onClick={() => handleExport('csv')}
+              className="px-3 py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors border-r border-primary/20"
+              title="Export as CSV"
+            >
+              CSV
+            </button>
+            <button
+              onClick={() => handleExport('pdf')}
+              className="px-3 py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
+              title="Export as PDF"
+            >
+              PDF
+            </button>
+          </div>
           <button
             className="flex items-center gap-1.5 px-4 py-2 bg-surface text-primary border border-primary rounded-[10px] text-sm font-semibold font-[inherit] cursor-pointer transition-all duration-200 whitespace-nowrap hover:bg-primary hover:text-white"
             onClick={() => setIsScanModalOpen(true)}
@@ -264,8 +308,10 @@ export default function Home() {
         transactions={transactions as TransactionToEdit[]}
         isDeleting={isDeleting}
         isUpdating={isUpdating}
+        isBulkDeleting={isDeletingMany}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
+        handleBulkDelete={handleBulkDelete}
       />
 
       <div className="mb-8">

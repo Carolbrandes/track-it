@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { FiDownload } from 'react-icons/fi';
 import { cn } from '@/app/lib/cn';
+import { exportElementToPDF } from '@/app/utils/exportData';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useCategories } from '../hooks/useCategories';
 import { useUserData } from '../hooks/useUserData';
@@ -31,9 +33,19 @@ export default function FinancialAnalyticsPage() {
 
     return (
         <div className="p-4 w-full min-w-0 overflow-x-hidden flex-1 md:p-8 md:max-w-[1400px] md:mx-auto">
-            <h1 className="text-[1.75rem] font-bold text-text-primary mb-5">{t.analytics.title}</h1>
+            <div className="flex items-center justify-between mb-5">
+                <h1 className="text-[1.75rem] font-bold text-text-primary">{t.analytics.title}</h1>
+                <button
+                    onClick={() => exportElementToPDF('analytics-report', `analytics_report_${selectedMonth}_${selectedYear}`)}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                    <FiDownload size={18} />
+                    Export Report (PDF)
+                </button>
+            </div>
 
-            <div className="flex gap-1 border-b-2 border-gray-300 mb-8">
+            <div id="analytics-report">
+                <div className="flex gap-1 border-b-2 border-gray-300 mb-8">
                 {(['summary', 'analysis', 'comparison'] as const).map((tab) => (
                     <button
                         key={tab}
@@ -132,6 +144,7 @@ export default function FinancialAnalyticsPage() {
                     years={years}
                 />
             )}
+            </div>
         </div>
     );
 }

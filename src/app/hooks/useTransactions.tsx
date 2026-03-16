@@ -118,13 +118,24 @@ const updateTransaction = async ({ id, ...transaction }: { id: string } & Partia
     return response.json();
 };
 
-const deleteTransaction = async (id: string): Promise<string> => {
+    const deleteTransaction = async (id: string): Promise<string> => {
     const response = await fetch(`/api/transactions/${id}`, {
         method: 'DELETE',
         credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to delete transaction');
     return id;
+};
+
+const deleteTransactions = async (ids: string[]): Promise<string[]> => {
+    const response = await fetch('/api/transactions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to delete transactions');
+    return ids;
 };
 
 export const useTransactions = (
@@ -195,6 +206,11 @@ export const useTransactions = (
         onSuccess: invalidateOnSuccess,
     });
 
+    const deleteManyMutation = useMutation({
+        mutationFn: deleteTransactions,
+        onSuccess: invalidateOnSuccess,
+    });
+
     return {
         transactions: transactionsData?.data || [],
         allTransactions: allTransactionsData?.data || [],
@@ -209,8 +225,11 @@ export const useTransactions = (
             updateMutation.mutateAsync({ id, ...transaction }),
         deleteTransaction: (id: string) =>
             deleteMutation.mutateAsync(id),
+        deleteTransactions: (ids: string[]) =>
+            deleteManyMutation.mutateAsync(ids),
         isAdding: addMutation.isPending,
         isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
+        isDeletingMany: deleteManyMutation.isPending,
     };
 };
