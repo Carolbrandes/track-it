@@ -1,5 +1,6 @@
-'use-cliente'
+'use client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { authFetch } from '../lib/authFetch';
 
 export interface Category {
     _id: string;
@@ -8,7 +9,7 @@ export interface Category {
 }
 
 const fetchCategories = async (userId: string): Promise<Category[]> => {
-    const response = await fetch(`/api/categories?userId=${userId}`, {
+    const response = await authFetch(`/api/categories?userId=${userId}`, {
         credentials: 'include'
     });
 
@@ -19,7 +20,7 @@ const fetchCategories = async (userId: string): Promise<Category[]> => {
 };
 
 const addCategory = async ({ name, userId }: { name: string; userId: string }): Promise<Category> => {
-    const response = await fetch('/api/categories', {
+    const response = await authFetch('/api/categories', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ const addCategory = async ({ name, userId }: { name: string; userId: string }): 
 };
 
 const updateCategory = async (id: string, name: string): Promise<Category> => {
-    const response = await fetch(`/api/categories/${id}`, {
+    const response = await authFetch(`/api/categories/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ const updateCategory = async (id: string, name: string): Promise<Category> => {
 };
 
 const deleteCategory = async ({ id }: { id: string }): Promise<string> => {
-    const response = await fetch(`/api/categories/${id}`, {
+    const response = await authFetch(`/api/categories/${id}`, {
         method: 'DELETE',
     });
 

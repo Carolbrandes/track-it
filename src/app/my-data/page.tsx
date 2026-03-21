@@ -7,6 +7,7 @@ import { useDateFormat, type DateFormatPreference } from '../contexts/DateFormat
 import { useTranslation, localeLabels } from '../i18n/LanguageContext';
 import { useUserData } from '../hooks/useUserData';
 import { useCurrency } from '../hooks/useCurrency';
+import { authFetch } from '@/app/lib/authFetch';
 import { cn } from '@/app/lib/cn';
 
 export default function MyDataPage() {
@@ -30,7 +31,7 @@ export default function MyDataPage() {
         setIsDeleting(true);
         setDeleteError(null);
         try {
-            const res = await fetch('/api/user/delete-account', { method: 'DELETE', credentials: 'include' });
+            const res = await authFetch('/api/user/delete-account', { method: 'DELETE', credentials: 'include' });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 setDeleteError(data.message ?? t.myData.deleteError);

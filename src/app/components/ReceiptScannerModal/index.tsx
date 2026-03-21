@@ -6,6 +6,7 @@ import { FiCamera, FiCheck } from 'react-icons/fi';
 import type { ParsedReceipt, ReceiptItem } from '@/app/actions/parseReceipt';
 import { Category } from '@/app/hooks/useCategories';
 import { useTranslation } from '@/app/i18n/LanguageContext';
+import { authFetch } from '@/app/lib/authFetch';
 import { cn } from '@/app/lib/cn';
 import CategoryAutocomplete from '../CategoryAutocomplete';
 
@@ -119,15 +120,13 @@ const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
         formData.append('existingCategories', JSON.stringify(categoryNames));
 
         try {
-            const res = await fetch('/api/receipt/parse', {
+            const res = await authFetch('/api/receipt/parse', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
             });
 
             if (res.status === 401) {
-                setError(scan.sessionExpired);
-                setStep('upload');
                 return;
             }
             if (res.status === 413) {

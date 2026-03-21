@@ -1,6 +1,7 @@
 'use client'
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { authFetch } from '../lib/authFetch';
 
 export interface Transaction {
     _id: string;
@@ -51,7 +52,7 @@ const fetchTransactions = async (
         ...(filters.isFixed === 'true' && { isFixed: 'true' }),
     });
 
-    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
+    const response = await authFetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
         credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to fetch transactions');
@@ -67,7 +68,7 @@ const fetchAllTransactions = async (
         Object.entries(filters).map(([key, value]) => [key, String(value)])
     );
 
-    const totalResponse = await fetch(`/api/transactions?userId=${userId}&${new URLSearchParams(stringFilters).toString()}`, {
+    const totalResponse = await authFetch(`/api/transactions?userId=${userId}&${new URLSearchParams(stringFilters).toString()}`, {
         credentials: 'include',
     });
 
@@ -89,7 +90,7 @@ const fetchAllTransactions = async (
         ...(filters.isFixed === 'true' && { isFixed: 'true' }),
     });
 
-    const response = await fetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
+    const response = await authFetch(`/api/transactions?userId=${userId}&${params.toString()}`, {
         credentials: 'include',
     });
     if (!response.ok) throw new Error('Failed to fetch transactions');
@@ -97,7 +98,7 @@ const fetchAllTransactions = async (
 };
 
 const addTransaction = async (transaction: Omit<Transaction, '_id'>): Promise<Transaction> => {
-    const response = await fetch('/api/transactions', {
+    const response = await authFetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -108,7 +109,7 @@ const addTransaction = async (transaction: Omit<Transaction, '_id'>): Promise<Tr
 };
 
 const updateTransaction = async ({ id, ...transaction }: { id: string } & Partial<Transaction>): Promise<Transaction> => {
-    const response = await fetch(`/api/transactions/${id}`, {
+    const response = await authFetch(`/api/transactions/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -119,7 +120,7 @@ const updateTransaction = async ({ id, ...transaction }: { id: string } & Partia
 };
 
     const deleteTransaction = async (id: string): Promise<string> => {
-    const response = await fetch(`/api/transactions/${id}`, {
+    const response = await authFetch(`/api/transactions/${id}`, {
         method: 'DELETE',
         credentials: 'include',
     });
@@ -128,7 +129,7 @@ const updateTransaction = async ({ id, ...transaction }: { id: string } & Partia
 };
 
 const deleteTransactions = async (ids: string[]): Promise<string[]> => {
-    const response = await fetch('/api/transactions', {
+    const response = await authFetch('/api/transactions', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -178,7 +179,7 @@ export const useTransactions = (
     // that were created before the recurring feature existed. Safe no-op when nothing to repair.
     useEffect(() => {
         if (!userId) return;
-        fetch('/api/transactions/backfill', { method: 'POST', credentials: 'include' })
+        authFetch('/api/transactions/backfill', { method: 'POST', credentials: 'include' })
             .then(async (res) => {
                 if (!res.ok) return;
                 const { backfilled } = await res.json() as { backfilled: number };

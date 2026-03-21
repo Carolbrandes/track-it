@@ -1,9 +1,10 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query';
+import { authFetch } from '../lib/authFetch';
 
 async function fetchUserData() {
-    const response = await fetch('/api/auth/me', {
+    const response = await authFetch('/api/auth/me', {
         credentials: 'include',
     });
 

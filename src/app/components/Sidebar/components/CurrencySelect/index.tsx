@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { TfiMoney } from "react-icons/tfi";
+import { authFetch } from '@/app/lib/authFetch';
 import { useCurrency } from '../../../../hooks/useCurrency';
 import { useUserData } from '../../../../hooks/useUserData';
 import { useTranslation } from '../../../../i18n/LanguageContext';
@@ -24,7 +25,7 @@ export const CurrencySelect = () => {
         setIsUpdating(true);
 
         try {
-            const response = await fetch('/api/user/update-currency', {
+            const response = await authFetch('/api/user/update-currency', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
