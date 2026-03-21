@@ -1,13 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { FiChevronDown, FiChevronUp, FiSettings } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiSettings, FiTrash2 } from 'react-icons/fi';
+import { TfiFilter } from 'react-icons/tfi';
 import { cn } from '@/app/lib/cn';
 import { useDateFormat } from '../../contexts/DateFormatContext';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Transaction } from '../../hooks/useTransactions';
 import { formatCurrency } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { SettingsModal } from '../SettingsModal';
 
 interface TransactionListProps {
     transactions: Transaction[];
@@ -17,6 +19,10 @@ interface TransactionListProps {
     isUpdating: boolean;
     isDeleting: boolean;
     isBulkDeleting: boolean;
+    filterTags?: React.ReactNode;
+    pageSize?: number;
+    onPageSizeChange?: (size: number) => void;
+    onOpenFilter?: () => void;
 }
 
 type SortKey = 'date' | 'description' | 'category' | 'amount';
@@ -42,7 +48,7 @@ function SortIcon({ columnKey, sortKey, sortDir }: Readonly<{ columnKey: SortKey
         : <FiChevronDown size={14} />;
 }
 
-export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDeleting, handleEdit, handleDelete, handleBulkDelete }: TransactionListProps) => {
+export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDeleting, handleEdit, handleDelete, handleBulkDelete, filterTags, pageSize = 10, onPageSizeChange, onOpenFilter }: TransactionListProps) => {
     const { selectedCurrencyCode } = useCurrency();
     const { t, locale } = useTranslation();
     const { formatDate } = useDateFormat();
@@ -52,6 +58,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDe
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const toggleExpanded = (id: string) => {
         setExpandedIds((prev) => {
@@ -141,61 +148,100 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDe
 
     return (
         <>
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-text-primary m-0">
-                    {t.transactions.listTitle || 'Transactions'}
-                </h2>
-                <div className="flex gap-2">
-                    <button
-                        onClick={executeDeleteAll}
-                        disabled={isBulkDeleting || sorted.length === 0}
-                        className="px-3 py-1.5 text-sm font-medium text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-colors disabled:opacity-50"
-                    >
-                        {t.transactions.deleteAll || 'Delete All'}
-                    </button>
-                    {isSelectionMode ? (
-                        <>
+            <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-lg font-semibold text-text-primary m-0">
+                        {t.transactions.listTitle || 'Transactions'}
+                    </h2>
+                    <div className="flex items-center gap-2">
+                        {onOpenFilter && (
                             <button
-                                onClick={executeBulkDelete}
-                                disabled={isBulkDeleting || selectedIds.size === 0}
-                                className="px-3 py-1.5 text-sm font-medium text-white bg-danger border border-danger rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                                type="button"
+                                className="flex items-center justify-center w-8 h-8 rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors"
+                                onClick={onOpenFilter}
+                                aria-label={t.filter.modalTitle}
                             >
-                                {t.transactions.deleteSelected || 'Delete Selected'} ({selectedIds.size})
+                                <TfiFilter size={18} />
                             </button>
-                            <button
-                                onClick={() => {
-                                    setIsSelectionMode(false);
-                                    setSelectedIds(new Set());
-                                }}
-                                className="px-3 py-1.5 text-sm font-medium text-text-secondary border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-                            >
-                                {t.editModal.cancel}
-                            </button>
-                        </>
-                    ) : (
+                        )}
                         <button
-                            onClick={() => setIsSelectionMode(true)}
-                            className="px-3 py-1.5 text-sm font-medium text-danger border border-danger rounded-lg hover:bg-danger hover:text-white transition-colors"
+                            type="button"
+                            className="flex items-center justify-center w-8 h-8 rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors"
+                            onClick={() => setIsSettingsOpen(true)}
+                            aria-label={t.transactions.settingsModalTitle}
                         >
-                            {t.transactions.deleteSelected || 'Delete Selected'}
+                            <FiSettings size={18} />
                         </button>
-                    )}
+                    </div>
                 </div>
+                {onPageSizeChange && (
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs text-text-secondary font-medium">{t.myData.itemsPerPage}:</span>
+                        <select
+                            className="px-2.5 py-1.5 rounded-md text-xs font-[inherit] cursor-pointer border border-border bg-surface text-text-primary outline-none hover:border-primary focus:border-primary"
+                            value={pageSize}
+                            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={15}>15</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </div>
+                )}
+                {filterTags}
+                <SettingsModal
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                    onDeleteAll={executeDeleteAll}
+                    onDeleteSelected={executeBulkDelete}
+                    onEnterSelectionMode={() => setIsSelectionMode(true)}
+                    onCancelSelection={() => {
+                        setIsSelectionMode(false);
+                        setSelectedIds(new Set());
+                    }}
+                    isSelectionMode={isSelectionMode}
+                    selectedCount={selectedIds.size}
+                    totalCount={sorted.length}
+                    isBulkDeleting={isBulkDeleting}
+                />
             </div>
 
-            {/* Mobile: cards */}
-            <div className="hidden flex-col gap-3 my-4 max-[859px]:flex">
-                {isSelectionMode && (
-                    <div className="flex items-center gap-2 px-1 mb-2">
+            {/* Selection toolbar - shown when in selection mode */}
+            {isSelectionMode && (
+                <div className="flex items-center gap-3 mb-3 px-1">
+                    <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
                             checked={sorted.length > 0 && selectedIds.size === sorted.length}
                             onChange={toggleSelectAll}
-                            className="w-5 h-5 accent-primary"
+                            className="w-5 h-5 accent-primary cursor-pointer"
                         />
                         <span className="text-sm text-text-secondary">{t.transactions.selectAll || 'Select All'}</span>
                     </div>
-                )}
+                    <button
+                        onClick={executeBulkDelete}
+                        disabled={isBulkDeleting || selectedIds.size === 0}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[0.75rem] font-medium text-white bg-danger border border-danger rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                        <FiTrash2 size={12} />
+                        {t.transactions.deleteSelected || 'Delete Selected'} ({selectedIds.size})
+                    </button>
+                    <button
+                        onClick={() => {
+                            setIsSelectionMode(false);
+                            setSelectedIds(new Set());
+                        }}
+                        className="text-sm font-medium text-text-secondary hover:text-text-primary"
+                    >
+                        {t.editModal.cancel}
+                    </button>
+                </div>
+            )}
+
+            {/* Mobile: cards */}
+            <div className="hidden flex-col gap-3 my-4 max-[859px]:flex">
                 
                 {sorted.map((transaction) => {
                     const expanded = expandedIds.has(transaction._id);
