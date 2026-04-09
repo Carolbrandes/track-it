@@ -59,9 +59,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
 
     if (!isOpen) return null;
 
-    const categoryValue = typeof updatedTransaction.category === 'object' && updatedTransaction.category !== null
+    const categoryValue = (typeof updatedTransaction.category === 'object' && updatedTransaction.category !== null
         ? updatedTransaction.category._id
-        : updatedTransaction.category || '';
+        : updatedTransaction.category || '') as string;
 
     return (
         <div className="fixed inset-0 w-screen h-screen bg-black/50 flex justify-center items-center z-[200]">
