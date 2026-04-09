@@ -59,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, transaction, cat
 
     if (!isOpen) return null;
 
-    const categoryValue = typeof updatedTransaction.category === 'object'
+    const categoryValue = typeof updatedTransaction.category === 'object' && updatedTransaction.category !== null
         ? updatedTransaction.category._id
         : updatedTransaction.category || '';
 

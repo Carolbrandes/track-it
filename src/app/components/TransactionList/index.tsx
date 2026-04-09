@@ -306,7 +306,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDe
                                     <div className="[&:not(:first-child)]:mt-3">
                                         <div className="text-xs text-text-secondary mb-[0.15rem]">{t.transactions.category}</div>
                                         <div className="text-[0.95rem] font-medium text-text-primary">
-                                            {typeof transaction.category === 'object'
+                                            {typeof transaction.category === 'object' && transaction.category !== null
                                                 ? transaction.category.name
                                                 : t.transactions.uncategorized}
                                         </div>
@@ -459,7 +459,7 @@ export const TransactionList = ({ transactions, isDeleting, isUpdating, isBulkDe
                                         </td>
                                         <td className={tdBaseClasses}>{transaction.description}</td>
                                         <td className={tdBaseClasses}>
-                                            {typeof transaction.category === 'object'
+                                            {typeof transaction.category === 'object' && transaction.category !== null
                                                 ? transaction.category.name
                                                 : t.transactions.uncategorized}
                                         </td>

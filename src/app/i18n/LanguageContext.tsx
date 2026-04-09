@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState, useEffect } from 'react';
 import en, { Translations } from './locales/en';
 import es from './locales/es';
 import pt from './locales/pt';
@@ -28,12 +28,14 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof globalThis.window !== 'undefined') {
-      return (localStorage.getItem('locale') as Locale) || 'en';
+  const [locale, setLocaleState] = useState<Locale>('en');
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('locale') as Locale;
+    if (savedLocale) {
+      setLocaleState(savedLocale);
     }
-    return 'en';
-  });
+  }, []);
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
